@@ -52,6 +52,7 @@ def test_marshaller():
     assert x == {}
     assert y == {}
 
+
 def test_unmarshaller():
     singleton = TraceContextSource.singleton_noop_trace_context
     m = TraceContextUnmarshaler()

@@ -3,10 +3,10 @@
 History
 -------
 
-0.1.1 (unreleased)
+0.1.1 (2015-12-27)
 ------------------
 
-- Nothing changed yet.
+- Add log methods
 
 
 0.1.0 (2015-12-27)

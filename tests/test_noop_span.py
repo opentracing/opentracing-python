@@ -29,6 +29,8 @@ def test_span():
     assert span.trace_context == ctx
     child = span.start_child(operation_name='test')
     assert span == child
+    child.info('cache hit', 'arg1', 'arg2')
+    child.error('cache miss', 'arg1', 'arg2')
 
     with mock.patch.object(span, 'finish') as finish:
         with mock.patch.object(span, 'set_tag') as set_tag:

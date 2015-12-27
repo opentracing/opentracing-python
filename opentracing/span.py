@@ -99,3 +99,23 @@ class Span(object):
         :rtype: Span
         """
         return self
+
+    def info(self, message, *args):
+        """Logs an event/message against the span, with the current timestamp.
+
+        :param message: a format string that can refer to fields
+            in the args payload.
+        :param args: arbitrary payload
+        :return: returns the span itself, for chaining the calls
+        """
+        return self
+
+    def error(self, message, *args):
+        """Same as info(), but for errors.
+
+        :param message: a format string that can refer to fields
+            in the args payload.
+        :param args: arbitrary payload
+        :return: returns the span itself, for chaining the calls
+        """
+        return self
