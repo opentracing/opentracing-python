@@ -24,11 +24,6 @@ from opentracing import TraceContextMarshaler, TraceContextUnmarshaler
 
 
 def test_context():
-    singleton = TraceContextSource.singleton_noop_trace_context
-    child, meta = singleton.new_child()
-    assert child == singleton
-    assert meta == dict()
-
     ctx = TraceContext()
     assert ctx.get_metadata('x') is None
     ctx.set_metadata('X_y', 'value').\
@@ -40,6 +35,10 @@ def test_context_source():
     singleton = TraceContextSource.singleton_noop_trace_context
     source = TraceContextSource()
     assert source.new_root_trace_context() == singleton
+    child, meta = source.new_child_trace_context(
+        parent_trace_context=singleton)
+    assert child == singleton
+    assert meta is None
 
 
 def test_marshaller():

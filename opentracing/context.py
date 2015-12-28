@@ -35,19 +35,6 @@ class TraceContext(object):
     requests on the wire, so it must be used with caution.
     """
 
-    def new_child(self):
-        """Creates a child context of the current context.
-
-        Since this is a no-op implementation, it returns itself as a child.
-        Actual implementation must create a new context that is a logical
-        child of the current context.
-
-        :rtype : (TraceContext, dict)
-        :return: a pair of (child_context, child_tags), where child_tags is
-            an optional dictionary of tags to be added to the child span.
-        """
-        return self, dict()
-
     def set_metadata(self, key, value):
         """Adds metadata to the trace.
 
@@ -184,3 +171,18 @@ class TraceContextSource(object):
             a new trace context without parent.
         """
         return TraceContextSource.singleton_noop_trace_context
+
+    def new_child_trace_context(self, parent_trace_context):
+        """Creates a child context from given parent context.
+
+        Since this is a no-op implementation, it returns itself as a child.
+        Actual implementation must create a new context that is a logical
+        child of the current context.
+
+        :param parent_trace_context: parent context
+
+        :rtype : (TraceContext, dict or None)
+        :return: a pair of (child_context, child_tags), where child_tags is
+            an optional dictionary of tags to be added to the child span.
+        """
+        return TraceContextSource.singleton_noop_trace_context, None
