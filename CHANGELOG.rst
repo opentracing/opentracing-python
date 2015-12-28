@@ -3,10 +3,10 @@
 History
 -------
 
-0.1.5 (unreleased)
+0.2.0 (2015-12-28)
 ------------------
 
-- Nothing changed yet.
+- Export global `tracer` variable.
 
 
 0.1.4 (2015-12-28)

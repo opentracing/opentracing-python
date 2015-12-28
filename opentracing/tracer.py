@@ -35,7 +35,7 @@ class Tracer(TraceContextMarshaler, TraceContextUnmarshaler, object):
 
     singleton_noop_span = Span(TraceContextSource.singleton_noop_trace_context)
 
-    def start_trace(self, operation_name):
+    def start_trace(self, operation_name, debug=False):
         """Starts a new trace and creates a new root span.
 
         This method should be used by services that are instrumented for
@@ -45,6 +45,8 @@ class Tracer(TraceContextMarshaler, TraceContextUnmarshaler, object):
             that received the request represented by this trace and span.
             The domain of names must be limited, e.g. do not use UUIDs or
             entity IDs or timestamps as part of the name.
+        :param debug: if True, we request this trace to be recorded by the
+            tracing system regardless of the sampling decisions.
 
         :return: a new root Span
         """
