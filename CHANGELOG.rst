@@ -3,10 +3,10 @@
 History
 -------
 
-0.1.2 (unreleased)
+0.1.2 (2015-12-27)
 ------------------
 
-- Nothing changed yet.
+- Move creation of child context to TraceContextSource
 
 
 0.1.1 (2015-12-27)
