@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
 
 setup(
@@ -7,7 +7,7 @@ setup(
     author='Yuri Shkuro',
     author_email='ys@uber.com',
     description='Opentracing API',
-    packages=find_packages(exclude=['clay_tornado.test']),
+    packages=['opentracing'],
     include_package_data=True,
     platforms='any',
     install_requires=[
