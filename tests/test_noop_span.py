@@ -51,7 +51,7 @@ def test_span():
             assert error.call_count == 0
 
     span.add_tag('x', 'y').add_tag('z', 1)
-    span.add_tag(tags.RPC_TARGET_SERVICE, 'test-service')
+    span.add_tag(tags.RPC_SERVICE, 'test-service')
     span.add_tag(tags.RPC_HOST_IPV4, 127 << 24 + 1)
     span.add_tag(tags.RPC_HOST_IPV6, '::')
     span.add_tag(tags.RPC_HOSTNAME, 'uber.com')
