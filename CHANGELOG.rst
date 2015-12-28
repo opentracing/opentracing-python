@@ -3,10 +3,10 @@
 History
 -------
 
-0.1.4 (unreleased)
+0.1.4 (2015-12-28)
 ------------------
 
-- Nothing changed yet.
+- Rename RPC_SERVICE tag to make it symmetric
 
 
 0.1.3 (2015-12-27)

@@ -22,8 +22,11 @@ from __future__ import absolute_import
 # Here we define standard names for tags that can be handled specially by
 # the tracing systems.
 
-# records target service name for an RPC call
-RPC_TARGET_SERVICE = 'rpc.target'
+# RPC tags are symmetric, they can be used by the server to identify the
+# caller, or by the client to identify the server it calls.
+
+# service name for an RPC call.
+RPC_SERVICE = 'rpc.service'
 
 # records the host name of the target service
 RPC_HOSTNAME = 'rpc.hostname'
