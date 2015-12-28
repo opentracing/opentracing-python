@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='opentracing',
-    version='0.1.2',
+    version='0.1.3.dev0',
     author='Yuri Shkuro',
     author_email='ys@uber.com',
     description='Opentracing API',
