@@ -6,7 +6,7 @@ History
 0.1.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Allow repeated keys for span tags; add standard tag names for RPC
 
 
 0.1.2 (2015-12-27)

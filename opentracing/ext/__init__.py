@@ -17,39 +17,3 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
-
-from __future__ import absolute_import
-
-
-class RawSpan(object):
-    """
-    Represents all accumulated state associated with a finished Span.
-    """
-    def __init__(self, trace_context, operation_name):
-        self.trace_context = trace_context
-        self.operation_name = operation_name
-        self.start_time = None
-        self.duration = None
-        self.tags = None  # array of (key,vale) pairs when initialized
-        self.logs = None  # array of RawLog's when initialized
-
-    def add_tag(self, key, value):
-        if self.tags is None:
-            self.tags = []
-        self.tags.append((key, value))
-
-    def add_log(self, log):
-        if self.logs is None:
-            self.logs = []
-        self.logs.append(log)
-
-
-class RawLog(object):
-    """
-    Encapsulates a log attached to a Span.
-    """
-    def __init__(self, timestamp, is_error, message, *args):
-        self.timestamp = timestamp
-        self.is_error = is_error
-        self.message = message
-        self.payload = args

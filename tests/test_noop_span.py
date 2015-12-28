@@ -21,6 +21,7 @@
 from __future__ import absolute_import
 import mock
 from opentracing import Span, TraceContextSource
+from opentracing.ext import tags
 
 
 def test_span():
@@ -33,21 +34,26 @@ def test_span():
     child.error('cache miss', 'arg1', 'arg2')
 
     with mock.patch.object(span, 'finish') as finish:
-        with mock.patch.object(span, 'set_tag') as set_tag:
+        with mock.patch.object(span, 'error') as error:
             try:
                 with span:
                     raise ValueError()
             except ValueError:
                 pass
             assert finish.call_count == 1
-            assert set_tag.call_count == 1
+            assert error.call_count == 1
 
     with mock.patch.object(span, 'finish') as finish:
-        with mock.patch.object(span, 'set_tag') as set_tag:
+        with mock.patch.object(span, 'error') as error:
             with span:
                 pass
             assert finish.call_count == 1
-            assert set_tag.call_count == 0
+            assert error.call_count == 0
 
-    span.set_tag('x', 'y').set_tag('z', 1)
+    span.add_tag('x', 'y').add_tag('z', 1)
+    span.add_tag(tags.RPC_TARGET_SERVICE, 'test-service')
+    span.add_tag(tags.RPC_HOST_IPV4, 127 << 24 + 1)
+    span.add_tag(tags.RPC_HOST_IPV6, '::')
+    span.add_tag(tags.RPC_HOSTNAME, 'uber.com')
+    span.add_tag(tags.RPC_PORT, 123)
     span.finish()

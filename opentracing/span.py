@@ -58,7 +58,9 @@ class Span(object):
         as a tag to the span.
         """
         if exc_type:
-            self.set_tag(str(exc_type), str(exc_val))
+            self.error('python.exception', {'type': exc_type,
+                                            'val': exc_val,
+                                            'tb': exc_tb})
         self.finish()
 
     def start_child(self, operation_name):
@@ -85,7 +87,7 @@ class Span(object):
         """
         pass
 
-    def set_tag(self, key, value):
+    def add_tag(self, key, value):
         """Attaches a key/value pair so the span.
 
         The set of supported value types is implementation specific. It is the

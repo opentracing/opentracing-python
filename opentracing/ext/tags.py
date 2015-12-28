@@ -17,39 +17,22 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
-
 from __future__ import absolute_import
 
+# Here we define standard names for tags that can be handled specially by
+# the tracing systems.
 
-class RawSpan(object):
-    """
-    Represents all accumulated state associated with a finished Span.
-    """
-    def __init__(self, trace_context, operation_name):
-        self.trace_context = trace_context
-        self.operation_name = operation_name
-        self.start_time = None
-        self.duration = None
-        self.tags = None  # array of (key,vale) pairs when initialized
-        self.logs = None  # array of RawLog's when initialized
+# records target service name for an RPC call
+RPC_TARGET_SERVICE = 'rpc.target'
 
-    def add_tag(self, key, value):
-        if self.tags is None:
-            self.tags = []
-        self.tags.append((key, value))
+# records the host name of the target service
+RPC_HOSTNAME = 'rpc.hostname'
 
-    def add_log(self, log):
-        if self.logs is None:
-            self.logs = []
-        self.logs.append(log)
+# records IP v4 host address of RPC target service
+RPC_HOST_IPV4 = 'rpc.ipv4'
 
+# records IP v6 host address of RPC target service
+RPC_HOST_IPV6 = 'rpc.ipv6'
 
-class RawLog(object):
-    """
-    Encapsulates a log attached to a Span.
-    """
-    def __init__(self, timestamp, is_error, message, *args):
-        self.timestamp = timestamp
-        self.is_error = is_error
-        self.message = message
-        self.payload = args
+# records port number of RPC target service
+RPC_PORT = 'rpc.port'
