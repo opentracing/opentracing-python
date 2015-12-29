@@ -3,10 +3,10 @@
 History
 -------
 
-0.2.1 (unreleased)
+0.3.0 (2015-12-29)
 ------------------
 
-- Nothing changed yet.
+- Rename trace tags to Trace Attributes. Rename RPC tags to PEER. Add README.
 
 
 0.2.0 (2015-12-28)

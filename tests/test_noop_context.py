@@ -25,20 +25,20 @@ from opentracing import TraceContextMarshaler, TraceContextUnmarshaler
 
 def test_context():
     ctx = TraceContext()
-    assert ctx.get_metadata('x') is None
-    ctx.set_metadata('X_y', 'value').\
-        set_metadata('ZZ', 'value2')
-    assert ctx.get_metadata('X_y') is None
+    assert ctx.get_trace_attribute('x') is None
+    ctx.set_trace_attribute('X_y', 'value').\
+        set_trace_attribute('ZZ', 'value2')
+    assert ctx.get_trace_attribute('X_y') is None
 
 
 def test_context_source():
     singleton = TraceContextSource.singleton_noop_trace_context
     source = TraceContextSource()
     assert source.new_root_trace_context() == singleton
-    child, meta = source.new_child_trace_context(
+    child, attr = source.new_child_trace_context(
         parent_trace_context=singleton)
     assert child == singleton
-    assert meta is None
+    assert attr is None
 
 
 def test_marshaller():
@@ -46,18 +46,18 @@ def test_marshaller():
     m = TraceContextMarshaler()
     x, y = m.marshal_trace_context_binary(trace_context=singleton)
     assert x == bytearray()
-    assert y == bytearray()
+    assert y is None
     x, y = m.marshal_trace_context_str_dict(trace_context=singleton)
     assert x == {}
-    assert y == {}
+    assert y is None
 
 
 def test_unmarshaller():
     singleton = TraceContextSource.singleton_noop_trace_context
     m = TraceContextUnmarshaler()
     ctx = m.unmarshal_trace_context_binary(trace_context_id=None,
-                                           metadata=None)
+                                           trace_attributes=None)
     assert singleton == ctx
     ctx = m.unmarshal_trace_context_str_dict(trace_context_id=None,
-                                             metadata=None)
+                                             trace_attributes=None)
     assert singleton == ctx

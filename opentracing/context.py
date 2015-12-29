@@ -22,39 +22,38 @@ from __future__ import absolute_import
 
 
 class TraceContext(object):
-    """Represents the identity of a given Span and metadata of the trace.
+    """Represents the identity of a given Span and Trace Attributes.
 
     The span identity is embedded in this context in implementation-specific
     format. The contents are serialized on the wire during inter-process calls.
 
-    Metadata can be added to the context and will be available to all
-    future spans in the call tree rooted at the current span, but will not
-    propagate up the call tree.
+    Trace Attributes can be added to the context and will be available to all
+    future children of this span, but will not propagate up the call tree.
 
-    The more metadata is added to the context, the heavier it makes the
+    The more attributes are added to the context, the heavier it makes the
     requests on the wire, so it must be used with caution.
     """
 
-    def set_metadata(self, key, value):
-        """Adds metadata to the trace.
+    def set_trace_attribute(self, key, value):
+        """Stores Trace Attribute in the context as a key/value pair.
 
         Enables powerful distributed context propagation functionality where
-        arbitrary set of metadata can be carried along the full path of
+        arbitrary application data can be carried along the full path of
         request execution throughout the system.
 
-        Note 1: metadata is only propagated to the future children of the
+        Note 1: attributes are only propagated to the future children of the
         current trace context.
 
-        Note 2: metadata is sent in-band with every subsequent local and
+        Note 2: attributes are sent in-band with every subsequent local and
         remote calls, so this feature must be used with care.
 
-        Note 3: keys are case-insensitive, to allow propagation of metadata
-        via HTTP headers. Keys must match rexep `(?i:[a-z0-9][-a-z0-9]*)`
+        Note 3: keys are case-insensitive, to allow propagation  via HTTP
+        headers. Keys must match rexep `(?i:[a-z0-9][-a-z0-9]*)`
 
-        :param key: key of the metadata
+        :param key: trace attribute key
         :type key: str
 
-        :param value: value of the metadata
+        :param value: trace attribute value
         :type vaue: str
 
         :rtype : TraceContext
@@ -62,23 +61,18 @@ class TraceContext(object):
         """
         return self
 
-    def get_metadata(self, key):
-        """Retrieves metadata value for a given key.
+    def get_trace_attribute(self, key):
+        """Retrieves value of the Trace Attribute with the given key.
 
-        Key is always converted to upper case.
+        Key is case-insensitive.
 
-        :param key: key of the metadata
+        :param key: key of the Trace Attribute
         :type key: str
 
         :rtype : str
-        :return: value of the metadata with given key, or None.
+        :return: value of the Trace Attribute with given key, or None.
         """
         return None
-
-    # def get_all_metadata(self):
-    #     """Returns metadata as a cloned dictionary."""
-    #     # TODO revisit if this needs to be in public API
-    #     return dict()
 
 
 class TraceContextMarshaler(object):
@@ -86,7 +80,7 @@ class TraceContextMarshaler(object):
 
     The marshaler is expected to serialize trace contexts into a pair of
     values representing separately the trace context / span identity,
-    and the metadata tags. This is done specifically for binary protocols
+    and the trace attributes. This is done specifically for binary protocols
     that may represent tracing identity in a dedicated fixed-length slot
     in the binary message format, so that it can be inspected efficiently
     by the middleware / routing layers without parsing the whole message.
@@ -94,59 +88,59 @@ class TraceContextMarshaler(object):
 
     def marshal_trace_context_binary(self, trace_context):
         """Converts trace context to a pair of bytearray's representing
-        separately span identity and metadata.
+        separately span identity and trace attributes.
 
         :param trace_context: trace context to marshal
         :type trace_context: TraceContext
 
+        :rtype (bytearray, bytearray or None)
         :return: a pair of bytearray's, first representing the span identity,
-            the second representing metadata key/value pairs.
+            the second representing Trace Attributes (can be None).
         """
-        return bytearray(), bytearray()
+        return bytearray(), None
 
     def marshal_trace_context_str_dict(self, trace_context):
         """Converts trace context to a pair of dict's representing
-        separately span identity and metadata.
+        separately span identity and trace attributes.
 
         :param trace_context: trace context to marshal
         :type trace_context: TraceContext
 
-        :return: a pair of str dicts, first representing the span identity,
-            the second representing metadata key/value pairs.
+        :rtype (dict, dict or None)
+        :return: a pair of string->string dictionaries, first representing the
+            span identity, the second representing attributes (can be None).
         """
-        return dict(), dict()
+        return dict(), None
 
 
 class TraceContextUnmarshaler(object):
     """Allows unmarshaling a trace context from binary or string formats."""
 
-    def unmarshal_trace_context_binary(self, trace_context_id, metadata):
+    def unmarshal_trace_context_binary(self, trace_context_id,
+                                       trace_attributes):
         """Converts marshaled binary data into a TraceContext.
 
         Singe this is a reference no-op implementation, it always returns
         two same singleton context.
 
-        Args:
-            trace_context_id (bytearray): span identity
-            trace_tags (bytearray): metadata tags
+        :param trace_context_id: span identity encoded as bytearray
+        :param trace_attributes: attributes encoded as bytearray
 
-        Returns:
-            a reconstructed TraceContext.
+        :return: a reconstructed TraceContext.
         """
         return TraceContextSource.singleton_noop_trace_context
 
-    def unmarshal_trace_context_str_dict(self, trace_context_id, metadata):
+    def unmarshal_trace_context_str_dict(self, trace_context_id,
+                                         trace_attributes):
         """Converts marshaled string data into a TraceContext.
 
         Singe this is a reference no-op implementation, it always returns
         two same singleton context.
 
-        Args:
-            trace_context_id (dict): span identity as string->string map
-            trace_tags (dict): metadata tags as string->string map
+        :param trace_context_id: span identity encoded as string->string map
+        :param trace_attributes: attributes encoded as string->string map
 
-        Returns:
-            a reconstructed TraceContext.
+        :return: a reconstructed TraceContext.
         """
         return TraceContextSource.singleton_noop_trace_context
 
@@ -167,8 +161,7 @@ class TraceContextSource(object):
 
         This is a no-op implementation that always returns the same context.
 
-        Returns:
-            a new trace context without parent.
+        :return: a new trace context without parent.
         """
         return TraceContextSource.singleton_noop_trace_context
 

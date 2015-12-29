@@ -22,20 +22,20 @@ from __future__ import absolute_import
 # Here we define standard names for tags that can be handled specially by
 # the tracing systems.
 
-# RPC tags are symmetric, they can be used by the server to identify the
-# caller, or by the client to identify the server it calls.
+# PeerXXX tags can be emitted by either client-side of server-side to describe
+# the other side/service in a peer-to-peer communications, like an RPC call.
 
-# service name for an RPC call.
-RPC_SERVICE = 'rpc.service'
+# PeerService records the service name of the peer
+PEER_SERVICE = 'peer.service'
 
-# records the host name of the target service
-RPC_HOSTNAME = 'rpc.hostname'
+# PeerHostname records the host name of the peer
+PEER_HOSTNAME = 'peer.hostname'
 
-# records IP v4 host address of RPC target service
-RPC_HOST_IPV4 = 'rpc.ipv4'
+# PeerHostIPv4 records IP v4 host address of the peer
+PEER_HOST_IPV4 = 'peer.ipv4'
 
-# records IP v6 host address of RPC target service
-RPC_HOST_IPV6 = 'rpc.ipv6'
+# PeerHostIPv6 records IP v6 host address of the peer
+PEER_HOST_IPV6 = 'peer.ipv6'
 
-# records port number of RPC target service
-RPC_PORT = 'rpc.port'
+# PeerPort records port number of the peer
+PEER_PORT = 'peer.port'
