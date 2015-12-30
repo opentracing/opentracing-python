@@ -3,10 +3,10 @@
 History
 -------
 
-0.3.1 (unreleased)
+0.3.1 (2015-12-30)
 ------------------
 
-- Nothing changed yet.
+- Fix std context implementation to refer to Trace Attributes instead of metadata
 
 
 0.3.0 (2015-12-29)

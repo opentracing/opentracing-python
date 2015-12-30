@@ -24,9 +24,9 @@ from opentracing.standard import TraceContext
 
 def test_metadata():
     ctx = TraceContext()
-    assert ctx.get_metadata('x') is None
-    assert ctx.metadata_as_dict() is None
-    ctx.set_metadata('X_y', 'value').\
-        set_metadata('ZZ', 'value2')
-    assert ctx.get_metadata('x-Y') == 'value'
-    assert ctx.metadata_as_dict() == {'x-y': 'value', 'zz': 'value2'}
+    assert ctx.get_trace_attribute('x') is None
+    assert ctx.trace_attributes_as_dict() is None
+    ctx.set_trace_attribute('X_y', 'value').\
+        set_trace_attribute('ZZ', 'value2')
+    assert ctx.get_trace_attribute('x-Y') == 'value'
+    assert ctx.trace_attributes_as_dict() == {'x-y': 'value', 'zz': 'value2'}

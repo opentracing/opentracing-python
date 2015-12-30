@@ -26,23 +26,22 @@ import opentracing
 class TraceContext(opentracing.TraceContext):
     """Base implementation of opentracing.TraceContext.
 
-    This implementation provides thread-safe metadata propagation methods,
-    but does not have any notion of the span identity. It is meant for
-    extension by the actual tracing implementations.
+    This implementation provides thread-safe Trace Attributes propagation
+    methods, but does not have any notion of the span identity. It is meant
+    for extension by the actual tracing implementations.
 
-    Access to me
     """
-    def __init__(self, metadata=None):
-        """Initializes this trace context with optional metadata.
+    def __init__(self, trace_attributes=None):
+        """Initializes this Trace Context with optional Trace Attributes.
 
-        :param metadata: string->string dictionary of metadata. Used as is,
-            without copying, so the caller is expected to give ownership of
-            this dictionary.
-        :type metadata: dict
+        :param trace_attributes: string->string dictionary of Trace
+            Attributes. Used as is, without copying, so the caller is
+            expected to give ownership of this dictionary.
+        :type trace_attributes: dict
 
         :return: None
         """
-        self.metadata = metadata
+        self.trace_attributes = trace_attributes
         self.lock = Lock()
 
     def normalize_key(self, key):
@@ -59,13 +58,13 @@ class TraceContext(opentracing.TraceContext):
         """
         return key.replace('_', '-').lower()
 
-    def set_metadata(self, key, value):
-        """Implements set_metadata() of opentracing.TraceContext.
+    def set_trace_attribute(self, key, value):
+        """Implements set_trace_attribute() of opentracing.TraceContext.
 
         :param key: string key
         :type key: str
 
-        :param value: value of the metadata
+        :param value: value of the attribute
         :type value: str
 
         :rtype : TraceContext
@@ -75,32 +74,32 @@ class TraceContext(opentracing.TraceContext):
         assert type(value) is str, 'value must be a string'
 
         with self.lock:
-            if self.metadata is None:
-                self.metadata = dict()
-            self.metadata[self.normalize_key(key)] = value
+            if self.trace_attributes is None:
+                self.trace_attributes = dict()
+            self.trace_attributes[self.normalize_key(key)] = value
         return self
 
-    def get_metadata(self, key):
-        """Implements get_metadata of :type:opentracing.TraceContext.
+    def get_trace_attribute(self, key):
+        """Implements get_trace_attribute of :type:opentracing.TraceContext.
 
         :param key: string key
-        :return: a metadata value, or None if no such key was stored.
+        :return: a Trace Attribute value, or None if no such key was stored.
         """
         with self.lock:
-            if self.metadata is None:
+            if self.trace_attributes is None:
                 return None
             else:
-                return self.metadata.get(self.normalize_key(key))
+                return self.trace_attributes.get(self.normalize_key(key))
 
-    def metadata_as_dict(self):
-        """Returns metadata as a cloned dictionary.
+    def trace_attributes_as_dict(self):
+        """Returns a copy of Trace Attributes.
 
-        :return: copy of the metadata dictionary or None if no metadata was
-            defined in this context.
+        :return: copy of the Trace Attributes dictionary or None if no
+            Trace Attributes was defined in this context.
         """
         with self.lock:
-            if self.metadata is None:
+            if self.trace_attributes is None:
                 out = None
             else:
-                out = dict(self.metadata)
+                out = dict(self.trace_attributes)
         return out
