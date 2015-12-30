@@ -88,7 +88,7 @@ Somewhere in your server's request handler code:
     def before_request(request, tracer):
         context = tracer.unmarshal_trace_context_str_dict(
             trace_context_id=request.headers, 
-            attributes=request.headers
+            trace_attributes=request.headers
         )
         operation = request.operation
         if context is None:
@@ -147,12 +147,12 @@ Somewhere in your service that's about to make an outgoing call:
         if port:
             span.add_tag(tags.RPC_PORT, port)
     
-        h_ctx, h_meta = opentracing.tracer.marshal_trace_context_str_dict(
+        h_ctx, h_attr = opentracing.tracer.marshal_trace_context_str_dict(
             trace_context=span.trace_context)
         for key, value in h_ctx.iteritems():
             request.add_header(key, value)
-        if h_meta:
-            for key, value in h_meta.iteritems():
+        if h_attr:
+            for key, value in h_attr.iteritems():
                 request.add_header(key, value)
     
         return span
