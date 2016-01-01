@@ -101,15 +101,15 @@ Somewhere in your server's request handler code:
     
         remote_ip = request.remote_ip
         if remote_ip:
-            span.add_tag(tags.RPC_HOST_IPV4, remote_ip)
+            span.add_tag(tags.PEER_HOST_IPV4, remote_ip)
     
         caller_name = request.caller_name
         if caller_name:
-            span.add_tag(tags.RPC_SERVICE, caller_name)
+            span.add_tag(tags.PEER_SERVICE, caller_name)
     
         remote_port = request.remote_port
         if remote_port:
-            span.add_tag(tags.RPC_PORT, remote_port)
+            span.add_tag(tags.PEER_PORT, remote_port)
     
         return span
 ```
@@ -141,11 +141,11 @@ Somewhere in your service that's about to make an outgoing call:
         service_name = request.service_name
         host, port = request.host_port
         if service_name:
-            span.add_tag(tags.RPC_SERVICE, service_name)
+            span.add_tag(tags.PEER_SERVICE, service_name)
         if host:
-            span.add_tag(tags.RPC_HOST_IPV4, host)
+            span.add_tag(tags.PEER_HOST_IPV4, host)
         if port:
-            span.add_tag(tags.RPC_PORT, port)
+            span.add_tag(tags.PEER_PORT, port)
     
         h_ctx, h_attr = opentracing.tracer.marshal_trace_context_str_dict(
             trace_context=span.trace_context)
