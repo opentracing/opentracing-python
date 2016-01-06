@@ -20,7 +20,7 @@
 
 from __future__ import absolute_import
 from opentracing import TraceContext, TraceContextSource
-from opentracing import TraceContextMarshaler, TraceContextUnmarshaler
+from opentracing import TraceContextEncoder, TraceContextDecoder
 
 
 def test_context():
@@ -41,23 +41,23 @@ def test_context_source():
     assert attr is None
 
 
-def test_marshaller():
+def test_encoder():
     singleton = TraceContextSource.singleton_noop_trace_context
-    m = TraceContextMarshaler()
-    x, y = m.marshal_trace_context_binary(trace_context=singleton)
+    e = TraceContextEncoder()
+    x, y = e.trace_context_to_binary(trace_context=singleton)
     assert x == bytearray()
     assert y is None
-    x, y = m.marshal_trace_context_str_dict(trace_context=singleton)
+    x, y = e.trace_context_to_text(trace_context=singleton)
     assert x == {}
     assert y is None
 
 
-def test_unmarshaller():
+def test_decoder():
     singleton = TraceContextSource.singleton_noop_trace_context
-    m = TraceContextUnmarshaler()
-    ctx = m.unmarshal_trace_context_binary(trace_context_id=None,
-                                           trace_attributes=None)
+    d = TraceContextDecoder()
+    ctx = d.trace_context_from_binary(trace_context_id=None,
+                                      trace_attributes=None)
     assert singleton == ctx
-    ctx = m.unmarshal_trace_context_str_dict(trace_context_id=None,
-                                             trace_attributes=None)
+    ctx = d.trace_context_from_text(trace_context_id=None,
+                                    trace_attributes=None)
     assert singleton == ctx

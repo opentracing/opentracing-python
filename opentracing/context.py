@@ -75,10 +75,10 @@ class TraceContext(object):
         return None
 
 
-class TraceContextMarshaler(object):
-    """Allows marshaling a trace context binary or string formats.
+class TraceContextEncoder(object):
+    """Encodes a trace context in binary or text formats.
 
-    The marshaler is expected to serialize trace contexts into a pair of
+    The encoder is expected to serialize trace contexts into a pair of
     values representing separately the trace context / span identity,
     and the trace attributes. This is done specifically for binary protocols
     that may represent tracing identity in a dedicated fixed-length slot
@@ -86,11 +86,11 @@ class TraceContextMarshaler(object):
     by the middleware / routing layers without parsing the whole message.
     """
 
-    def marshal_trace_context_binary(self, trace_context):
+    def trace_context_to_binary(self, trace_context):
         """Converts trace context to a pair of bytearray's representing
         separately span identity and trace attributes.
 
-        :param trace_context: trace context to marshal
+        :param trace_context: trace context to encode
         :type trace_context: TraceContext
 
         :rtype (bytearray, bytearray or None)
@@ -99,11 +99,11 @@ class TraceContextMarshaler(object):
         """
         return bytearray(), None
 
-    def marshal_trace_context_str_dict(self, trace_context):
+    def trace_context_to_text(self, trace_context):
         """Converts trace context to a pair of dict's representing
         separately span identity and trace attributes.
 
-        :param trace_context: trace context to marshal
+        :param trace_context: trace context to encode
         :type trace_context: TraceContext
 
         :rtype (dict, dict or None)
@@ -113,12 +113,12 @@ class TraceContextMarshaler(object):
         return dict(), None
 
 
-class TraceContextUnmarshaler(object):
-    """Allows unmarshaling a trace context from binary or string formats."""
+class TraceContextDecoder(object):
+    """Decodes a trace context from binary or text formats."""
 
-    def unmarshal_trace_context_binary(self, trace_context_id,
-                                       trace_attributes):
-        """Converts marshaled binary data into a TraceContext.
+    def trace_context_from_binary(self, trace_context_id,
+                                  trace_attributes):
+        """Converts encoded binary data into a TraceContext.
 
         Singe this is a reference no-op implementation, it always returns
         two same singleton context.
@@ -130,9 +130,9 @@ class TraceContextUnmarshaler(object):
         """
         return TraceContextSource.singleton_noop_trace_context
 
-    def unmarshal_trace_context_str_dict(self, trace_context_id,
-                                         trace_attributes):
-        """Converts marshaled string data into a TraceContext.
+    def trace_context_from_text(self, trace_context_id,
+                               trace_attributes):
+        """Converts encoded string data into a TraceContext.
 
         Singe this is a reference no-op implementation, it always returns
         two same singleton context.

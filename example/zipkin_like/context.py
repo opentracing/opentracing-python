@@ -63,9 +63,9 @@ class TraceContext(opentracing.standard.context.TraceContext):
         return self.trace_id, self.span_id, self.parent_id, self.flags
 
     def __str__(self):
-        from .marshaling import TraceContextMarshaler
+        from .encoding import TraceContextEncoder
 
-        return TraceContextMarshaler.id_to_string(self)
+        return TraceContextEncoder.id_to_string(self)
 
     def append_trace_attributes(self, trace_attributes):
         """Adds extra Trace Attributes to the current context
