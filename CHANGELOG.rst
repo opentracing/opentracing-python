@@ -3,10 +3,10 @@
 History
 -------
 
-0.4.1 (unreleased)
+0.4.1 (2016-01-07)
 ------------------
 
-- Nothing changed yet.
+- Add SPAN_KIND tag
 
 
 0.4.0 (2016-01-06)
