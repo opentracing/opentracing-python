@@ -3,10 +3,10 @@
 History
 -------
 
-0.3.2 (unreleased)
+0.4.0 (2016-01-06)
 ------------------
 
-- Nothing changed yet.
+- Rename marshal -> encode
 
 
 0.3.1 (2015-12-30)
