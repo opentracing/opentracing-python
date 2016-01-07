@@ -19,23 +19,35 @@
 # THE SOFTWARE.
 from __future__ import absolute_import
 
-# Here we define standard names for tags that can be handled specially by
-# the tracing systems.
+# Here we define standard names for tags that can be added to spans by the
+# instrumentation code. The actual tracing systems are not required to
+# retain these as tags in the stored spans if they have other means of
+# representing the same data. For example, the SPAN_KIND='s' (server) can be
+# inferred from a Zipkin span by the presence of ss/sr annotations.
 
-# PeerXXX tags can be emitted by either client-side of server-side to describe
+# PEER_* tags can be emitted by either client-side of server-side to describe
 # the other side/service in a peer-to-peer communications, like an RPC call.
 
-# PeerService records the service name of the peer
+# PEER_SERVICE records the service name of the peer
 PEER_SERVICE = 'peer.service'
 
-# PeerHostname records the host name of the peer
+# PEER_HOSTNAME records the host name of the peer
 PEER_HOSTNAME = 'peer.hostname'
 
-# PeerHostIPv4 records IP v4 host address of the peer
+# PEER_HOST_IPV4 records IP v4 host address of the peer
 PEER_HOST_IPV4 = 'peer.ipv4'
 
-# PeerHostIPv6 records IP v6 host address of the peer
+# PEER_HOST_IPV6 records IP v6 host address of the peer
 PEER_HOST_IPV6 = 'peer.ipv6'
 
-# PeerPort records port number of the peer
+# PEER_PORT records port number of the peer
 PEER_PORT = 'peer.port'
+
+# SPAN_KIND hints at relationship between spans, e.g. client/server
+SPAN_KIND = 'span.kind'
+
+# Marks a span representing the client-side of an RPC or other remote call
+SPAN_KIND_RPC_CLIENT = 'c'
+
+# Marks a span representing the server-side of an RPC or other remote call
+SPAN_KIND_RPC_SERVER = 's'
