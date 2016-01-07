@@ -22,10 +22,10 @@ from __future__ import absolute_import
 from concurrent.futures import Future
 from .span import Span
 from .context import TraceContextSource
-from .context import TraceContextMarshaler, TraceContextUnmarshaler
+from .context import TraceContextEncoder, TraceContextDecoder
 
 
-class Tracer(TraceContextMarshaler, TraceContextUnmarshaler, object):
+class Tracer(TraceContextEncoder, TraceContextDecoder, object):
     """Tracer is the entry point API between instrumentation code and the
     tracing implementation.
 

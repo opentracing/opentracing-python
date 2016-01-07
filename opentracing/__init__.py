@@ -22,8 +22,8 @@ from .span import Span  # noqa
 from .tracer import Tracer  # noqa
 from .context import TraceContext  # noqa
 from .context import TraceContextSource  # noqa
-from .context import TraceContextMarshaler  # noqa
-from .context import TraceContextUnmarshaler  # noqa
+from .context import TraceContextEncoder  # noqa
+from .context import TraceContextDecoder  # noqa
 
 # Global variable that should be initialized to an instance of real tracer.
 # Note: it should be accessed via 'opentracing.tracer', not via

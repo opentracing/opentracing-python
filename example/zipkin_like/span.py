@@ -135,9 +135,9 @@ class Span(opentracing.Span):
         return self.trace_context.flags & DEBUG_FLAG == DEBUG_FLAG
 
     def __str__(self):
-        from .marshaling import TraceContextMarshaler
+        from .encoding import TraceContextEncoder
 
-        id_str = TraceContextMarshaler.id_to_string(self.trace_context)
+        id_str = TraceContextEncoder.id_to_string(self.trace_context)
         return "%s.%s %s" % (self.tracer.service_name,
                              self.operation_name,
                              id_str)

@@ -86,7 +86,7 @@ Somewhere in your server's request handler code:
         
     
     def before_request(request, tracer):
-        context = tracer.unmarshal_trace_context_str_dict(
+        context = tracer.trace_context_from_text(
             trace_context_id=request.headers, 
             trace_attributes=request.headers
         )
@@ -147,7 +147,7 @@ Somewhere in your service that's about to make an outgoing call:
         if port:
             span.add_tag(tags.PEER_PORT, port)
     
-        h_ctx, h_attr = opentracing.tracer.marshal_trace_context_str_dict(
+        h_ctx, h_attr = opentracing.tracer.trace_context_to_text(
             trace_context=span.trace_context)
         for key, value in h_ctx.iteritems():
             request.add_header(key, value)

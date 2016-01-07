@@ -26,7 +26,7 @@ from tchannel.net import local_ip
 import opentracing
 from . import glossary
 from .glossary import TRACE_ATTRIBUTES_HEADER_PREFIX
-from .marshaling import TraceContextMarshaler, TraceContextUnmarshaler
+from .encoding import TraceContextEncoder, TraceContextDecoder
 from .span import Span
 from .version import __version__
 from .thrift import ipv4_to_int
@@ -38,10 +38,10 @@ class Tracer(opentracing.Tracer):
         self.reporter = reporter
         self.trace_context_source = trace_context_source
         self.ip_address = ipv4_to_int(local_ip())
-        self.encoder = TraceContextMarshaler(
+        self.encoder = TraceContextEncoder(
             trace_id_header=glossary.TRACE_ID_HEADER,
             trace_attributes_header_prefix=TRACE_ATTRIBUTES_HEADER_PREFIX)
-        self.decoder = TraceContextUnmarshaler(
+        self.decoder = TraceContextDecoder(
             trace_id_header=glossary.TRACE_ID_HEADER,
             trace_attributes_header_prefix=TRACE_ATTRIBUTES_HEADER_PREFIX)
 
@@ -93,26 +93,26 @@ class Tracer(opentracing.Tracer):
         """Returns current time in microseconds."""
         return time.time() * 1000000
 
-    def marshal_trace_context_binary(self, trace_context):
-        return self.encoder.marshal_trace_context_binary(
+    def trace_context_to_binary(self, trace_context):
+        return self.encoder.trace_context_to_binary(
             trace_context=trace_context
         )
 
-    def marshal_trace_context_str_dict(self, trace_context):
-        return self.encoder.marshal_trace_context_str_dict(
+    def trace_context_to_text(self, trace_context):
+        return self.encoder.trace_context_to_text(
             trace_context=trace_context
         )
 
-    def unmarshal_trace_context_binary(self, trace_context_id,
-                                       trace_attributes):
-        return self.decoder.unmarshal_trace_context_binary(
+    def trace_context_from_binary(self, trace_context_id,
+                                  trace_attributes):
+        return self.decoder.trace_context_from_binary(
             trace_context_id=trace_context_id,
             trace_attributes=trace_attributes
         )
 
-    def unmarshal_trace_context_str_dict(self, trace_context_id,
-                                         trace_attributes):
-        return self.decoder.unmarshal_trace_context_str_dict(
+    def trace_context_from_text(self, trace_context_id,
+                                trace_attributes):
+        return self.decoder.trace_context_from_text(
             trace_context_id=trace_context_id,
             trace_attributes=trace_attributes
         )

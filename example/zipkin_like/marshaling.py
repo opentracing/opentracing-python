@@ -23,29 +23,29 @@ import opentracing
 from .context import TraceContext
 
 
-class TraceContextMarshaler(opentracing.TraceContextMarshaler):
+class TraceContextEncoder(opentracing.TraceContextEncoder):
     """
-    Implements opentracing.TraceContextMarshaler.
+    Implements opentracing.TraceContextEncoder.
     """
     def __init__(self, trace_id_header, trace_attributes_header_prefix):
         self.prefix = trace_attributes_header_prefix.lower()
         self.prefix_length = len(trace_attributes_header_prefix)
         self.trace_id_header = trace_id_header.lower().replace('_', '-')
 
-    def marshal_trace_context_binary(self, trace_context):
-        raise NotImplementedError('marshal_trace_context_binary')
+    def trace_context_to_binary(self, trace_context):
+        raise NotImplementedError('trace_context_to_binary')
 
-    def marshal_trace_context_str_dict(self, trace_context):
+    def trace_context_to_text(self, trace_context):
         """Converts trace context to a pair of dict's representing
         separately span identity and Trace Attributes.
 
-        :param trace_context: trace context to marshal
+        :param trace_context: trace context to encode
         :type trace_context: TraceContext
 
         :return: a pair of str dicts, first representing the span identity,
             the second representing Trace Attributes.
         """
-        ctx_id = TraceContextMarshaler.id_to_string(trace_context)
+        ctx_id = TraceContextEncoder.id_to_string(trace_context)
         span_id_out = {self.trace_id_header: ctx_id}
         trace_attributes = trace_context.trace_attributes_as_dict()
         trace_attributes_out = None
@@ -72,23 +72,23 @@ class TraceContextMarshaler(opentracing.TraceContextMarshaler):
                                             trace_context.flags)
 
 
-class TraceContextUnmarshaler(opentracing.TraceContextUnmarshaler):
+class TraceContextDecoder(opentracing.TraceContextDecoder):
 
     def __init__(self, trace_id_header, trace_attributes_header_prefix):
         self.prefix = trace_attributes_header_prefix.lower()
         self.prefix_length = len(trace_attributes_header_prefix)
         self.trace_id_header = trace_id_header.lower().replace('_', '-')
 
-    def unmarshal_trace_context_binary(self, trace_context_id,
-                                       trace_attributes):
-        raise NotImplementedError('unmarshal_trace_context_binary')
+    def trace_context_from_binary(self, trace_context_id,
+                                  trace_attributes):
+        raise NotImplementedError('trace_context_from_binary')
 
-    def unmarshal_trace_context_str_dict(self, trace_context_id,
-                                         trace_attributes):
+    def trace_context_from_text(self, trace_context_id,
+                                trace_attributes):
         ctx_id = trace_context_id.get(self.trace_id_header, None)
         if ctx_id is None:
             return None
-        trace_context = TraceContextUnmarshaler.\
+        trace_context = TraceContextDecoder.\
             trace_context_from_string(value=ctx_id)
         if trace_context is None:
             return None
