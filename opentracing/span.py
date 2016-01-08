@@ -46,8 +46,7 @@ class Span(object):
     def __enter__(self):
         """Invoked when span is used as a context manager.
 
-        Returns:
-            itself
+        :return: returns the Span itself
         """
         return self
 
@@ -63,18 +62,17 @@ class Span(object):
                                             'tb': exc_tb})
         self.finish()
 
-    def start_child(self, operation_name):
+    def start_child(self, operation_name, tags=None):
         """Denotes the beginning of a subordinate unit of work.
 
         As this is a no-op implementation, it actually returns itself as the
         child span. Real implementations should create a new span.
 
-        Args:
-            operation_name: name of the new span from the perspective of the
-                current service.
+        :param operation_name: name of the operation represened by the new
+            span from the perspective of the current service.
+        :param tags: optional dictionary of Span Tags.
 
-        Returns:
-            A new child span in "started" state.
+        :return: Returns a new child Span in "started" state.
         """
         return self
 
@@ -88,7 +86,7 @@ class Span(object):
         pass
 
     def add_tag(self, key, value):
-        """Attaches a key/value pair so the span.
+        """Attaches a key/value pair to the span.
 
         The set of supported value types is implementation specific. It is the
         responsibility of the actual tracing system to know how to serialize
@@ -97,7 +95,20 @@ class Span(object):
         :param key: key or name of the tag. Must be a string.
         :param value: value of the tag. Multi-valued tags are not supported
 
-        :return: itself, for chaining
+        :return: Returns the Span itself, for call chaining.
+        :rtype: Span
+        """
+        return self
+
+    def add_tags(self, tags):
+        """Attaches one or more a key/value pairs to the span.
+
+        Equivalent to adding each key/value pair with `add_tag` method,
+        except that adding many tags at once may be more efficient.
+
+        :param tags: dictionary with tags.
+
+        :return: Returns the Span itself, for call chaining.
         :rtype: Span
         """
         return self
