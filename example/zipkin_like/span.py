@@ -48,15 +48,18 @@ class Span(opentracing.Span):
         self.tags = []
         self.logs = []
 
-    def start_child(self, operation_name):
+    def start_child(self, operation_name, tags=None):
         """Implements start_child() of opentracing.Span"""
         child_ctx, child_tags = self.tracer.trace_context_source. \
             new_child_trace_context(parent_trace_context=self.trace_context)
 
-        return self.tracer.create_span(operation_name=operation_name,
+        span = self.tracer.create_span(operation_name=operation_name,
                                        trace_context=child_ctx,
                                        is_client=True,
                                        tags=child_tags)
+        if tags:
+            span.add_tags(tags)
+        return span
 
     def finish(self):
         """Implements finish() of opentracing.Span"""
@@ -98,6 +101,14 @@ class Span(opentracing.Span):
                 tag = thrift.make_string_tag(key, value)
                 with self.update_lock:
                     self.tags.append(tag)
+        return self
+
+    def add_tags(self, tags):
+        """Implements add_tags() method of opentracing.Span"""
+        if self.is_sampled():
+            for k, v in tags.itemiter():
+                self.add_tag(k, v)
+        return self
 
     def info(self, message, *payload):
         self.add_log(message, False, *payload)
@@ -135,7 +146,7 @@ class Span(opentracing.Span):
         return self.trace_context.flags & DEBUG_FLAG == DEBUG_FLAG
 
     def __str__(self):
-        from .encoding import TraceContextEncoder
+        from .marshaling import TraceContextEncoder
 
         id_str = TraceContextEncoder.id_to_string(self.trace_context)
         return "%s.%s %s" % (self.tracer.service_name,

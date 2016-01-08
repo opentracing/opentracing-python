@@ -54,7 +54,7 @@ class TraceContext(object):
         :type key: str
 
         :param value: trace attribute value
-        :type vaue: str
+        :type value: str
 
         :rtype : TraceContext
         :return: itself, for chaining the calls.
@@ -100,8 +100,8 @@ class TraceContextEncoder(object):
         return bytearray(), None
 
     def trace_context_to_text(self, trace_context):
-        """Converts trace context to a pair of dict's representing
-        separately span identity and trace attributes.
+        """Converts trace context to a pair of dictionaries representing
+        separately span identity and Trace Attributes.
 
         :param trace_context: trace context to encode
         :type trace_context: TraceContext
@@ -116,8 +116,7 @@ class TraceContextEncoder(object):
 class TraceContextDecoder(object):
     """Decodes a trace context from binary or text formats."""
 
-    def trace_context_from_binary(self, trace_context_id,
-                                  trace_attributes):
+    def trace_context_from_binary(self, trace_context_id, trace_attributes):
         """Converts encoded binary data into a TraceContext.
 
         Singe this is a reference no-op implementation, it always returns
@@ -130,8 +129,7 @@ class TraceContextDecoder(object):
         """
         return TraceContextSource.singleton_noop_trace_context
 
-    def trace_context_from_text(self, trace_context_id,
-                               trace_attributes):
+    def trace_context_from_text(self, trace_context_id, trace_attributes):
         """Converts encoded string data into a TraceContext.
 
         Singe this is a reference no-op implementation, it always returns
