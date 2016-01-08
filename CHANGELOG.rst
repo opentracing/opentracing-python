@@ -6,7 +6,9 @@ History
 0.4.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Remove debug flag
+- Allow passing tags to start methods
+- Add Span.add_tags() method
 
 
 0.4.2 (2016-01-07)

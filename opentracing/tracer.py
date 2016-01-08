@@ -35,7 +35,7 @@ class Tracer(TraceContextEncoder, TraceContextDecoder, object):
 
     singleton_noop_span = Span(TraceContextSource.singleton_noop_trace_context)
 
-    def start_trace(self, operation_name, debug=False):
+    def start_trace(self, operation_name, tags=None):
         """Starts a new trace and creates a new root span.
 
         This method should be used by services that are instrumented for
@@ -45,14 +45,13 @@ class Tracer(TraceContextEncoder, TraceContextDecoder, object):
             that received the request represented by this trace and span.
             The domain of names must be limited, e.g. do not use UUIDs or
             entity IDs or timestamps as part of the name.
-        :param debug: if True, we request this trace to be recorded by the
-            tracing system regardless of the sampling decisions.
+        :param tags: optional dictionary of Span Tags.
 
         :return: a new root Span
         """
         return Tracer.singleton_noop_span
 
-    def join_trace(self, operation_name, parent_trace_context):
+    def join_trace(self, operation_name, parent_trace_context, tags=None):
         """Joins a trace started elsewhere and creates a new span as a
         child of the given parent trace context.
 
@@ -65,6 +64,7 @@ class Tracer(TraceContextEncoder, TraceContextDecoder, object):
             entity IDs or timestamps as part of the name.
         :param parent_trace_context: Trace Context of a client span started
             elsewhere and whose trace we're joining.
+        :param tags: optional dictionary of Span Tags.
 
         :return: a new Span
         """
