@@ -157,3 +157,25 @@ Somewhere in your service that's about to make an outgoing call:
     
         return span
 ```
+
+# Development
+
+## Tests
+
+```
+virtualenv env
+source env/bin/activate
+make bootstrap
+make test
+```
+
+## Releases
+
+```
+pip install zest.releaser[recommended]
+prerelease
+release
+python setup.py sdist upload -r pypi
+postrelease
+```
+
