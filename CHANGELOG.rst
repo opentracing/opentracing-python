@@ -3,7 +3,7 @@
 History
 -------
 
-0.4.3 (unreleased)
+0.5.0 (2016-01-07)
 ------------------
 
 - Remove debug flag
