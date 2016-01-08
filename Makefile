@@ -72,13 +72,15 @@ docs:
 	$(MAKE) -C docs html
 
 release: clean
-	python setup.py sdist upload
-	python setup.py bdist_wheel upload
+	@echo Please see README
+#	python setup.py sdist upload
+#	python setup.py bdist_wheel upload
 
 dist: clean
-	python setup.py sdist
-	python setup.py bdist_wheel
-	ls -l dist
+	@echo Please see README
+#	python setup.py sdist
+#	python setup.py bdist_wheel
+#	ls -l dist
 
 install:
 	pip install -r requirements.txt
