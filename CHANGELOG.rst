@@ -3,10 +3,10 @@
 History
 -------
 
-0.5.2 (unreleased)
+0.5.2 (2016-01-08)
 ------------------
 
-- Nothing changed yet.
+- Update README and meta.
 
 
 0.5.1 (2016-01-08)
