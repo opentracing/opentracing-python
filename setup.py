@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='opentracing',
-    version='0.5.1.dev0',
+    version='0.5.1',
     author='Yuri Shkuro',
     author_email='shkuro@gmail.com',
     description='Opentracing API',

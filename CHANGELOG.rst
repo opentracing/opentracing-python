@@ -3,10 +3,10 @@
 History
 -------
 
-0.5.1 (unreleased)
+0.5.1 (2016-01-08)
 ------------------
 
-- Nothing changed yet.
+- Prepare for PYPI publishing.
 
 
 0.5.0 (2016-01-07)
