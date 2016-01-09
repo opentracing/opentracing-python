@@ -3,7 +3,7 @@
 History
 -------
 
-0.6.1 (unreleased)
+0.6.1 (2016-01-09)
 ------------------
 
 - Fix typo in the attributes API test
