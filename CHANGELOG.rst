@@ -3,7 +3,7 @@
 History
 -------
 
-0.5.3 (unreleased)
+0.6.0 (2016-01-09)
 ------------------
 
 - Change inheritance to match api-go: TraceContextSource extends codecs,

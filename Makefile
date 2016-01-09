@@ -47,6 +47,7 @@ clean-pyc:
 
 clean-test:
 	rm -f .coverage
+	rm -f coverage.xml
 	rm -fr htmlcov/
 
 lint:
