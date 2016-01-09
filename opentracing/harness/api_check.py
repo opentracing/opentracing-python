@@ -102,7 +102,7 @@ class APICompatibilityCheckMixin(object):
     def test_trace_attributes(self):
         trace_context = self.tracer().new_root_trace_context()
         trace_context.set_trace_attribute('Kiff-loves', 'Amy')
-        val = trace_context.get_trace_attribute('kiff-Loved')
+        val = trace_context.get_trace_attribute('kiff-Loves')  # case change
         if self.check_trace_attribute_values():
             assert 'Amy' == val
 

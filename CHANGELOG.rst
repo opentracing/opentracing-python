@@ -6,7 +6,7 @@ History
 0.6.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix typo in the attributes API test
 
 
 0.6.0 (2016-01-09)
