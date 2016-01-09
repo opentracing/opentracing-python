@@ -10,14 +10,14 @@ micro-services implemented in different languages.  The success of these
 tools is dependent on pervasive instrumentation of applications and 
 libraries with trace context propagation support.
 
-The OpenTracing project (http://opentracing.github.io) provides a multi-lingual 
+The OpenTracing project (http://opentracing.io) provides a multi-lingual 
 standard for application-level instrumentation that's loosely coupled to any 
 particular downstream tracing or monitoring system. In this way, adding or 
 switching tracing implementations becomes an O(1) code change.
 
 ## Status
 
-In the current version, `opentracing-python` provides only the API and a 
+In the current version, `api-python` provides only the API and a 
 basic no-op implementation that can be used by instrumentation libraries to 
 collect and propagate distributed tracing context.
 
