@@ -70,7 +70,9 @@ class Span(object):
 
         :param operation_name: name of the operation represened by the new
             span from the perspective of the current service.
-        :param tags: optional dictionary of Span Tags.
+        :param tags: optional dictionary of Span Tags. The caller is
+            expected to give up ownership of that dictionary, because the
+            Tracer may use it as is to avoid extra data copying.
 
         :return: Returns a new child Span in "started" state.
         """
@@ -86,27 +88,15 @@ class Span(object):
         pass
 
     def add_tag(self, key, value):
-        """Attaches a key/value pair to the span.
+        """Attaches a key/value pair to the span. More than one value can be
+        added for the same key.
 
         The set of supported value types is implementation specific. It is the
         responsibility of the actual tracing system to know how to serialize
         and record the values.
 
         :param key: key or name of the tag. Must be a string.
-        :param value: value of the tag. Multi-valued tags are not supported
-
-        :return: Returns the Span itself, for call chaining.
-        :rtype: Span
-        """
-        return self
-
-    def add_tags(self, tags):
-        """Attaches one or more a key/value pairs to the span.
-
-        Equivalent to adding each key/value pair with `add_tag` method,
-        except that adding many tags at once may be more efficient.
-
-        :param tags: dictionary with tags.
+        :param value: value of the tag.
 
         :return: Returns the Span itself, for call chaining.
         :rtype: Span

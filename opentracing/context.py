@@ -143,7 +143,7 @@ class TraceContextDecoder(object):
         return TraceContextSource.singleton_noop_trace_context
 
 
-class TraceContextSource(object):
+class TraceContextSource(TraceContextEncoder, TraceContextDecoder):
     """Knows how to create new TraceContext
 
     Since this is a reference no-op implementation, it always returns the

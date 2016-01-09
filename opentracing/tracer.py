@@ -25,7 +25,7 @@ from .context import TraceContextSource
 from .context import TraceContextEncoder, TraceContextDecoder
 
 
-class Tracer(TraceContextEncoder, TraceContextDecoder, object):
+class Tracer(TraceContextSource, object):
     """Tracer is the entry point API between instrumentation code and the
     tracing implementation.
 
@@ -45,7 +45,9 @@ class Tracer(TraceContextEncoder, TraceContextDecoder, object):
             that received the request represented by this trace and span.
             The domain of names must be limited, e.g. do not use UUIDs or
             entity IDs or timestamps as part of the name.
-        :param tags: optional dictionary of Span Tags.
+        :param tags: optional dictionary of Span Tags. The caller is
+            expected to give up ownership of that dictionary, because the
+            Tracer may use it as is to avoid extra data copying.
 
         :return: a new root Span
         """
@@ -64,7 +66,9 @@ class Tracer(TraceContextEncoder, TraceContextDecoder, object):
             entity IDs or timestamps as part of the name.
         :param parent_trace_context: Trace Context of a client span started
             elsewhere and whose trace we're joining.
-        :param tags: optional dictionary of Span Tags.
+        :param tags: optional dictionary of Span Tags. The caller is
+            expected to give up ownership of that dictionary, because the
+            Tracer may use it as is to avoid extra data copying.
 
         :return: a new Span
         """

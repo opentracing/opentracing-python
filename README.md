@@ -22,8 +22,8 @@ basic no-op implementation that can be used by instrumentation libraries to
 collect and propagate distributed tracing context.
 
 Future versions will include a reference implementation utilizing an 
-abstract Recorder interface, as well as a (Zipkin)
-[http://openzipkin.github.io]-compatible Tracer.
+abstract Recorder interface, as well as a 
+[Zipkin](http://openzipkin.github.io)-compatible Tracer.
 
 ## Concepts
 

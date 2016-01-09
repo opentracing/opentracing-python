@@ -56,5 +56,4 @@ def test_span():
     span.add_tag(tags.PEER_HOST_IPV6, '::')
     span.add_tag(tags.PEER_HOSTNAME, 'uber.com')
     span.add_tag(tags.PEER_PORT, 123)
-    span.add_tags({tags.PEER_PORT: 123, tags.PEER_HOSTNAME: 'uber.com'})
     span.finish()
