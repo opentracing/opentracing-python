@@ -1,4 +1,4 @@
-# Copyright (c) 2015 Uber Technologies, Inc.
+# Copyright (c) 2016 The OpenTracing Authors.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -17,12 +17,3 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
-
-from __future__ import absolute_import
-from .tracer import Tracer  # noqa
-from .context import TraceContext  # noqa
-from .span import Span  # noqa
-from .sampler import ConstSampler  # noqa
-from .sampler import ProbabilisticSampler  # noqa
-from .sampler import RateLimitingSampler  # noqa
-from .version import __version__  # noqa

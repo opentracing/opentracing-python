@@ -1,4 +1,4 @@
-# Copyright (c) 2015 Uber Technologies, Inc.
+# Copyright (c) 2016 The OpenTracing Authors.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -17,12 +17,25 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
-
 from __future__ import absolute_import
-from .tracer import Tracer  # noqa
-from .context import TraceContext  # noqa
-from .span import Span  # noqa
-from .sampler import ConstSampler  # noqa
-from .sampler import ProbabilisticSampler  # noqa
-from .sampler import RateLimitingSampler  # noqa
-from .version import __version__  # noqa
+import unittest
+from example.zipkin_like import Tracer, ConstSampler
+from example.zipkin_like.reporter import NullReporter
+from example.zipkin_like.context import TraceContextSource
+from opentracing.harness.api_check import APICompatibilityCheckMixin
+
+
+class APICheckZipkinTracer(unittest.TestCase, APICompatibilityCheckMixin):
+    sampler = ConstSampler(True)
+    source = TraceContextSource(sampler)
+    reporter = NullReporter()
+    _tracer = Tracer(service_name='api-test',
+                     reporter=reporter,
+                     trace_context_source=source)
+
+    def tracer(self):
+        return APICheckZipkinTracer._tracer
+
+    def test_binary_codecs(self):
+        # TODO binary codecs are not implemented at the moment
+        pass

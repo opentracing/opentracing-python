@@ -37,6 +37,7 @@ setup(
             'pytest-mock',
             'Sphinx',
             'sphinx_rtd_theme',
+            'tchannel>=0.21,<0.22'
         ]
     },
 )

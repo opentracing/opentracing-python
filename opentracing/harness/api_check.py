@@ -25,6 +25,7 @@ class APICompatibilityCheckMixin(object):
     A mixin class for validation that a given tracer implementation
     satisfies the requirements of the OpenTracing API.
     """
+
     def tracer(self):
         raise NotImplementedError('Subclass must implement tracer()')
 
@@ -88,10 +89,11 @@ class APICompatibilityCheckMixin(object):
         else:
             raise AssertionError('Expected ValueError')  # pragma: no cover
 
-    def test_span_tags(self):
+    def test_span_tags_with_chaining(self):
         span = self.tracer().start_trace(operation_name='Farnsworth')
-        span.add_tag('birthday', '9 April, 2841')
-        span.add_tag('loves', 'different lengths of wires')
+        span. \
+            set_tag('birthday', '9 April, 2841'). \
+            set_tag('loves', 'different lengths of wires')
         span.finish()
 
     def test_span_logs(self):

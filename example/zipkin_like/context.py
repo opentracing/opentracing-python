@@ -63,7 +63,7 @@ class TraceContext(opentracing.standard.context.TraceContext):
         return self.trace_id, self.span_id, self.parent_id, self.flags
 
     def __str__(self):
-        from .encoding import TraceContextEncoder
+        from .codecs import TraceContextEncoder
 
         return TraceContextEncoder.id_to_string(self)
 
