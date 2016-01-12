@@ -50,10 +50,10 @@ def test_span():
             assert finish.call_count == 1
             assert error.call_count == 0
 
-    span.add_tag('x', 'y').add_tag('z', 1)
-    span.add_tag(tags.PEER_SERVICE, 'test-service')
-    span.add_tag(tags.PEER_HOST_IPV4, 127 << 24 + 1)
-    span.add_tag(tags.PEER_HOST_IPV6, '::')
-    span.add_tag(tags.PEER_HOSTNAME, 'uber.com')
-    span.add_tag(tags.PEER_PORT, 123)
+    span.set_tag('x', 'y').set_tag('z', 1)  # test chaining
+    span.set_tag(tags.PEER_SERVICE, 'test-service')
+    span.set_tag(tags.PEER_HOST_IPV4, 127 << 24 + 1)
+    span.set_tag(tags.PEER_HOST_IPV6, '::')
+    span.set_tag(tags.PEER_HOSTNAME, 'uber.com')
+    span.set_tag(tags.PEER_PORT, 123)
     span.finish()

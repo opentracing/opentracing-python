@@ -26,7 +26,7 @@ from tchannel.net import local_ip
 import opentracing
 from . import glossary
 from .glossary import TRACE_ATTRIBUTES_HEADER_PREFIX
-from .marshaling import TraceContextEncoder, TraceContextDecoder
+from .codecs import TraceContextEncoder, TraceContextDecoder
 from .span import Span
 from .version import __version__
 from .thrift import ipv4_to_int
@@ -47,7 +47,7 @@ class Tracer(opentracing.Tracer):
 
     def start_trace(self, operation_name, tags=None):
         """Implements start_trace of opentracing.Tracer."""
-        trace_context = self.trace_context_source.new_root_trace_context(debug)
+        trace_context = self.trace_context_source.new_root_trace_context()
         return self.create_span(operation_name=operation_name,
                                 trace_context=trace_context,
                                 is_client=False, tags=tags)
@@ -80,9 +80,9 @@ class Tracer(opentracing.Tracer):
                     is_client=is_client)
         if tags:
             for k, v in tags.iteritems():
-                span.add_tag(k, v)
+                span.set_tag(k, v)
         span.ts = self.timestamp()
-        span.add_tag(key='tracing.client', value='Python-%s' % __version__)
+        span.set_tag(key='tracing.client', value='Python-%s' % __version__)
         return span
 
     def report_span(self, span):
@@ -92,6 +92,14 @@ class Tracer(opentracing.Tracer):
     def timestamp():
         """Returns current time in microseconds."""
         return time.time() * 1000000
+
+    def new_root_trace_context(self):
+        return self.trace_context_source.new_root_trace_context()
+
+    def new_child_trace_context(self, parent_trace_context):
+        return self.trace_context_source.new_child_trace_context(
+            parent_trace_context = parent_trace_context
+        )
 
     def trace_context_to_binary(self, trace_context):
         return self.encoder.trace_context_to_binary(
@@ -103,15 +111,13 @@ class Tracer(opentracing.Tracer):
             trace_context=trace_context
         )
 
-    def trace_context_from_binary(self, trace_context_id,
-                                  trace_attributes):
+    def trace_context_from_binary(self, trace_context_id, trace_attributes):
         return self.decoder.trace_context_from_binary(
             trace_context_id=trace_context_id,
             trace_attributes=trace_attributes
         )
 
-    def trace_context_from_text(self, trace_context_id,
-                                trace_attributes):
+    def trace_context_from_text(self, trace_context_id, trace_attributes):
         return self.decoder.trace_context_from_text(
             trace_context_id=trace_context_id,
             trace_attributes=trace_attributes

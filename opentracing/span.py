@@ -87,13 +87,17 @@ class Span(object):
         """
         pass
 
-    def add_tag(self, key, value):
-        """Attaches a key/value pair to the span. More than one value can be
-        added for the same key.
+    def set_tag(self, key, value):
+        """Attaches a key/value pair to the span.
 
         The set of supported value types is implementation specific. It is the
         responsibility of the actual tracing system to know how to serialize
         and record the values.
+
+        If the user calls set_tag multiple times for the same key,
+        the behavior of the tracer is undefined, i.e. it is implementation
+        specific whether the tracer will retain the first value, or the last
+        value, or pick one randomly, or even keep all of them.
 
         :param key: key or name of the tag. Must be a string.
         :param value: value of the tag.

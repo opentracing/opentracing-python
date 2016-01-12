@@ -22,7 +22,7 @@ from __future__ import absolute_import
 import threading
 
 import opentracing
-from opentracing.ext import tags
+from opentracing.ext import tags as ext_tags
 from .glossary import SERVER_SEND, SERVER_RECV, CLIENT_SEND, CLIENT_RECV
 from .glossary import SERVER_ADDR, CLIENT_ADDR
 from . import thrift
@@ -58,7 +58,8 @@ class Span(opentracing.Span):
                                        is_client=True,
                                        tags=child_tags)
         if tags:
-            span.add_tags(tags)
+            for k, v in tags.itemitems():
+                span.set_tag(k, v)
         return span
 
     def finish(self):
@@ -91,8 +92,8 @@ class Span(opentracing.Span):
 
             self.tracer.report_span(self)
 
-    def add_tag(self, key, value):
-        """Implements add_tag() method of opentracing.Span"""
+    def set_tag(self, key, value):
+        """Implements set_tag() method of opentracing.Span"""
         if self.is_sampled():
             special = SPECIAL_TAGS.get(key, None)
             if special is not None and callable(special):
@@ -101,13 +102,6 @@ class Span(opentracing.Span):
                 tag = thrift.make_string_tag(key, value)
                 with self.update_lock:
                     self.tags.append(tag)
-        return self
-
-    def add_tags(self, tags):
-        """Implements add_tags() method of opentracing.Span"""
-        if self.is_sampled():
-            for k, v in tags.itemiter():
-                self.add_tag(k, v)
         return self
 
     def info(self, message, *payload):
@@ -146,7 +140,7 @@ class Span(opentracing.Span):
         return self.trace_context.flags & DEBUG_FLAG == DEBUG_FLAG
 
     def __str__(self):
-        from .marshaling import TraceContextEncoder
+        from .codecs import TraceContextEncoder
 
         id_str = TraceContextEncoder.id_to_string(self.trace_context)
         return "%s.%s %s" % (self.tracer.service_name,
@@ -179,7 +173,7 @@ def _peer_port(span, value):
 
 
 SPECIAL_TAGS = {
-    tags.PEER_SERVICE: _peer_service,
-    tags.PEER_HOST_IPV4: _peer_host_ipv4,
-    tags.PEER_PORT: _peer_port,
+    ext_tags.PEER_SERVICE: _peer_service,
+    ext_tags.PEER_HOST_IPV4: _peer_host_ipv4,
+    ext_tags.PEER_PORT: _peer_port,
 }
