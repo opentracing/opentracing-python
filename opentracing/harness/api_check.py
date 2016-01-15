@@ -98,8 +98,10 @@ class APICompatibilityCheckMixin(object):
 
     def test_span_logs(self):
         span = self.tracer().start_trace(operation_name='Fry')
-        span.info('frozen', {'year': 1999, 'place': 'Cryogenics Labs'})
-        span.error('defrosted', {'year': 2999})
+        span.\
+            info('frozen', {'year': 1999, 'place': 'Cryogenics Labs'}). \
+            error('defrosted', {'year': 2999}). \
+            error('became his own grandfather', 1947)
 
     def test_trace_attributes(self):
         trace_context = self.tracer().new_root_trace_context()

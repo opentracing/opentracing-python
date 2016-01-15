@@ -3,10 +3,10 @@
 History
 -------
 
-0.6.2 (unreleased)
+0.6.2 (2016-01-15)
 ------------------
 
-- Nothing changed yet.
+- Validate chaining of logging calls
 
 
 0.6.1 (2016-01-09)

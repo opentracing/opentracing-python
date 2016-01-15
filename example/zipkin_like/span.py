@@ -105,12 +105,14 @@ class Span(opentracing.Span):
         return self
 
     def info(self, message, *payload):
-        self.add_log(message, False, *payload)
+        self._add_log(message, False, *payload)
+        return self
 
     def error(self, message, *payload):
-        self.add_log(message, True, *payload)
+        self._add_log(message, True, *payload)
+        return self
 
-    def add_log(self, message, is_error, *payload):
+    def _add_log(self, message, is_error, *payload):
         """Internal method"""
         if self.is_sampled():
             timestamp = self.tracer.timestamp()
