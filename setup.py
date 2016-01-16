@@ -3,13 +3,12 @@ from setuptools import setup
 
 setup(
     name='opentracing',
-    version='0.6.3.dev0',
-    author='OpenTracing Authors',
+    version='0.6.3',
+    author='Yuri Shkuro, The OpenTracing Authors',
     author_email='shkuro@gmail.com',
     description='OpenTracing API for Python. See documentation at http://opentracing.io',
     license='MIT',
-    url='https://github.com/opentracing/api-python',
-    download_url = 'https://github.com/opentracing/api-python/tarball/0.5.0',
+    url='https://github.com/opentracing/opentracing-python',
     keywords=['opentracing'],
     classifiers=[
         'Development Status :: 3 - Alpha',

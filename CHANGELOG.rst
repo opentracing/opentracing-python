@@ -3,10 +3,10 @@
 History
 -------
 
-0.6.3 (unreleased)
+0.6.3 (2016-01-16)
 ------------------
 
-- Nothing changed yet.
+- Rename repository back to opentracing-python
 
 
 0.6.2 (2016-01-15)
