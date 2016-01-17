@@ -1,19 +1,12 @@
 # OpenTracing API for Python
 
-This library is a Python implementation of Open Tracing API.
+This library is a Python platform API for OpenTracing.
 
-## Objectives
+## Required Reading
 
-Distributed tracing and context propagation have become important analysis 
-tools for today's multi-layer distributed systems comprised of numerous 
-micro-services implemented in different languages.  The success of these
-tools is dependent on pervasive instrumentation of applications and 
-libraries with trace context propagation support.
-
-The OpenTracing project (http://opentracing.io) provides a multi-lingual 
-standard for application-level instrumentation that's loosely coupled to any 
-particular downstream tracing or monitoring system. In this way, adding or 
-switching tracing implementations becomes an O(1) code change.
+In order to understand the Python platform API, one must first be familiar with
+the [OpenTracing project](http://opentracing.io) and
+[terminology](http://opentracing.io/spec/) more generally.
 
 ## Status
 
@@ -24,27 +17,6 @@ collect and propagate distributed tracing context.
 Future versions will include a reference implementation utilizing an 
 abstract Recorder interface, as well as a 
 [Zipkin](http://openzipkin.github.io)-compatible Tracer.
-
-## Concepts
-
-**Trace** is a virtual representation of the path a request takes through 
-the layers and services of a (potentially distributed) system.
-
-**Span** is a representation of any logical unit of work in the system. 
-Spans can be nested and ordered to model parent-child and casual 
-relationships. A Trace is tree of Spans. 
-
-**Trace Context** encapsulates the smallest amount of state needed to 
-describe a Span's identity within a larger, potentially distributed trace,
-sufficient to propagate the context of a particular trace between processes.
-
-**Trace Attributes** is a collection of key/value pairs stored in a Trace 
-Context and propagated to all future children Spans. Given a full-stack 
-OpenTracing integration, Trace Attributes enable powerful functionality 
-of transparently propagating  arbitrary application data, from a mobile app 
-all the way into the depth of a storage system. It comes with powerful 
-*costs* as well, since the attributes are propagated *in-band*, alongside 
-with the application data; use this feature with care.
 
 ## Usage
 
