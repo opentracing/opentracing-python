@@ -30,13 +30,13 @@ class RawSpan(object):
         self.operation_name = operation_name
         self.start_time = None
         self.duration = None
-        self.tags = None  # dict when initialized
+        self.tags = None  # array of (key, value) tuples when initialized
         self.logs = None  # array of RawLog's when initialized
 
     def set_tag(self, key, value):
         if self.tags is None:
-            self.tags = {}
-        self.tags[key] = value
+            self.tags = []
+        self.tags.append((key, value))
 
     def add_log(self, log):
         if self.logs is None:
