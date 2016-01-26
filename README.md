@@ -69,19 +69,19 @@ Somewhere in your server's request handler code:
             span = tracer.join_trace(operation_name=operation,
                                      parent_trace_context=context)
     
-        span.add_tag('client.http.url', request.full_url)
+        span.set_tag('client.http.url', request.full_url)
     
         remote_ip = request.remote_ip
         if remote_ip:
-            span.add_tag(tags.PEER_HOST_IPV4, remote_ip)
+            span.set_tag(tags.PEER_HOST_IPV4, remote_ip)
     
         caller_name = request.caller_name
         if caller_name:
-            span.add_tag(tags.PEER_SERVICE, caller_name)
+            span.set_tag(tags.PEER_SERVICE, caller_name)
     
         remote_port = request.remote_port
         if remote_port:
-            span.add_tag(tags.PEER_PORT, remote_port)
+            span.set_tag(tags.PEER_PORT, remote_port)
     
         return span
 ```
@@ -109,15 +109,15 @@ Somewhere in your service that's about to make an outgoing call:
         else:
             span = parent_span.start_child(operation_name=op)
     
-        span.add_tag('server.http.url', request.full_url)
+        span.set_tag('server.http.url', request.full_url)
         service_name = request.service_name
         host, port = request.host_port
         if service_name:
-            span.add_tag(tags.PEER_SERVICE, service_name)
+            span.set_tag(tags.PEER_SERVICE, service_name)
         if host:
-            span.add_tag(tags.PEER_HOST_IPV4, host)
+            span.set_tag(tags.PEER_HOST_IPV4, host)
         if port:
-            span.add_tag(tags.PEER_PORT, port)
+            span.set_tag(tags.PEER_PORT, port)
     
         h_ctx, h_attr = opentracing.tracer.trace_context_to_text(
             trace_context=span.trace_context)
