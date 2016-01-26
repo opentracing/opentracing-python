@@ -35,11 +35,14 @@ class Tracer(TraceContextSource, object):
 
     singleton_noop_span = Span(TraceContextSource.singleton_noop_trace_context)
 
-    def start_trace(self, operation_name, tags=None):
-        """Starts a new trace and creates a new root span.
+    def start_trace(self, operation_name, tags=None, parent_trace_context=None):
+        """Start a new trace, or continue an upstream trace in this service.
 
-        This method should be used by services that are instrumented for
-        tracing but did not receive trace ID from upstream request.
+        If no parent_trace_context is provided, start a new trace and return a
+        new root span.
+
+        If provided a parent_trace_context, return a new span which is a child
+        of the given parent trace context.
 
         :param operation_name: the service's own name for the end-point
             that received the request represented by this trace and span.
@@ -48,27 +51,8 @@ class Tracer(TraceContextSource, object):
         :param tags: optional dictionary of Span Tags. The caller is
             expected to give up ownership of that dictionary, because the
             Tracer may use it as is to avoid extra data copying.
-
-        :return: a new root Span
-        """
-        return Tracer.singleton_noop_span
-
-    def join_trace(self, operation_name, parent_trace_context, tags=None):
-        """Joins a trace started elsewhere and creates a new span as a
-        child of the given parent trace context.
-
-        This method should be used by services that receive tracing info
-        from upstream.
-
-        :param operation_name: the service's own name for the end-point
-            that received the request represented by this trace and span.
-            The domain of names must be limited, e.g. do not use UUIDs or
-            entity IDs or timestamps as part of the name.
-        :param parent_trace_context: Trace Context of a client span started
-            elsewhere and whose trace we're joining.
-        :param tags: optional dictionary of Span Tags. The caller is
-            expected to give up ownership of that dictionary, because the
-            Tracer may use it as is to avoid extra data copying.
+        :param parent_trace_context: optional Trace Context of a client span
+            started elsewhere whose trace we're joining.
 
         :return: a new Span
         """

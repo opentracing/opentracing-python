@@ -50,16 +50,16 @@ class APICompatibilityCheckMixin(object):
                                     'city': 'Old New York'})
         tracer.close()
 
-    def test_join_trace(self):
+    def test_continue_trace(self):
         tracer = self.tracer()
         trace_context = tracer.new_root_trace_context()
         assert trace_context is not None
-        span = tracer.join_trace(operation_name='Leela',
-                                 parent_trace_context=trace_context)
+        span = tracer.start_trace(operation_name='Leela',
+                                  parent_trace_context=trace_context)
         span.finish()
-        span = tracer.join_trace(operation_name='Leela',
-                                 parent_trace_context=trace_context,
-                                 tags={'birthplace': 'sewers'})
+        span = tracer.start_trace(operation_name='Leela',
+                                  parent_trace_context=trace_context,
+                                  tags={'birthplace': 'sewers'})
         span.finish()
         tracer.close()
 
