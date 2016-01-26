@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 from __future__ import absolute_import
+import time
 
 
 class APICompatibilityCheckMixin(object):
@@ -44,9 +45,9 @@ class APICompatibilityCheckMixin(object):
         span.finish()
         with tracer.start_trace(operation_name='Fry',
                                 tags={'birthday': 'August 14 1974'}) as span:
-            span.info('birthplace',
-                      {'hospital': 'Brooklyn Pre-Med Hospital',
-                       'city': 'Old New York'})
+            span.log_event('birthplace',
+		           payload={'hospital': 'Brooklyn Pre-Med Hospital',
+                                    'city': 'Old New York'})
         tracer.close()
 
     def test_join_trace(self):
@@ -99,9 +100,12 @@ class APICompatibilityCheckMixin(object):
     def test_span_logs(self):
         span = self.tracer().start_trace(operation_name='Fry')
         span.\
-            info('frozen', {'year': 1999, 'place': 'Cryogenics Labs'}). \
-            error('defrosted', {'year': 2999}). \
-            error('became his own grandfather', 1947)
+            log_event('frozen', {'year': 1999, 'place': 'Cryogenics Labs'}). \
+            log_event('defrosted', {'year': 2999}). \
+            log_event('became his own grandfather', 1947)
+        span.\
+            log(timestamp=time.time(), event='frozen', payload={'year': 1999}). \
+            log(timestamp=time.time(), event='unfrozen', payload={'year': 2999})
 
     def test_trace_attributes(self):
         trace_context = self.tracer().new_root_trace_context()
