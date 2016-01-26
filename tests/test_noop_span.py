@@ -30,25 +30,24 @@ def test_span():
     assert span.trace_context == ctx
     child = span.start_child(operation_name='test')
     assert span == child
-    child.info('cache hit', 'arg1', 'arg2')
-    child.error('cache miss', 'arg1', 'arg2')
+    child.log_event('cache_hit', ['arg1', 'arg2'])
 
     with mock.patch.object(span, 'finish') as finish:
-        with mock.patch.object(span, 'error') as error:
+        with mock.patch.object(span, 'log_event') as log_event:
             try:
                 with span:
                     raise ValueError()
             except ValueError:
                 pass
             assert finish.call_count == 1
-            assert error.call_count == 1
+            assert log_event.call_count == 1
 
     with mock.patch.object(span, 'finish') as finish:
-        with mock.patch.object(span, 'error') as error:
+        with mock.patch.object(span, 'log_event') as log_event:
             with span:
                 pass
             assert finish.call_count == 1
-            assert error.call_count == 0
+            assert log_event.call_count == 0
 
     span.set_tag('x', 'y').set_tag('z', 1)  # test chaining
     span.set_tag(tags.PEER_SERVICE, 'test-service')

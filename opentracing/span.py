@@ -57,9 +57,9 @@ class Span(object):
         as a tag to the span.
         """
         if exc_type:
-            self.error('python.exception', {'type': exc_type,
-                                            'val': exc_val,
-                                            'tb': exc_tb})
+            self.log_event('python.exception', {'type': exc_type,
+                                                'val': exc_val,
+                                                'tb': exc_tb})
         self.finish()
 
     def start_child(self, operation_name, tags=None):
@@ -107,22 +107,23 @@ class Span(object):
         """
         return self
 
-    def info(self, message, *args):
-        """Logs an event/message against the span, with the current timestamp.
+    def log_event(self, event, payload=None):
+        """Logs an event against the span, with the current timestamp.
 
-        :param message: a format string that can refer to fields
-            in the args payload.
-        :param args: arbitrary payload
+        :param event: an event name as a string
+	:param payload: an arbitrary structured payload. Implementations may
+	    choose to ignore none, some, or all of the payload.
         :return: returns the span itself, for chaining the calls
         """
         return self
 
-    def error(self, message, *args):
-        """Same as info(), but for errors.
+    def log(self, **kwargs):
+        """Records a generic Log event at an arbitrary timestamp.
 
-        :param message: a format string that can refer to fields
-            in the args payload.
-        :param args: arbitrary payload
+	:param timestamp: the log timestamp an a unix timestamp per time.time()
+        :param event: an event name as a string
+	:param payload: an arbitrary structured payload. Implementations may
+	    choose to ignore none, some, or all of the payload.
         :return: returns the span itself, for chaining the calls
         """
         return self
