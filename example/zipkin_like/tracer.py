@@ -45,19 +45,14 @@ class Tracer(opentracing.Tracer):
             trace_id_header=glossary.TRACE_ID_HEADER,
             trace_attributes_header_prefix=TRACE_ATTRIBUTES_HEADER_PREFIX)
 
-    def start_trace(self, operation_name, tags=None):
+    def start_trace(self, operation_name, tags=None, parent_trace_context=None):
         """Implements start_trace of opentracing.Tracer."""
-        trace_context = self.trace_context_source.new_root_trace_context()
+        if not parent_trace_context:
+            trace_context = self.trace_context_source.new_root_trace_context()
+        else:
+            trace_context = parent_trace_context
         return self.create_span(operation_name=operation_name,
                                 trace_context=trace_context,
-                                is_client=False, tags=tags)
-
-    def join_trace(self, operation_name, parent_trace_context, tags=None):
-        """Implements join_trace of opentracing.Tracer"""
-        # NOTE: Zipkin-specific behavior - server joins the same span that
-        # was started by the client.
-        return self.create_span(operation_name=operation_name,
-                                trace_context=parent_trace_context,
                                 is_client=False, tags=tags)
 
     def close(self):

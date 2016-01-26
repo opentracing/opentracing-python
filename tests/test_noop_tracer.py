@@ -26,8 +26,8 @@ from opentracing import Tracer
 def test_tracer():
     tracer = Tracer()
     span = tracer.start_trace(operation_name='root')
-    child = tracer.join_trace(operation_name='child',
-                              parent_trace_context=span.trace_context)
+    child = tracer.start_trace(operation_name='child',
+                               parent_trace_context=span.trace_context)
     assert span == child
     assert span.trace_context == child.trace_context
     fut = tracer.close()

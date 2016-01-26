@@ -63,11 +63,9 @@ Somewhere in your server's request handler code:
             trace_attributes=request.headers
         )
         operation = request.operation
-        if context is None:
-            span = tracer.start_trace(operation_name=operation)
-        else:
-            span = tracer.join_trace(operation_name=operation,
-                                     parent_trace_context=context)
+
+        span = tracer.start_trace(operation_name=operation,
+                                  parent_trace_context=context)
     
         span.add_tag('client.http.url', request.full_url)
     
