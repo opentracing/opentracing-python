@@ -20,14 +20,14 @@
 
 from __future__ import absolute_import
 import mock
-from opentracing import Span, TraceContextSource
+from opentracing import Span
+from opentracing import SpanPropagator
+from opentracing import Tracer
 from opentracing.ext import tags
 
 
 def test_span():
-    ctx = TraceContextSource().new_root_trace_context()
-    span = Span(trace_context=ctx)
-    assert span.trace_context == ctx
+    span = Span()
     child = span.start_child(operation_name='test')
     assert span == child
     child.log_event('cache_hit', ['arg1', 'arg2'])
@@ -56,3 +56,26 @@ def test_span():
     span.set_tag(tags.PEER_HOSTNAME, 'uber.com')
     span.set_tag(tags.PEER_PORT, 123)
     span.finish()
+
+def test_encoder():
+    span = Span()
+    tracer = Tracer()
+    x, y = tracer.propagate_span_as_binary(span=span)
+    assert x == bytearray()
+    assert y is None
+    x, y = tracer.propagate_span_as_text(span=span)
+    assert x == {}
+    assert y is None
+
+
+def test_decoder():
+    singleton_span = SpanPropagator.singleton_noop_span
+    tracer = Tracer()
+    span = tracer.join_trace_from_binary('op_name',
+                                         tracer_state=None,
+                                         trace_attributes=None)
+    assert singleton_span == span
+    span = tracer.join_trace_from_text('op_name',
+                                       tracer_state=None,
+                                       trace_attributes=None)
+    assert singleton_span == span

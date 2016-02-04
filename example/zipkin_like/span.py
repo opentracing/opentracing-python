@@ -48,6 +48,10 @@ class Span(opentracing.Span):
         self.tags = []
         self.logs = []
 
+    def set_operation_name(self, operation_name):
+        """Implements set_operation_name() of opentracing.Span"""
+        self.operation_name = operation_name
+
     def start_child(self, operation_name, tags=None):
         """Implements start_child() of opentracing.Span"""
         child_ctx, child_tags = self.tracer.trace_context_source. \

@@ -21,11 +21,10 @@
 from __future__ import absolute_import
 from concurrent.futures import Future
 from .span import Span
-from .context import TraceContextSource
-from .context import TraceContextEncoder, TraceContextDecoder
+from .propagator import SpanPropagator
 
 
-class Tracer(TraceContextSource, object):
+class Tracer(SpanPropagator):
     """Tracer is the entry point API between instrumentation code and the
     tracing implementation.
 
@@ -33,9 +32,9 @@ class Tracer(TraceContextSource, object):
     a default no-op behavior.
     """
 
-    singleton_noop_span = Span(TraceContextSource.singleton_noop_trace_context)
+    singleton_noop_span = Span()
 
-    def start_trace(self, operation_name, tags=None):
+    def start_trace(self, operation_name=None, tags=None):
         """Starts a new trace and creates a new root span.
 
         This method should be used by services that are instrumented for
@@ -53,7 +52,7 @@ class Tracer(TraceContextSource, object):
         """
         return Tracer.singleton_noop_span
 
-    def join_trace(self, operation_name, parent_trace_context, tags=None):
+    def join_trace(self, operation_name, parent_span, tags=None):
         """Joins a trace started elsewhere and creates a new span as a
         child of the given parent trace context.
 
@@ -64,8 +63,8 @@ class Tracer(TraceContextSource, object):
             that received the request represented by this trace and span.
             The domain of names must be limited, e.g. do not use UUIDs or
             entity IDs or timestamps as part of the name.
-        :param parent_trace_context: Trace Context of a client span started
-            elsewhere and whose trace we're joining.
+        :param parent_span: a Span instance started elsewhere and whose trace
+            we're joining.
         :param tags: optional dictionary of Span Tags. The caller is
             expected to give up ownership of that dictionary, because the
             Tracer may use it as is to avoid extra data copying.

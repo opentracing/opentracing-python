@@ -27,9 +27,8 @@ def test_tracer():
     tracer = Tracer()
     span = tracer.start_trace(operation_name='root')
     child = tracer.join_trace(operation_name='child',
-                              parent_trace_context=span.trace_context)
+                              parent_span=span)
     assert span == child
-    assert span.trace_context == child.trace_context
     fut = tracer.close()
     assert type(fut) is Future
     fut.result(timeout=1)

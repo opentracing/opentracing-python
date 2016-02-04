@@ -25,13 +25,92 @@ import time
 
 import os
 import opentracing.context
-import opentracing.standard.context
 
 from .span import SAMPLED_FLAG, DEBUG_FLAG
 from .sampler import MAX_ID_BITS
 
+class BaseTraceContext(object):
+    """Base implementation of opentracing.TraceContext.
 
-class TraceContext(opentracing.standard.context.TraceContext):
+    This implementation provides thread-safe Trace Attributes propagation
+    methods, but does not have any notion of the span identity. It is meant
+    for extension by the actual tracing implementations.
+    """
+    def __init__(self, trace_attributes=None):
+        """Initializes this Trace Context with optional Trace Attributes.
+
+        :param trace_attributes: string->string dictionary of Trace
+            Attributes. Used as is, without copying, so the caller is
+            expected to give ownership of this dictionary.
+        :type trace_attributes: dict
+
+        :return: None
+        """
+        self.trace_attributes = trace_attributes
+        self.lock = Lock()
+
+    def normalize_key(self, key):
+        """Normalizes the key.
+
+        The keys are always normalized before use by replacing underscores
+        with dashes and converting the result to lowercase. For performance
+        reasons, the complete validation of the key value to match the
+        target regexp `(?i:[a-z0-9][-a-z0-9]*)` is not performed, it is up
+        to the implementation to enforce this.
+
+        :param key: some string key
+        :return: normalized key
+        """
+        return key.replace('_', '-').lower()
+
+    def set_trace_attribute(self, key, value):
+        """Implements set_trace_attribute() of opentracing.TraceContext.
+
+        :param key: string key
+        :type key: str
+
+        :param value: value of the attribute
+        :type value: str
+
+        :rtype : TraceContext
+        :return: itself, for chaining the calls.
+        """
+        assert type(key) is str, 'key must be a string'
+        assert type(value) is str, 'value must be a string'
+
+        with self.lock:
+            if self.trace_attributes is None:
+                self.trace_attributes = dict()
+            self.trace_attributes[self.normalize_key(key)] = value
+        return self
+
+    def get_trace_attribute(self, key):
+        """Implements get_trace_attribute of :type:opentracing.TraceContext.
+
+        :param key: string key
+        :return: a Trace Attribute value, or None if no such key was stored.
+        """
+        with self.lock:
+            if self.trace_attributes is None:
+                return None
+            else:
+                return self.trace_attributes.get(self.normalize_key(key))
+
+    def trace_attributes_as_dict(self):
+        """Returns a copy of Trace Attributes.
+
+        :return: copy of the Trace Attributes dictionary or None if no
+            Trace Attributes was defined in this context.
+        """
+        with self.lock:
+            if self.trace_attributes is None:
+                out = None
+            else:
+                out = dict(self.trace_attributes)
+        return out
+
+
+class TraceContext(BaseTraceContext):
     """
     Zipkin-style subclass of standard TraceContext
     """
