@@ -23,9 +23,10 @@ help:
 	@echo "dist - package"
 	@echo "install - install the package to the active Python's site-packages"
 
-bootstrap:
-	@[ -d env ] || echo "Please run 'virtualenv env' first"
-	@[ -d env ] || exit 1
+check-virtual-env:
+	@echo virtual-env: $${VIRTUAL_ENV?"Please run in virtual-env"}
+
+bootstrap: check-virtual-env
 	pip install -r requirements.txt
 	pip install -r requirements-test.txt
 	python setup.py develop
