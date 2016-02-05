@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/opentracing/opentracing-python.svg?branch=master)](https://travis-ci.org/opentracing/opentracing-python)
+
 # OpenTracing API for Python
 
 This library is a Python platform API for OpenTracing.

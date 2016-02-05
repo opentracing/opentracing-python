@@ -31,7 +31,7 @@ setup(
             'flake8',
             'flake8-quotes',
             'mock<1.1.0',
-            'pytest',
+            'pytest>=2.7,<3',
             'pytest-cov',
             'pytest-mock',
             'Sphinx',
