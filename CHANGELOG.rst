@@ -3,10 +3,10 @@
 History
 -------
 
-0.6.4 (unreleased)
+0.7.0 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Removed TraceContext
 
 
 0.6.3 (2016-01-16)

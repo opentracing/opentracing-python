@@ -12,7 +12,7 @@ the [OpenTracing project](http://opentracing.io) and
 
 ## Status
 
-In the current version, `api-python` provides only the API and a 
+In the current version, `opentracing-python` provides only the API and a 
 basic no-op implementation that can be used by instrumentation libraries to 
 collect and propagate distributed tracing context.
 
