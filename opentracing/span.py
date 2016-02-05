@@ -40,8 +40,8 @@ class Span(object):
     In this case it's not necessary to call span.finish()
     """
 
-    def __init__(self, trace_context):
-        self.trace_context = trace_context
+    def __init__(self):
+        pass
 
     def __enter__(self):
         """Invoked when span is used as a context manager.
@@ -62,13 +62,21 @@ class Span(object):
                                                 'tb': exc_tb})
         self.finish()
 
+    def set_operation_name(self, operation_name):
+        """Sets or changes the operation name.
+
+        :param operation_name: the new operation name
+        :return: Returns the Span itself, for call chaining.
+        """
+        return self
+
     def start_child(self, operation_name, tags=None):
         """Denotes the beginning of a subordinate unit of work.
 
         As this is a no-op implementation, it actually returns itself as the
         child span. Real implementations should create a new span.
 
-        :param operation_name: name of the operation represened by the new
+        :param operation_name: name of the operation represented by the new
             span from the perspective of the current service.
         :param tags: optional dictionary of Span Tags. The caller is
             expected to give up ownership of that dictionary, because the
@@ -127,3 +135,43 @@ class Span(object):
         :return: returns the span itself, for chaining the calls
         """
         return self
+
+    def set_trace_attribute(self, key, value):
+        """Stores a Trace Attribute in the span as a key/value pair.
+
+        Enables powerful distributed context propagation functionality where
+        arbitrary application data can be carried along the full path of
+        request execution throughout the system.
+
+        Note 1: attributes are only propagated to the future (recursive)
+        children of this Span.
+
+        Note 2: attributes are sent in-band with every subsequent local and
+        remote calls, so this feature must be used with care.
+
+        Note 3: keys are case-insensitive, to allow propagation via HTTP
+        headers. Keys must match regexp `(?i:[a-z0-9][-a-z0-9]*)`
+
+        :param key: trace attribute key
+        :type key: str
+
+        :param value: trace attribute value
+        :type value: str
+
+        :rtype : Span
+        :return: itself, for chaining the calls.
+        """
+        return self
+
+    def get_trace_attribute(self, key):
+        """Retrieves value of the Trace Attribute with the given key.
+
+        Key is case-insensitive.
+
+        :param key: key of the Trace Attribute
+        :type key: str
+
+        :rtype : str
+        :return: value of the Trace Attribute with given key, or None.
+        """
+        return None

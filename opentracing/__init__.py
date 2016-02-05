@@ -20,10 +20,7 @@
 from __future__ import absolute_import
 from .span import Span  # noqa
 from .tracer import Tracer  # noqa
-from .context import TraceContext  # noqa
-from .context import TraceContextSource  # noqa
-from .context import TraceContextEncoder  # noqa
-from .context import TraceContextDecoder  # noqa
+from .propagator import SpanPropagator  # noqa
 
 # Global variable that should be initialized to an instance of real tracer.
 # Note: it should be accessed via 'opentracing.tracer', not via

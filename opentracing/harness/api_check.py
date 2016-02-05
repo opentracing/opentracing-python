@@ -52,18 +52,22 @@ class APICompatibilityCheckMixin(object):
 
     def test_join_trace(self):
         tracer = self.tracer()
-        trace_context = tracer.new_root_trace_context()
-        assert trace_context is not None
+        parent_span = tracer.start_trace(operation_name='parent')
+        assert parent_span is not None
         span = tracer.join_trace(operation_name='Leela',
-                                 parent_trace_context=trace_context)
+                                 parent_span=parent_span)
         span.finish()
         span = tracer.join_trace(operation_name='Leela',
-                                 parent_trace_context=trace_context,
+                                 parent_span=parent_span,
                                  tags={'birthplace': 'sewers'})
         span.finish()
         tracer.close()
 
-    def test_child_span(self):
+    def test_set_operation_name(self):
+        span = self.tracer().start_trace().set_operation_name('Farnsworth')
+        span.finish()
+
+    def test_start_child(self):
         parent = self.tracer().start_trace(operation_name='Farnsworth')
         with parent as p:
             child = p.start_child(operation_name='Cubert')
@@ -108,44 +112,37 @@ class APICompatibilityCheckMixin(object):
             log(timestamp=time.time(), event='unfrozen', payload={'year': 2999})
 
     def test_trace_attributes(self):
-        trace_context = self.tracer().new_root_trace_context()
-        trace_context.set_trace_attribute('Kiff-loves', 'Amy')
-        val = trace_context.get_trace_attribute('kiff-Loves')  # case change
-        if self.check_trace_attribute_values():
-            assert 'Amy' == val
+        with self.tracer().start_trace(operation_name='Fry') as span:
+            span.set_trace_attribute('Kiff-loves', 'Amy')
+            val = span.get_trace_attribute('kiff-Loves')  # case change
+            if self.check_trace_attribute_values():
+                assert 'Amy' == val
+            pass
 
-    def test_trace_context_source_child(self):
-        trace_context = self.tracer().new_root_trace_context()
-        child_context, tags = self.tracer().new_child_trace_context(
-            parent_trace_context=trace_context
-        )
-        child_context.set_trace_attribute('child', 'Igner')
-        assert tags is None or type(tags) is dict
+    def test_text_propagation(self):
+        with self.tracer().start_trace(operation_name='Bender') as span:
+            dict_tracer_state, dict_attrs = self.tracer().propagate_span_as_text(
+                span=span
+            )
+            assert type(dict_tracer_state) is dict
+            assert dict_attrs is None or type(dict_attrs) is dict
+            with self.tracer().join_trace_from_text(
+                None,
+                tracer_state=dict_tracer_state,
+                trace_attributes=dict_attrs
+            ) as reassembled_span:
+                reassembled_span.set_trace_attribute('middle-name', 'Rodriguez')
 
-    def test_text_codecs(self):
-        span = self.tracer().start_trace(operation_name='Bender')
-        trace_context = span.trace_context
-        dict_trace_id, dict_attrs = self.tracer().trace_context_to_text(
-            trace_context=trace_context
-        )
-        assert type(dict_trace_id) is dict
-        assert dict_attrs is None or type(dict_attrs) is dict
-        trace_context = self.tracer().trace_context_from_text(
-            trace_context_id=dict_trace_id,
-            trace_attributes=dict_attrs
-        )
-        trace_context.set_trace_attribute('middle-name', 'Rodriguez')
-
-    def test_binary_codecs(self):
-        span = self.tracer().start_trace(operation_name='Bender')
-        trace_context = span.trace_context
-        bin_trace_id, bin_attrs = self.tracer().trace_context_to_binary(
-            trace_context=trace_context
-        )
-        assert type(bin_trace_id) is bytearray
-        assert bin_attrs is None or type(bin_attrs) is bytearray
-        trace_context = self.tracer().trace_context_from_binary(
-            trace_context_id=bin_trace_id,
-            trace_attributes=bin_attrs
-        )
-        trace_context.set_trace_attribute('middle-name', 'Rodriguez')
+    def test_binary_propagation(self):
+        with self.tracer().start_trace(operation_name='Bender') as span:
+            bin_tracer_state, bin_attrs = self.tracer().propagate_span_as_binary(
+                span=span
+            )
+            assert type(bin_tracer_state) is bytearray
+            assert bin_attrs is None or type(bin_attrs) is bytearray
+            with self.tracer().join_trace_from_binary(
+                None,
+                tracer_state=bin_tracer_state,
+                trace_attributes=bin_attrs
+            ) as reassembled_span:
+                reassembled_span.set_trace_attribute('middle-name', 'Rodriguez')
