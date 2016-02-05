@@ -107,8 +107,8 @@ class SpanPropagator(object):
         :param operation_name: the operation name for the returned Span, or
             None if the caller prefers to call `Span.set_operation_name()`
             directly.
-        :param tracer_state: tracer state encoded as a tsring->string dict
-        :param trace_attributes: Trace Attributes encoded as a tsring->string dict
+        :param tracer_state: tracer state encoded as a string->string dict
+        :param trace_attributes: Trace Attributes encoded as a string->string dict
 
         :return: a started Span instance
         """
