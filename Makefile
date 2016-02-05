@@ -85,7 +85,6 @@ dist: clean
 #	ls -l dist
 
 install:
-	pip install setuptools
 	pip install -r requirements.txt
 	pip install -r requirements-test.txt
 	echo skipping pip install -r requirements-doc.txt
