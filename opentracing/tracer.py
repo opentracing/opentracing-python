@@ -20,7 +20,6 @@
 
 from __future__ import absolute_import
 from concurrent.futures import Future
-from collections import namedtuple
 from .span import Span
 from .propagator import SpanPropagator
 
@@ -33,7 +32,7 @@ class Tracer(SpanPropagator):
     a default no-op behavior.
 
     All OpenTracing implementations MUST formally subclass Tracer (in order to
-    inherit OPENTRACING_PYTHON_SEMVER if nothing else).
+    inherit OPENTRACING_PYTHON_API_SEMVER if nothing else).
     """
 
 
@@ -88,15 +87,10 @@ class Tracer(SpanPropagator):
         fut.set_result(True)
         return fut
 
-    def implementation_id(self):
-        """Returns the ImplementationID for this OpenTracing implementation.
-
-        :return: An ImplementationID instance that describes this OpenTracing
-            implementation.
-        """
-        return ImplementationID('noop', '1.0.0')
-
-    # The OpenTracing Python API SemVer (http://semver.org/).
+    # The OpenTracing Python API's SemVer (http://semver.org/). Note that each
+    # OpenTracing platform API has its own semver (which has more to do with
+    # refactors or other compatibility changes and less to do with the
+    # platform-independent OpenTracing semantic specification).
     #
     # Note that -- with vendored code buried within vendored code -- it is
     # possible (though not particularly desirable) for a single Python process
@@ -107,13 +101,3 @@ class Tracer(SpanPropagator):
     #     if tracer_var.OPENTRACING_PYTHON_API_SEMVER == ...
     #
     OPENTRACING_PYTHON_API_SEMVER = '0.9.0'
-
-
-# Per collections.namedtuple, the below defines a class called ImplementationID
-# which can be initialized via positional parameters or a kwargs-style
-# initializer.
-#
-#     dapper_impl = ImplementationID('dapper', '0.1.2')
-#     zipkin_impl = ImplementationID(name='zipkin', version='0.3.4')
-#
-ImplementationID = namedtuple('ImplementationID', 'name version')
