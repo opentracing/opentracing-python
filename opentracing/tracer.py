@@ -31,7 +31,11 @@ class Tracer(SpanPropagator):
 
     This implementation both defines the public Tracer API, and provides
     a default no-op behavior.
+
+    All OpenTracing implementations MUST formally subclass Tracer (in order to
+    inherit OPENTRACING_PYTHON_SEMVER if nothing else).
     """
+
 
     singleton_noop_span = Span()
 
@@ -92,6 +96,18 @@ class Tracer(SpanPropagator):
         """
         return ImplementationID('noop', '1.0.0')
 
+    # The OpenTracing Python API SemVer (http://semver.org/).
+    #
+    # Note that -- with vendored code buried within vendored code -- it is
+    # possible (though not particularly desirable) for a single Python process
+    # to have more than one OpenTracing implementation contained within, and
+    # perhaps at different API SemVers. As such, OpenTracing users who want to
+    # know the API SemVer should always do so via a Tracer instance.
+    #
+    #     if tracer_var.OPENTRACING_PYTHON_API_SEMVER == ...
+    #
+    OPENTRACING_PYTHON_API_SEMVER = '0.9.0'
+
 
 # Per collections.namedtuple, the below defines a class called ImplementationID
 # which can be initialized via positional parameters or a kwargs-style
@@ -101,6 +117,3 @@ class Tracer(SpanPropagator):
 #     zipkin_impl = ImplementationID(name='zipkin', version='0.3.4')
 #
 ImplementationID = namedtuple('ImplementationID', 'name version')
-
-# The SemVer (http://semver.org/) of the OpenTracing Python API.
-OPENTRACING_PYTHON_SEMVER = '0.9.0'

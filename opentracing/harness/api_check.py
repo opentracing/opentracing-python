@@ -151,3 +151,7 @@ class APICompatibilityCheckMixin(object):
         impl_id = self.tracer().implementation_id()
         assert len(impl_id.name) > 0
         assert len(impl_id.version) > 0
+
+    def test_opentracing_semver_presence(self):
+        semver = self.tracer().OPENTRACING_PYTHON_API_SEMVER
+        assert len(semver) > 0
