@@ -119,8 +119,8 @@ class Span(object):
         """Logs an event against the span, with the current timestamp.
 
         :param event: an event name as a string
-	:param payload: an arbitrary structured payload. Implementations may
-	    choose to ignore none, some, or all of the payload.
+    :param payload: an arbitrary structured payload. Implementations may
+        choose to ignore none, some, or all of the payload.
         :return: returns the span itself, for chaining the calls
         """
         return self
@@ -128,10 +128,10 @@ class Span(object):
     def log(self, **kwargs):
         """Records a generic Log event at an arbitrary timestamp.
 
-	:param timestamp: the log timestamp an a unix timestamp per time.time()
+    :param timestamp: the log timestamp an a unix timestamp per time.time()
         :param event: an event name as a string
-	:param payload: an arbitrary structured payload. Implementations may
-	    choose to ignore none, some, or all of the payload.
+    :param payload: an arbitrary structured payload. Implementations may
+        choose to ignore none, some, or all of the payload.
         :return: returns the span itself, for chaining the calls
         """
         return self
