@@ -30,7 +30,11 @@ class Tracer(SpanPropagator):
 
     This implementation both defines the public Tracer API, and provides
     a default no-op behavior.
+
+    All OpenTracing implementations MUST formally subclass Tracer (in order to
+    inherit OPENTRACING_PYTHON_API_SEMVER if nothing else).
     """
+
 
     singleton_noop_span = Span()
 
@@ -82,3 +86,18 @@ class Tracer(SpanPropagator):
         fut = Future()
         fut.set_result(True)
         return fut
+
+    # The OpenTracing Python API's SemVer (http://semver.org/). Note that each
+    # OpenTracing platform API has its own semver (which has more to do with
+    # refactors or other compatibility changes and less to do with the
+    # platform-independent OpenTracing semantic specification).
+    #
+    # Note that -- with vendored code buried within vendored code -- it is
+    # possible (though not particularly desirable) for a single Python process
+    # to have more than one OpenTracing implementation contained within, and
+    # perhaps at different API SemVers. As such, OpenTracing users who want to
+    # know the API SemVer should always do so via a Tracer instance.
+    #
+    #     if tracer_var.OPENTRACING_PYTHON_API_SEMVER == ...
+    #
+    OPENTRACING_PYTHON_API_SEMVER = '0.9.0'

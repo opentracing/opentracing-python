@@ -46,7 +46,7 @@ class APICompatibilityCheckMixin(object):
         with tracer.start_trace(operation_name='Fry',
                                 tags={'birthday': 'August 14 1974'}) as span:
             span.log_event('birthplace',
-		           payload={'hospital': 'Brooklyn Pre-Med Hospital',
+                   payload={'hospital': 'Brooklyn Pre-Med Hospital',
                                     'city': 'Old New York'})
         tracer.close()
 
@@ -146,3 +146,7 @@ class APICompatibilityCheckMixin(object):
                 trace_attributes=bin_attrs
             ) as reassembled_span:
                 reassembled_span.set_trace_attribute('middle-name', 'Rodriguez')
+
+    def test_opentracing_semver_presence(self):
+        semver = self.tracer().OPENTRACING_PYTHON_API_SEMVER
+        assert len(semver) > 0

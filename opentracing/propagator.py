@@ -22,15 +22,16 @@ from __future__ import absolute_import
 
 from .span import Span
 
+
 class SpanPropagator(object):
     """SpanPropagator encodes and decodes Spans between processes.
 
     SpanPropagator is responsible (a) for encoding Span instances in a manner
     suitable for propagation, and (b) for taking that encoded data and using it
     to generate Span instances that are placed appropriately in the overarching
-    Trace. Typically the propagation will take place across an RPC boundary, but
-    message queues and other IPC mechanisms are also reasonable places to use
-    a SpanPropagator.
+    Trace. Typically the propagation will take place across an RPC boundary,
+    but message queues and other IPC mechanisms are also reasonable places to
+    use a SpanPropagator.
 
     The encoded form of a propagated span is divided into two components:
 
@@ -53,7 +54,7 @@ class SpanPropagator(object):
 
     def propagate_span_as_binary(self, span):
         """Represents the Span for propagation as opaque binary data.
-	
+
         :param span: the Span instance to propagate
 
         :rtype: ((bytearray, bytearray) or None)
@@ -66,7 +67,7 @@ class SpanPropagator(object):
 
     def propagate_span_as_text(self, span):
         """Represents the Span for propagation as a pair of text dicts.
-	
+
         :param span: the Span instance to propagate
 
         :rtype: ((dict, dict) or None)
