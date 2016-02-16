@@ -21,6 +21,7 @@
 from __future__ import absolute_import
 from concurrent.futures import Future
 from .span import Span
+from .propagator import _NoopPropagator
 
 
 class Tracer(object):
@@ -32,8 +33,9 @@ class Tracer(object):
     """
 
     singleton_noop_span = Span()
+    singleton_noop_propagator = _NoopPropagator()
 
-    def start_span(self, operation_name, parent=None, **kwargs):
+    def start_span(self, operation_name, parent=None, tags=None, start_time=None):
         """Starts and returns a new Span representing a unit of work.
 
         :param operation_name: name of the operation represented by the new
@@ -54,8 +56,8 @@ class Tracer(object):
     def injector(self, format):
         """Returns an Injector instance corresponding to `format`.
 
-        See the opentracing.propagation module for standard (and required)
-        formats.
+        See the opentracing.propagation.Format class/namespace for standard
+        (and required) formats.
 
         :param format: a python object instance that represents a given
             Injector format. `format` may be of any type, and `format` equality
@@ -64,13 +66,13 @@ class Tracer(object):
         :return: an Injector instance corresponding to `format`, or None if the
             Tracer implementation does not support `format`.
         """
-        return None
+        return Tracer.singleton_noop_propagator
 
     def extractor(self, format):
         """Returns an Extractor instance corresponding to `format`.
 
-        See the opentracing.propagation module for standard (and required)
-        formats.
+        See the opentracing.propagation.Format class/namespace for standard
+        (and required) formats.
 
         :param format: a python object instance that represents a given
             Extractor format. `format` may be of any type, and `format`
@@ -79,11 +81,11 @@ class Tracer(object):
         :return: an Extractor instance corresponding to `format`, or None if
             the Tracer implementation does not support `format`.
         """
-        return None
+        return Tracer.singleton_noop_propagator
 
-    def close(self):
-        """Performs a clean shutdown of the tracer, flushing any traces that
-        may have been buffered in memory.
+    def flush(self):
+        """Flushes any trace data that may be buffered in memory, presumably
+        out of the process.
 
         :return: Returns a :py:class:futures.Future
         """

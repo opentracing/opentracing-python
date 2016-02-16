@@ -21,6 +21,20 @@
 from __future__ import absolute_import
 
 
+class Format:
+    """A namespace for builtin Injector/Extractor formats.
+
+    These static constants are intended for use in the Tracer.injector() and
+    Tracer.extractor() methods. E.g.,
+
+        tracer.injector(Format.SPLIT_BINARY).inject_span(...)
+
+    """
+
+    SPLIT_BINARY = "split_binary"
+    SPLIT_TEXT = "split_text"
+
+
 class Injector(object):
     """An Injector injects Span instances into a format-specific "carrier"
     object.
@@ -95,3 +109,10 @@ class TraceCorruptedException(Exception):
     See Extractor.join_trace.
     """
     pass
+
+
+class _NoopPropagator:
+    def inject_span(span, carrier):
+        pass
+    def join_trace(operation_name, carrier):
+        return None

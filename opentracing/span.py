@@ -70,7 +70,7 @@ class Span(object):
         """
         return self
 
-    def finish(self, **kwargs):
+    def finish(self, finish_time=None):
         """Indicates that the work represented by this span has been completed
         or terminated, and is ready to be sent to the Reporter.
 
@@ -163,6 +163,7 @@ class Span(object):
         """
         return None
 
+    @property
     def tracer(self):
         """Provides access to the Tracer that created this Span.
 
