@@ -33,7 +33,7 @@ class Span(object):
 
     .. code-block:: python
 
-        span = tracer.start_trace(operation_name='go_fishing')
+        span = tracer.start_span(operation_name='go_fishing')
         with span:
             call_some_service()
 

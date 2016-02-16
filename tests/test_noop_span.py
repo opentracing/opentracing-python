@@ -21,46 +21,46 @@
 from __future__ import absolute_import
 import mock
 from opentracing import Span
-from opentracing import SpanPropagator
 from opentracing import Tracer
 from opentracing.ext import tags
 
 
 def test_span():
-    span = Span()
-    child = span.start_child(operation_name='test')
-    assert span == child
+    tracer = Tracer()
+    parent = tracer.start_span('parent')
+    child = tracer.start_span('test', parent=parent)
+    assert parent == child
     child.log_event('cache_hit', ['arg1', 'arg2'])
 
-    with mock.patch.object(span, 'finish') as finish:
-        with mock.patch.object(span, 'log_event') as log_event:
+    with mock.patch.object(parent, 'finish') as finish:
+        with mock.patch.object(parent, 'log_event') as log_event:
             try:
-                with span:
+                with parent:
                     raise ValueError()
             except ValueError:
                 pass
             assert finish.call_count == 1
             assert log_event.call_count == 1
 
-    with mock.patch.object(span, 'finish') as finish:
-        with mock.patch.object(span, 'log_event') as log_event:
-            with span:
+    with mock.patch.object(parent, 'finish') as finish:
+        with mock.patch.object(parent, 'log_event') as log_event:
+            with parent:
                 pass
             assert finish.call_count == 1
             assert log_event.call_count == 0
 
-    span.set_tag('x', 'y').set_tag('z', 1)  # test chaining
-    span.set_tag(tags.PEER_SERVICE, 'test-service')
-    span.set_tag(tags.PEER_HOST_IPV4, 127 << 24 + 1)
-    span.set_tag(tags.PEER_HOST_IPV6, '::')
-    span.set_tag(tags.PEER_HOSTNAME, 'uber.com')
-    span.set_tag(tags.PEER_PORT, 123)
-    span.finish()
+    parent.set_tag('x', 'y').set_tag('z', 1)  # test chaining
+    parent.set_tag(tags.PEER_SERVICE, 'test-service')
+    parent.set_tag(tags.PEER_HOST_IPV4, 127 << 24 + 1)
+    parent.set_tag(tags.PEER_HOST_IPV6, '::')
+    parent.set_tag(tags.PEER_HOSTNAME, 'uber.com')
+    parent.set_tag(tags.PEER_PORT, 123)
+    parent.finish()
 
 
 def test_encoder():
-    span = Span()
     tracer = Tracer()
+    span = tracer.start_span()
     x, y = tracer.propagate_span_as_binary(span=span)
     assert x == bytearray()
     assert y is None

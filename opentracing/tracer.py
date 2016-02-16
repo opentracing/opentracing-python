@@ -21,7 +21,7 @@
 from __future__ import absolute_import
 from concurrent.futures import Future
 from .span import Span
-from .propagator import _NoopPropagator
+from .propagation import _NoopPropagator
 
 
 class Tracer(object):
@@ -32,10 +32,11 @@ class Tracer(object):
     a default no-op behavior.
     """
 
-    singleton_noop_span = Span()
-    singleton_noop_propagator = _NoopPropagator()
+    def __init__(self):
+        self._noop_span = Span(self)
+        self._noop_propagator = _NoopPropagator()
 
-    def start_span(self, operation_name, parent=None, tags=None, start_time=None):
+    def start_span(self, operation_name=None, parent=None, tags=None, start_time=None):
         """Starts and returns a new Span representing a unit of work.
 
         :param operation_name: name of the operation represented by the new
@@ -51,7 +52,7 @@ class Tracer(object):
 
         :return: Returns a new child Span in "started" state.
         """
-        return Tracer.singleton_noop_span
+        return self._noop_span
 
     def injector(self, format):
         """Returns an Injector instance corresponding to `format`.
@@ -66,7 +67,7 @@ class Tracer(object):
         :return: an Injector instance corresponding to `format`, or None if the
             Tracer implementation does not support `format`.
         """
-        return Tracer.singleton_noop_propagator
+        return self._noop_propagator
 
     def extractor(self, format):
         """Returns an Extractor instance corresponding to `format`.
@@ -81,7 +82,7 @@ class Tracer(object):
         :return: an Extractor instance corresponding to `format`, or None if
             the Tracer implementation does not support `format`.
         """
-        return Tracer.singleton_noop_propagator
+        return self._noop_propagator
 
     def flush(self):
         """Flushes any trace data that may be buffered in memory, presumably

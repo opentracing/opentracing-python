@@ -25,10 +25,10 @@ from opentracing import Tracer
 
 def test_tracer():
     tracer = Tracer()
-    span = tracer.start_trace(operation_name='root')
-    child = tracer.join_trace(operation_name='child',
-                              parent_span=span)
+    span = tracer.start_span(operation_name='root')
+    child = tracer.start_span(operation_name='child',
+                              parent=span)
     assert span == child
-    fut = tracer.close()
+    fut = tracer.flush()
     assert type(fut) is Future
     fut.result(timeout=1)
