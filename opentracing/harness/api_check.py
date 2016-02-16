@@ -46,7 +46,7 @@ class APICompatibilityCheckMixin(object):
         with tracer.start_trace(operation_name='Fry',
                                 tags={'birthday': 'August 14 1974'}) as span:
             span.log_event('birthplace',
-		           payload={'hospital': 'Brooklyn Pre-Med Hospital',
+                           payload={'hospital': 'Brooklyn Pre-Med Hospital',
                                     'city': 'Old New York'})
         tracer.close()
 
@@ -108,8 +108,12 @@ class APICompatibilityCheckMixin(object):
             log_event('defrosted', {'year': 2999}). \
             log_event('became his own grandfather', 1947)
         span.\
-            log(timestamp=time.time(), event='frozen', payload={'year': 1999}). \
-            log(timestamp=time.time(), event='unfrozen', payload={'year': 2999})
+            log(timestamp=time.time(),
+                event='frozen',
+                payload={'year': 1999}). \
+            log(timestamp=time.time(),
+                event='unfrozen',
+                payload={'year': 2999})
 
     def test_trace_attributes(self):
         with self.tracer().start_trace(operation_name='Fry') as span:
@@ -121,9 +125,8 @@ class APICompatibilityCheckMixin(object):
 
     def test_text_propagation(self):
         with self.tracer().start_trace(operation_name='Bender') as span:
-            dict_tracer_state, dict_attrs = self.tracer().propagate_span_as_text(
-                span=span
-            )
+            dict_tracer_state, dict_attrs = self.tracer(). \
+                propagate_span_as_text(span=span)
             assert type(dict_tracer_state) is dict
             assert dict_attrs is None or type(dict_attrs) is dict
             with self.tracer().join_trace_from_text(
@@ -131,13 +134,13 @@ class APICompatibilityCheckMixin(object):
                 tracer_state=dict_tracer_state,
                 trace_attributes=dict_attrs
             ) as reassembled_span:
-                reassembled_span.set_trace_attribute('middle-name', 'Rodriguez')
+                reassembled_span.set_trace_attribute(
+                    'middle-name', 'Rodriguez')
 
     def test_binary_propagation(self):
         with self.tracer().start_trace(operation_name='Bender') as span:
-            bin_tracer_state, bin_attrs = self.tracer().propagate_span_as_binary(
-                span=span
-            )
+            bin_tracer_state, bin_attrs = self.tracer(). \
+                propagate_span_as_binary(span=span)
             assert type(bin_tracer_state) is bytearray
             assert bin_attrs is None or type(bin_attrs) is bytearray
             with self.tracer().join_trace_from_binary(
@@ -145,4 +148,5 @@ class APICompatibilityCheckMixin(object):
                 tracer_state=bin_tracer_state,
                 trace_attributes=bin_attrs
             ) as reassembled_span:
-                reassembled_span.set_trace_attribute('middle-name', 'Rodriguez')
+                reassembled_span.set_trace_attribute(
+                    'middle-name', 'Rodriguez')

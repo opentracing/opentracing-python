@@ -20,12 +20,11 @@
 
 from __future__ import absolute_import
 
-from .span import Span
 
 class Injector(object):
     """An Injector injects Span instances into a format-specific "carrier"
     object.
-    
+
     Typically the carrier will then propagate across a process boundary, often
     via an RPC (though message queues and other IPC mechanisms are also
     reasonable places to use an Injector).
@@ -47,10 +46,11 @@ class Injector(object):
         """
         pass
 
+
 class Extractor(object):
     """An Extractor extracts Span instances from a format-specific "carrier"
     object.
-    
+
     Typically the carrier has just arrived across a process boundary, often via
     an RPC (though message queues and other IPC mechanisms are also reasonable
     places to use an Extractor).
@@ -62,12 +62,12 @@ class Extractor(object):
         """join_trace returns a Span instance with operation name `operation_name`
         that's joined to the trace state embedded within `carrier`, or None if
         no such trace state could be found.
-	
+
         Implementations may raise opentracing.InvalidCarrierException,
         opentracing.TraceCorruptedException, or implementation-specific errors
         if there are more fundamental problems with `carrier`.
-	
-	Upon success, the returned Span instance is already started.
+
+        Upon success, the returned Span instance is already started.
 
         :param operation_name: the operation name for the returned Span (which
             can be set later via Span.set_operation_name())
@@ -78,6 +78,7 @@ class Extractor(object):
         """
         return None
 
+
 class InvalidCarrierException(Exception):
     """InvalidCarrierException should be used when the provided carrier
     instance does not match what the `format` argument requires.
@@ -85,6 +86,7 @@ class InvalidCarrierException(Exception):
     See Injector and Extractor.
     """
     pass
+
 
 class TraceCorruptedException(Exception):
     """TraceCorruptedException should be used when the underlynig trace state

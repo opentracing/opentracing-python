@@ -76,8 +76,8 @@ class Tracer(object):
             Extractor format. `format` may be of any type, and `format`
             equality is defined by python `==` equality.
 
-        :return: an Extractor instance corresponding to `format`, or None if the
-            Tracer implementation does not support `format`.
+        :return: an Extractor instance corresponding to `format`, or None if
+            the Tracer implementation does not support `format`.
         """
         return None
 

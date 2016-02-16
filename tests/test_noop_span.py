@@ -57,6 +57,7 @@ def test_span():
     span.set_tag(tags.PEER_PORT, 123)
     span.finish()
 
+
 def test_encoder():
     span = Span()
     tracer = Tracer()
