@@ -20,7 +20,10 @@
 from __future__ import absolute_import
 from .span import Span  # noqa
 from .tracer import Tracer  # noqa
-from .propagator import SpanPropagator  # noqa
+from .propagation import Extractor  # noqa
+from .propagation import Injector  # noqa
+from .propagation import InvalidCarrierException  # noqa
+from .propagation import TraceCorruptedException  # noqa
 
 # Global variable that should be initialized to an instance of real tracer.
 # Note: it should be accessed via 'opentracing.tracer', not via

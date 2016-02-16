@@ -40,8 +40,8 @@ class Span(object):
     In this case it's not necessary to call span.finish()
     """
 
-    def __init__(self):
-        pass
+    def __init__(self, tracer):
+        self._tracer = tracer
 
     def __enter__(self):
         """Invoked when span is used as a context manager.
@@ -70,28 +70,15 @@ class Span(object):
         """
         return self
 
-    def start_child(self, operation_name, tags=None):
-        """Denotes the beginning of a subordinate unit of work.
-
-        As this is a no-op implementation, it actually returns itself as the
-        child span. Real implementations should create a new span.
-
-        :param operation_name: name of the operation represented by the new
-            span from the perspective of the current service.
-        :param tags: optional dictionary of Span Tags. The caller is
-            expected to give up ownership of that dictionary, because the
-            Tracer may use it as is to avoid extra data copying.
-
-        :return: Returns a new child Span in "started" state.
-        """
-        return self
-
-    def finish(self):
+    def finish(self, **kwargs):
         """Indicates that the work represented by this span has been completed
         or terminated, and is ready to be sent to the Reporter.
 
         If any tags / logs need to be added to the span, it should be done
         before calling finish(), otherwise they may be ignored.
+
+        :param finish_time: an explicit Span finish timestamp as a unix
+            timestamp per time.time()
         """
         pass
 
@@ -119,8 +106,8 @@ class Span(object):
         """Logs an event against the span, with the current timestamp.
 
         :param event: an event name as a string
-	:param payload: an arbitrary structured payload. Implementations may
-	    choose to ignore none, some, or all of the payload.
+        :param payload: an arbitrary structured payload. Implementations may
+            choose to ignore none, some, or all of the payload.
         :return: returns the span itself, for chaining the calls
         """
         return self
@@ -128,10 +115,10 @@ class Span(object):
     def log(self, **kwargs):
         """Records a generic Log event at an arbitrary timestamp.
 
-	:param timestamp: the log timestamp an a unix timestamp per time.time()
+        :param timestamp: the log timestamp as a unix timestamp per time.time()
         :param event: an event name as a string
-	:param payload: an arbitrary structured payload. Implementations may
-	    choose to ignore none, some, or all of the payload.
+        :param payload: an arbitrary structured payload. Implementations may
+            choose to ignore none, some, or all of the payload.
         :return: returns the span itself, for chaining the calls
         """
         return self
@@ -175,3 +162,10 @@ class Span(object):
         :return: value of the Trace Attribute with given key, or None.
         """
         return None
+
+    def tracer(self):
+        """Provides access to the Tracer that created this Span.
+
+        :return: returns the Tracer that created this Span.
+        """
+        return self._tracer
