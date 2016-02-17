@@ -19,6 +19,7 @@
 # THE SOFTWARE.
 from __future__ import absolute_import
 from .span import Span  # noqa
+from .span import start_child_span  # noqa
 from .tracer import Tracer  # noqa
 from .propagation import Extractor  # noqa
 from .propagation import Format  # noqa
