@@ -47,7 +47,7 @@ class APICompatibilityCheckMixin(object):
         span = tracer.start_span(operation_name='Fry')
         span.finish()
         with tracer.start_span(operation_name='Fry',
-                                tags={'birthday': 'August 14 1974'}) as span:
+                               tags={'birthday': 'August 14 1974'}) as span:
             span.log_event('birthplace',
                            payload={'hospital': 'Brooklyn Pre-Med Hospital',
                                     'city': 'Old New York'})
@@ -124,7 +124,7 @@ class APICompatibilityCheckMixin(object):
         with self.tracer().start_span(operation_name='Bender') as span:
             text_carrier = SplitTextCarrier()
             self.tracer().injector(Format.SPLIT_TEXT).inject_span(
-                    span=span, carrier=text_carrier)
+                span=span, carrier=text_carrier)
             assert type(text_carrier.tracer_state) is dict
             assert (text_carrier.trace_attributes is None or
                     type(text_carrier.trace_attributes) is dict)
@@ -139,7 +139,7 @@ class APICompatibilityCheckMixin(object):
         with self.tracer().start_span(operation_name='Bender') as span:
             bin_carrier = SplitBinaryCarrier()
             self.tracer().injector(Format.SPLIT_BINARY).inject_span(
-                    span=span, carrier=bin_carrier)
+                span=span, carrier=bin_carrier)
             assert type(bin_carrier.tracer_state) is bytearray
             assert (bin_carrier.trace_attributes is None or
                     type(bin_carrier.trace_attributes) is bytearray)

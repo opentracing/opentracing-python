@@ -21,7 +21,6 @@
 from __future__ import absolute_import
 import mock
 from opentracing import Format
-from opentracing import Span
 from opentracing import SplitBinaryCarrier
 from opentracing import SplitTextCarrier
 from opentracing import Tracer
@@ -67,13 +66,13 @@ def test_injector():
 
     bin_carrier = SplitBinaryCarrier()
     tracer.injector(Format.SPLIT_BINARY).inject_span(
-            span=span, carrier=bin_carrier)
+        span=span, carrier=bin_carrier)
     assert bin_carrier.tracer_state == bytearray()
     assert bin_carrier.trace_attributes == bytearray()
 
     text_carrier = SplitTextCarrier()
     tracer.injector(Format.SPLIT_TEXT).inject_span(
-            span=span, carrier=text_carrier)
+        span=span, carrier=text_carrier)
     assert text_carrier.tracer_state == {}
     assert text_carrier.trace_attributes == {}
 
@@ -84,10 +83,10 @@ def test_extractor():
 
     bin_carrier = SplitBinaryCarrier()
     span = tracer.extractor(Format.SPLIT_BINARY).join_trace(
-            'op_name', carrier=bin_carrier)
+        'op_name', carrier=bin_carrier)
     assert noop_span == span
 
     text_carrier = SplitTextCarrier()
     span = tracer.extractor(Format.SPLIT_TEXT).join_trace(
-            'op_name', carrier=text_carrier)
+        'op_name', carrier=text_carrier)
     assert noop_span == span

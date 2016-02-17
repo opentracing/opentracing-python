@@ -109,11 +109,11 @@ class Format:
 
     # The SPLIT_BINARY format pairs with an Injector or Extractor that expects
     # a SplitBinaryCarrier carrier object.
-    SPLIT_BINARY = "split_binary"
+    SPLIT_BINARY = 'split_binary'
 
     # The SPLIT_TEXT format pairs with an Injector or Extractor that expects a
     # SplitTextCarrier carrier object.
-    SPLIT_TEXT = "split_text"
+    SPLIT_TEXT = 'split_text'
 
 
 class SplitBinaryCarrier(object):

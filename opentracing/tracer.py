@@ -36,7 +36,11 @@ class Tracer(object):
         self._noop_span = Span(self)
         self._noop_propagator = _NoopPropagator(self)
 
-    def start_span(self, operation_name=None, parent=None, tags=None, start_time=None):
+    def start_span(self,
+                   operation_name=None,
+                   parent=None,
+                   tags=None,
+                   start_time=None):
         """Starts and returns a new Span representing a unit of work.
 
         :param operation_name: name of the operation represented by the new
