@@ -25,23 +25,22 @@ abstract Recorder interface, as well as a
 The work of instrumentation libraries generally consists of three steps:
 
 1. When a service receives a new request (over HTTP or some other protocol),
-it uses OpenTracing API serialization tools to extract a Trace Context 
-from the request headers and create a Span object. If the request does
-not contain a trace context, the service starts a new trace and a new 
-*root* Span.
+it uses OpenTracing's Extractor API to join to an active trace, creating a Span
+object in the process. If the request does not contain an active trace, the
+service starts a new trace and a new *root* Span.
 2. The service needs to store the current Span in some request-local storage,
-where it can be retrieved from when a child Span must be created, e.g. in 
-case of the service making an RPC to another service.
-3. When making outbound calls to another service, the current Span must be 
-retrieved from request-local storage, a child span must be created using
-`span.start_child()` method, and the Trace Context of the child span must
-be serialized into the outbound request (e.g. HTTP headers) using 
-OpenTracing API serialization tools.
+where it can be retrieved from when a child Span must be created, e.g. in case
+of the service making an RPC to another service.
+3. When making outbound calls to another service, the current Span must be
+retrieved from request-local storage, a child span must be created (e.g., by
+using the `start_child_span()` helper), and that child span must be embedded
+into the outbound request (e.g., using HTTP headers) via OpenTracing's Injector
+API.
 
-Below are the code examples for steps 1 and 3. Implementation of 
-request-local storage needed for step 2 is specific to the service and/or 
-frameworks / instrumentation libraries it is using (TODO reference to other
-OSS projects with examples of instrumentation).
+Below are the code examples for steps 1 and 3. Implementation of request-local
+storage needed for step 2 is specific to the service and/or frameworks /
+instrumentation libraries it is using (TODO: reference to other OSS projects
+with examples of instrumentation).
 
 ### Inbound request
 
@@ -60,17 +59,14 @@ Somewhere in your server's request handler code:
         
     
     def before_request(request, tracer):
-        context = tracer.trace_context_from_text(
-            trace_context_id=request.headers, 
-            trace_attributes=request.headers
+        text_carrier = opentracing.SplitTextCarrier(
+            request.headers, request.headers)
+        span = tracer.extractor(Format.SPLIT_TEXT).join_trace(
+            operation_name=request.operation,
+            carrier=text_carrier
         )
-        operation = request.operation
-        if context is None:
-            span = tracer.start_trace(operation_name=operation)
-        else:
-            span = tracer.join_trace(operation_name=operation,
-                                     parent_trace_context=context)
-    
+        if span is None:
+            span = tracer.start_span(operation_name=request.operation)
         span.set_tag('client.http.url', request.full_url)
     
         remote_ip = request.remote_ip
@@ -106,30 +102,33 @@ Somewhere in your service that's about to make an outgoing call:
     def before_http_request(request, current_span_extractor):
         op = request.operation
         parent_span = current_span_extractor()
-        if parent_span is None:
-            span = opentracing.tracer.start_trace(operation_name=op)
-        else:
-            span = parent_span.start_child(operation_name=op)
+        outbound_span = opentracing.tracer.start_span(
+            operation_name=op,
+            parent=parent_span
+        )
     
-        span.set_tag('server.http.url', request.full_url)
+        outbound_span.set_tag('server.http.url', request.full_url)
         service_name = request.service_name
         host, port = request.host_port
         if service_name:
-            span.set_tag(tags.PEER_SERVICE, service_name)
+            outbound_span.set_tag(tags.PEER_SERVICE, service_name)
         if host:
-            span.set_tag(tags.PEER_HOST_IPV4, host)
+            outbound_span.set_tag(tags.PEER_HOST_IPV4, host)
         if port:
-            span.set_tag(tags.PEER_PORT, port)
+            outbound_span.set_tag(tags.PEER_PORT, port)
     
-        h_ctx, h_attr = opentracing.tracer.trace_context_to_text(
-            trace_context=span.trace_context)
-        for key, value in h_ctx.iteritems():
+        text_carrier = opentracing.SplitTextCarrier()
+        opentracing.tracer.injector(Format.SPLIT_TEXT).inject(
+            span=outbound_span,
+            carrier=text_carrier
+        )
+        for key, value in text_carrier.tracer_state.iteritems():
             request.add_header(key, value)
-        if h_attr:
-            for key, value in h_attr.iteritems():
+        if text_carrier.trace_attributes:
+            for key, value in text_carrier.trace_attributes.iteritems():
                 request.add_header(key, value)
     
-        return span
+        return outbound_span
 ```
 
 # Development
