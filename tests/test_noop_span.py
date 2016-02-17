@@ -20,62 +20,73 @@
 
 from __future__ import absolute_import
 import mock
-from opentracing import Span
-from opentracing import SpanPropagator
+from opentracing import Format
+from opentracing import SplitBinaryCarrier
+from opentracing import SplitTextCarrier
 from opentracing import Tracer
 from opentracing.ext import tags
 
 
 def test_span():
-    span = Span()
-    child = span.start_child(operation_name='test')
-    assert span == child
+    tracer = Tracer()
+    parent = tracer.start_span('parent')
+    child = tracer.start_span('test', parent=parent)
+    assert parent == child
     child.log_event('cache_hit', ['arg1', 'arg2'])
 
-    with mock.patch.object(span, 'finish') as finish:
-        with mock.patch.object(span, 'log_event') as log_event:
+    with mock.patch.object(parent, 'finish') as finish:
+        with mock.patch.object(parent, 'log_event') as log_event:
             try:
-                with span:
+                with parent:
                     raise ValueError()
             except ValueError:
                 pass
             assert finish.call_count == 1
             assert log_event.call_count == 1
 
-    with mock.patch.object(span, 'finish') as finish:
-        with mock.patch.object(span, 'log_event') as log_event:
-            with span:
+    with mock.patch.object(parent, 'finish') as finish:
+        with mock.patch.object(parent, 'log_event') as log_event:
+            with parent:
                 pass
             assert finish.call_count == 1
             assert log_event.call_count == 0
 
-    span.set_tag('x', 'y').set_tag('z', 1)  # test chaining
-    span.set_tag(tags.PEER_SERVICE, 'test-service')
-    span.set_tag(tags.PEER_HOST_IPV4, 127 << 24 + 1)
-    span.set_tag(tags.PEER_HOST_IPV6, '::')
-    span.set_tag(tags.PEER_HOSTNAME, 'uber.com')
-    span.set_tag(tags.PEER_PORT, 123)
-    span.finish()
+    parent.set_tag('x', 'y').set_tag('z', 1)  # test chaining
+    parent.set_tag(tags.PEER_SERVICE, 'test-service')
+    parent.set_tag(tags.PEER_HOST_IPV4, 127 << 24 + 1)
+    parent.set_tag(tags.PEER_HOST_IPV6, '::')
+    parent.set_tag(tags.PEER_HOSTNAME, 'uber.com')
+    parent.set_tag(tags.PEER_PORT, 123)
+    parent.finish()
 
-def test_encoder():
-    span = Span()
+
+def test_injector():
     tracer = Tracer()
-    x, y = tracer.propagate_span_as_binary(span=span)
-    assert x == bytearray()
-    assert y is None
-    x, y = tracer.propagate_span_as_text(span=span)
-    assert x == {}
-    assert y is None
+    span = tracer.start_span()
+
+    bin_carrier = SplitBinaryCarrier()
+    tracer.injector(Format.SPLIT_BINARY).inject_span(
+        span=span, carrier=bin_carrier)
+    assert bin_carrier.tracer_state == bytearray()
+    assert bin_carrier.trace_attributes == bytearray()
+
+    text_carrier = SplitTextCarrier()
+    tracer.injector(Format.SPLIT_TEXT).inject_span(
+        span=span, carrier=text_carrier)
+    assert text_carrier.tracer_state == {}
+    assert text_carrier.trace_attributes == {}
 
 
-def test_decoder():
-    singleton_span = SpanPropagator.singleton_noop_span
+def test_extractor():
     tracer = Tracer()
-    span = tracer.join_trace_from_binary('op_name',
-                                         tracer_state=None,
-                                         trace_attributes=None)
-    assert singleton_span == span
-    span = tracer.join_trace_from_text('op_name',
-                                       tracer_state=None,
-                                       trace_attributes=None)
-    assert singleton_span == span
+    noop_span = tracer._noop_span
+
+    bin_carrier = SplitBinaryCarrier()
+    span = tracer.extractor(Format.SPLIT_BINARY).join_trace(
+        'op_name', carrier=bin_carrier)
+    assert noop_span == span
+
+    text_carrier = SplitTextCarrier()
+    span = tracer.extractor(Format.SPLIT_TEXT).join_trace(
+        'op_name', carrier=text_carrier)
+    assert noop_span == span

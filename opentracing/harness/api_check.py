@@ -19,7 +19,7 @@
 # THE SOFTWARE.
 from __future__ import absolute_import
 import time
-
+import opentracing
 
 class APICompatibilityCheckMixin(object):
     """
@@ -39,39 +39,43 @@ class APICompatibilityCheckMixin(object):
         """
         return True
 
-    def test_start_trace(self):
+    def test_start_span(self):
         tracer = self.tracer()
-        span = tracer.start_trace(operation_name='Fry')
+        span = tracer.start_span(operation_name='Fry')
         span.finish()
-        with tracer.start_trace(operation_name='Fry',
-                                tags={'birthday': 'August 14 1974'}) as span:
+        with tracer.start_span(operation_name='Fry',
+                               tags={'birthday': 'August 14 1974'}) as span:
             span.log_event('birthplace',
-		           payload={'hospital': 'Brooklyn Pre-Med Hospital',
+                           payload={'hospital': 'Brooklyn Pre-Med Hospital',
                                     'city': 'Old New York'})
-        tracer.close()
+        tracer.flush()
 
-    def test_join_trace(self):
+    def test_start_span_with_parent(self):
         tracer = self.tracer()
-        parent_span = tracer.start_trace(operation_name='parent')
+        parent_span = tracer.start_span(operation_name='parent')
         assert parent_span is not None
-        span = tracer.join_trace(operation_name='Leela',
-                                 parent_span=parent_span)
+        span = tracer.start_span(operation_name='Leela',
+                                 parent=parent_span)
         span.finish()
-        span = tracer.join_trace(operation_name='Leela',
-                                 parent_span=parent_span,
+        span = tracer.start_span(operation_name='Leela',
+                                 parent=parent_span,
                                  tags={'birthplace': 'sewers'})
         span.finish()
-        tracer.close()
+        parent_span.finish()
+        tracer.flush()
+
+    def test_start_child_span(self):
+        tracer = self.tracer()
+        parent_span = tracer.start_span(operation_name='parent')
+        assert parent_span is not None
+        child_span = opentracing.start_child_span(parent_span, operation_name='Leela')
+        child_span.finish()
+        parent_span.finish()
+        tracer.flush()
 
     def test_set_operation_name(self):
-        span = self.tracer().start_trace().set_operation_name('Farnsworth')
+        span = self.tracer().start_span().set_operation_name('Farnsworth')
         span.finish()
-
-    def test_start_child(self):
-        parent = self.tracer().start_trace(operation_name='Farnsworth')
-        with parent as p:
-            child = p.start_child(operation_name='Cubert')
-            child.finish()
 
     def test_span_as_context_manager(self):
         finish = {'called': False}
@@ -79,14 +83,14 @@ class APICompatibilityCheckMixin(object):
         def mock_finish(*_):
             finish['called'] = True
 
-        with self.tracer().start_trace(operation_name='antiquing') as span:
+        with self.tracer().start_span(operation_name='antiquing') as span:
             setattr(span, 'finish', mock_finish)
         assert finish['called'] is True
 
         # now try with exception
         finish['called'] = False
         try:
-            with self.tracer().start_trace(operation_name='antiquing') as span:
+            with self.tracer().start_span(operation_name='antiquing') as span:
                 setattr(span, 'finish', mock_finish)
                 raise ValueError()
         except ValueError:
@@ -95,24 +99,28 @@ class APICompatibilityCheckMixin(object):
             raise AssertionError('Expected ValueError')  # pragma: no cover
 
     def test_span_tags_with_chaining(self):
-        span = self.tracer().start_trace(operation_name='Farnsworth')
+        span = self.tracer().start_span(operation_name='Farnsworth')
         span. \
             set_tag('birthday', '9 April, 2841'). \
             set_tag('loves', 'different lengths of wires')
         span.finish()
 
     def test_span_logs(self):
-        span = self.tracer().start_trace(operation_name='Fry')
+        span = self.tracer().start_span(operation_name='Fry')
         span.\
             log_event('frozen', {'year': 1999, 'place': 'Cryogenics Labs'}). \
             log_event('defrosted', {'year': 2999}). \
             log_event('became his own grandfather', 1947)
         span.\
-            log(timestamp=time.time(), event='frozen', payload={'year': 1999}). \
-            log(timestamp=time.time(), event='unfrozen', payload={'year': 2999})
+            log(timestamp=time.time(),
+                event='frozen',
+                payload={'year': 1999}). \
+            log(timestamp=time.time(),
+                event='unfrozen',
+                payload={'year': 2999})
 
     def test_trace_attributes(self):
-        with self.tracer().start_trace(operation_name='Fry') as span:
+        with self.tracer().start_span(operation_name='Fry') as span:
             span.set_trace_attribute('Kiff-loves', 'Amy')
             val = span.get_trace_attribute('kiff-Loves')  # case change
             if self.check_trace_attribute_values():
@@ -120,29 +128,31 @@ class APICompatibilityCheckMixin(object):
             pass
 
     def test_text_propagation(self):
-        with self.tracer().start_trace(operation_name='Bender') as span:
-            dict_tracer_state, dict_attrs = self.tracer().propagate_span_as_text(
-                span=span
-            )
-            assert type(dict_tracer_state) is dict
-            assert dict_attrs is None or type(dict_attrs) is dict
-            with self.tracer().join_trace_from_text(
+        with self.tracer().start_span(operation_name='Bender') as span:
+            text_carrier = opentracing.SplitTextCarrier()
+            self.tracer().injector(opentracing.Format.SPLIT_TEXT).inject_span(
+                span=span, carrier=text_carrier)
+            assert type(text_carrier.tracer_state) is dict
+            assert (text_carrier.trace_attributes is None or
+                    type(text_carrier.trace_attributes) is dict)
+            with self.tracer().extractor(opentracing.Format.SPLIT_TEXT).join_trace(
                 None,
-                tracer_state=dict_tracer_state,
-                trace_attributes=dict_attrs
+                carrier=text_carrier
             ) as reassembled_span:
-                reassembled_span.set_trace_attribute('middle-name', 'Rodriguez')
+                reassembled_span.set_trace_attribute(
+                    'middle-name', 'Rodriguez')
 
     def test_binary_propagation(self):
-        with self.tracer().start_trace(operation_name='Bender') as span:
-            bin_tracer_state, bin_attrs = self.tracer().propagate_span_as_binary(
-                span=span
-            )
-            assert type(bin_tracer_state) is bytearray
-            assert bin_attrs is None or type(bin_attrs) is bytearray
-            with self.tracer().join_trace_from_binary(
+        with self.tracer().start_span(operation_name='Bender') as span:
+            bin_carrier = opentracing.SplitBinaryCarrier()
+            self.tracer().injector(opentracing.Format.SPLIT_BINARY).inject_span(
+                span=span, carrier=bin_carrier)
+            assert type(bin_carrier.tracer_state) is bytearray
+            assert (bin_carrier.trace_attributes is None or
+                    type(bin_carrier.trace_attributes) is bytearray)
+            with self.tracer().extractor(opentracing.Format.SPLIT_BINARY).join_trace(
                 None,
-                tracer_state=bin_tracer_state,
-                trace_attributes=bin_attrs
+                carrier=bin_carrier
             ) as reassembled_span:
-                reassembled_span.set_trace_attribute('middle-name', 'Rodriguez')
+                reassembled_span.set_trace_attribute(
+                    'middle-name', 'Rodriguez')

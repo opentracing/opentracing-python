@@ -21,10 +21,10 @@
 from __future__ import absolute_import
 from concurrent.futures import Future
 from .span import Span
-from .propagator import SpanPropagator
+from .propagation import _NoopPropagator
 
 
-class Tracer(SpanPropagator):
+class Tracer(object):
     """Tracer is the entry point API between instrumentation code and the
     tracing implementation.
 
@@ -32,50 +32,65 @@ class Tracer(SpanPropagator):
     a default no-op behavior.
     """
 
-    singleton_noop_span = Span()
+    def __init__(self):
+        self._noop_span = Span(self)
+        self._noop_propagator = _NoopPropagator(self)
 
-    def start_trace(self, operation_name=None, tags=None):
-        """Starts a new trace and creates a new root span.
+    def start_span(self,
+                   operation_name=None,
+                   parent=None,
+                   tags=None,
+                   start_time=None):
+        """Starts and returns a new Span representing a unit of work.
 
-        This method should be used by services that are instrumented for
-        tracing but did not receive trace ID from upstream request.
+        :param operation_name: name of the operation represented by the new
+            span from the perspective of the current service.
+        :param parent: an optional parent Span. If specified, the returned Span
+            will be a child of `parent` in `parent`'s trace. If unspecified,
+            the returned Span will be the root of its own trace.
+        :param tags: optional dictionary of Span Tags. The caller gives up
+            ownership of that dictionary, because the Tracer may use it as-is
+            to avoid extra data copying.
+        :param start_time: an explicit Span start time as a unix timestamp per
+            time.time()
 
-        :param operation_name: the service's own name for the end-point
-            that received the request represented by this trace and span.
-            The domain of names must be limited, e.g. do not use UUIDs or
-            entity IDs or timestamps as part of the name.
-        :param tags: optional dictionary of Span Tags. The caller is
-            expected to give up ownership of that dictionary, because the
-            Tracer may use it as is to avoid extra data copying.
-
-        :return: a new root Span
+        :return: Returns an already-started Span instance.
         """
-        return Tracer.singleton_noop_span
+        return self._noop_span
 
-    def join_trace(self, operation_name, parent_span, tags=None):
-        """Joins a trace started elsewhere and creates a new span as a
-        child of the given parent trace context.
+    def injector(self, format):
+        """Returns an Injector instance corresponding to `format`.
 
-        This method should be used by services that receive tracing info
-        from upstream.
+        See the opentracing.propagation.Format class/namespace for standard
+        (and required) formats.
 
-        :param operation_name: the service's own name for the end-point
-            that received the request represented by this trace and span.
-            The domain of names must be limited, e.g. do not use UUIDs or
-            entity IDs or timestamps as part of the name.
-        :param parent_span: a Span instance started elsewhere and whose trace
-            we're joining.
-        :param tags: optional dictionary of Span Tags. The caller is
-            expected to give up ownership of that dictionary, because the
-            Tracer may use it as is to avoid extra data copying.
+        :param format: a python object instance that represents a given
+            Injector format. `format` may be of any type, and `format` equality
+            is defined by python `==` equality.
 
-        :return: a new Span
+        :return: an Injector instance corresponding to `format`, or None if the
+            Tracer implementation does not support `format`.
         """
-        return Tracer.singleton_noop_span
+        return self._noop_propagator
 
-    def close(self):
-        """Performs a clean shutdown of the tracer, flushing any traces that
-        may have been buffered in memory.
+    def extractor(self, format):
+        """Returns an Extractor instance corresponding to `format`.
+
+        See the opentracing.propagation.Format class/namespace for standard
+        (and required) formats.
+
+        :param format: a python object instance that represents a given
+            Extractor format. `format` may be of any type, and `format`
+            equality is defined by python `==` equality.
+
+        :return: an Extractor instance corresponding to `format`, or None if
+            the Tracer implementation does not support `format`.
+        """
+        return self._noop_propagator
+
+    def flush(self):
+        """Flushes any trace data that may be buffered in memory, presumably
+        out of the process.
 
         :return: Returns a :py:class:futures.Future
         """
