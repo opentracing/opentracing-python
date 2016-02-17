@@ -170,3 +170,29 @@ class Span(object):
         :return: returns the Tracer that created this Span.
         """
         return self._tracer
+
+
+def start_child_span(parent_span, operation_name, tags=None, start_time=None):
+    """A shorthand method that starts a child span given a parent span.
+
+    Equivalent to calling
+
+        parent_span.tracer().start_span(operation_name, parent_span, ...)
+
+    :param parent_span: the Span which will act as the parent of the returned
+        child Span instance
+    :param operation_name: the operation name for the child Span instance
+    :param tags: optional dict of Span Tags. The caller gives up ownership of
+        that dict, because the Tracer may use it as-is to avoid extra data
+        copying.
+    :param start_time: an explicit Span start time as a unix timestamp per
+        time.time().
+
+    :return: Returns an already-started Span instance.
+    """
+    return parent_span.tracer.start_span(
+        operation_name=operation_name,
+        parent=parent_span,
+        tags=tags,
+        start_time=start_time
+    )

@@ -67,7 +67,7 @@ Somewhere in your server's request handler code:
         )
         if span is None:
             span = tracer.start_span(operation_name=request.operation)
-        span.set_tag('client.http.url', request.full_url)
+        span.set_tag('http.url', request.full_url)
     
         remote_ip = request.remote_ip
         if remote_ip:
@@ -107,7 +107,7 @@ Somewhere in your service that's about to make an outgoing call:
             parent=parent_span
         )
     
-        outbound_span.set_tag('server.http.url', request.full_url)
+        outbound_span.set_tag('http.url', request.full_url)
         service_name = request.service_name
         host, port = request.host_port
         if service_name:

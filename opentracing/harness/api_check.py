@@ -19,6 +19,7 @@
 # THE SOFTWARE.
 from __future__ import absolute_import
 import time
+from .. import span
 from ..propagation import Format
 from ..propagation import SplitTextCarrier
 from ..propagation import SplitBinaryCarrier
@@ -64,6 +65,16 @@ class APICompatibilityCheckMixin(object):
                                  parent=parent_span,
                                  tags={'birthplace': 'sewers'})
         span.finish()
+        parent_span.finish()
+        tracer.flush()
+
+    def test_start_child_span(self):
+        tracer = self.tracer()
+        parent_span = tracer.start_span(operation_name='parent')
+        assert parent_span is not None
+        child_span = span.start_child_span(parent_span, operation_name='Leela')
+        child_span.finish()
+        parent_span.finish()
         tracer.flush()
 
     def test_set_operation_name(self):

@@ -49,12 +49,12 @@ class Tracer(object):
             will be a child of `parent` in `parent`'s trace. If unspecified,
             the returned Span will be the root of its own trace.
         :param tags: optional dictionary of Span Tags. The caller gives up
-            ownership of that dictionary, because the Tracer may use it as is
+            ownership of that dictionary, because the Tracer may use it as-is
             to avoid extra data copying.
-        :param start_time: an explicit Span start timestamp as a unix timestamp
-            per time.time()
+        :param start_time: an explicit Span start time as a unix timestamp per
+            time.time()
 
-        :return: Returns a new child Span in "started" state.
+        :return: Returns an already-started Span instance.
         """
         return self._noop_span
 
