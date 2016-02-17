@@ -34,7 +34,7 @@ class Tracer(object):
 
     def __init__(self):
         self._noop_span = Span(self)
-        self._noop_propagator = _NoopPropagator()
+        self._noop_propagator = _NoopPropagator(self)
 
     def start_span(self, operation_name=None, parent=None, tags=None, start_time=None):
         """Starts and returns a new Span representing a unit of work.

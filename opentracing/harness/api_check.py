@@ -19,6 +19,9 @@
 # THE SOFTWARE.
 from __future__ import absolute_import
 import time
+from ..propagation import Format
+from ..propagation import SplitTextCarrier
+from ..propagation import SplitBinaryCarrier
 
 
 class APICompatibilityCheckMixin(object):
@@ -119,28 +122,30 @@ class APICompatibilityCheckMixin(object):
 
     def test_text_propagation(self):
         with self.tracer().start_span(operation_name='Bender') as span:
-            dict_tracer_state, dict_attrs = self.tracer(). \
-                propagate_span_as_text(span=span)
-            assert type(dict_tracer_state) is dict
-            assert dict_attrs is None or type(dict_attrs) is dict
-            with self.tracer().join_trace_from_text(
+            text_carrier = SplitTextCarrier()
+            self.tracer().injector(Format.SPLIT_TEXT).inject_span(
+                    span=span, carrier=text_carrier)
+            assert type(text_carrier.tracer_state) is dict
+            assert (text_carrier.trace_attributes is None or
+                    type(text_carrier.trace_attributes) is dict)
+            with self.tracer().extractor(Format.SPLIT_TEXT).join_trace(
                 None,
-                tracer_state=dict_tracer_state,
-                trace_attributes=dict_attrs
+                carrier=text_carrier
             ) as reassembled_span:
                 reassembled_span.set_trace_attribute(
                     'middle-name', 'Rodriguez')
 
     def test_binary_propagation(self):
         with self.tracer().start_span(operation_name='Bender') as span:
-            bin_tracer_state, bin_attrs = self.tracer(). \
-                propagate_span_as_binary(span=span)
-            assert type(bin_tracer_state) is bytearray
-            assert bin_attrs is None or type(bin_attrs) is bytearray
-            with self.tracer().join_trace_from_binary(
+            bin_carrier = SplitBinaryCarrier()
+            self.tracer().injector(Format.SPLIT_BINARY).inject_span(
+                    span=span, carrier=bin_carrier)
+            assert type(bin_carrier.tracer_state) is bytearray
+            assert (bin_carrier.trace_attributes is None or
+                    type(bin_carrier.trace_attributes) is bytearray)
+            with self.tracer().extractor(Format.SPLIT_BINARY).join_trace(
                 None,
-                tracer_state=bin_tracer_state,
-                trace_attributes=bin_attrs
+                carrier=bin_carrier
             ) as reassembled_span:
                 reassembled_span.set_trace_attribute(
                     'middle-name', 'Rodriguez')

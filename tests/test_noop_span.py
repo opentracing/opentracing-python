@@ -20,7 +20,10 @@
 
 from __future__ import absolute_import
 import mock
+from opentracing import Format
 from opentracing import Span
+from opentracing import SplitBinaryCarrier
+from opentracing import SplitTextCarrier
 from opentracing import Tracer
 from opentracing.ext import tags
 
@@ -58,25 +61,33 @@ def test_span():
     parent.finish()
 
 
-def test_encoder():
+def test_injector():
     tracer = Tracer()
     span = tracer.start_span()
-    x, y = tracer.propagate_span_as_binary(span=span)
-    assert x == bytearray()
-    assert y is None
-    x, y = tracer.propagate_span_as_text(span=span)
-    assert x == {}
-    assert y is None
+
+    bin_carrier = SplitBinaryCarrier()
+    tracer.injector(Format.SPLIT_BINARY).inject_span(
+            span=span, carrier=bin_carrier)
+    assert bin_carrier.tracer_state == bytearray()
+    assert bin_carrier.trace_attributes == bytearray()
+
+    text_carrier = SplitTextCarrier()
+    tracer.injector(Format.SPLIT_TEXT).inject_span(
+            span=span, carrier=text_carrier)
+    assert text_carrier.tracer_state == {}
+    assert text_carrier.trace_attributes == {}
 
 
-def test_decoder():
-    singleton_span = SpanPropagator.singleton_noop_span
+def test_extractor():
     tracer = Tracer()
-    span = tracer.join_trace_from_binary('op_name',
-                                         tracer_state=None,
-                                         trace_attributes=None)
-    assert singleton_span == span
-    span = tracer.join_trace_from_text('op_name',
-                                       tracer_state=None,
-                                       trace_attributes=None)
-    assert singleton_span == span
+    noop_span = tracer._noop_span
+
+    bin_carrier = SplitBinaryCarrier()
+    span = tracer.extractor(Format.SPLIT_BINARY).join_trace(
+            'op_name', carrier=bin_carrier)
+    assert noop_span == span
+
+    text_carrier = SplitTextCarrier()
+    span = tracer.extractor(Format.SPLIT_TEXT).join_trace(
+            'op_name', carrier=text_carrier)
+    assert noop_span == span

@@ -21,20 +21,6 @@
 from __future__ import absolute_import
 
 
-class Format:
-    """A namespace for builtin Injector/Extractor formats.
-
-    These static constants are intended for use in the Tracer.injector() and
-    Tracer.extractor() methods. E.g.,
-
-        tracer.injector(Format.SPLIT_BINARY).inject_span(...)
-
-    """
-
-    SPLIT_BINARY = "split_binary"
-    SPLIT_TEXT = "split_text"
-
-
 class Injector(object):
     """An Injector injects Span instances into a format-specific "carrier"
     object.
@@ -46,7 +32,7 @@ class Injector(object):
     See Extractor and Tracer.injector().
     """
 
-    def inject_span(span, carrier):
+    def inject_span(self, span, carrier):
         """inject_span takes `span` and injects it into `carrier`.
 
         The actual type of `carrier` depends on the `format` value passed to
@@ -72,7 +58,7 @@ class Extractor(object):
     See Injector and Tracer.extractor().
     """
 
-    def join_trace(operation_name, carrier):
+    def join_trace(self, operation_name, carrier):
         """join_trace returns a Span instance with operation name `operation_name`
         that's joined to the trace state embedded within `carrier`, or None if
         no such trace state could be found.
@@ -111,8 +97,73 @@ class TraceCorruptedException(Exception):
     pass
 
 
+class Format:
+    """A namespace for builtin Injector/Extractor formats.
+
+    These static constants are intended for use in the Tracer.injector() and
+    Tracer.extractor() methods. E.g.,
+
+        tracer.injector(Format.SPLIT_BINARY).inject_span(...)
+
+    """
+
+    # The SPLIT_BINARY format pairs with an Injector or Extractor that expects
+    # a SplitBinaryCarrier carrier object.
+    SPLIT_BINARY = "split_binary"
+
+    # The SPLIT_TEXT format pairs with an Injector or Extractor that expects a
+    # SplitTextCarrier carrier object.
+    SPLIT_TEXT = "split_text"
+
+
+class SplitBinaryCarrier(object):
+    """The SplitBinaryCarrier is a carrier to be used with Format.SPLIT_BINARY
+    Injectors/Extractors.
+
+    The SplitBinaryCarrier has two properties, and each is represented as a
+    bytearray:
+     - tracer_state: Tracer-specific context that must cross process
+       boundaries. For example, in Dapper this would include a trace_id, a
+       span_id, and a bitmask representing the sampling status for the given
+       trace.
+     - trace_attributes: any Trace Attributes for the encoded Span (per
+       Span.SetTraceAttribute).
+    """
+
+    def __init__(self, tracer_state=None, trace_attributes=None):
+        self.tracer_state = (
+            bytearray() if tracer_state is None else tracer_state)
+        self.trace_attributes = (
+            bytearray() if trace_attributes is None else trace_attributes)
+
+
+class SplitTextCarrier(object):
+    """The SplitTextCarrier is a carrier to be used with Format.SPLIT_BINARY
+    Injectors/Extractors.
+
+    The SplitTextCarrier has two properties, and each is represented as a
+    string->string dict:
+     - tracer_state: Tracer-specific context that must cross process
+       boundaries. For example, in Dapper this would include a trace_id, a
+       span_id, and a bitmask representing the sampling status for the given
+       trace.
+     - trace_attributes: any Trace Attributes for the encoded Span (per
+       Span.SetTraceAttribute).
+    """
+
+    def __init__(self, tracer_state=None, trace_attributes=None):
+        self.tracer_state = (
+            {} if tracer_state is None else tracer_state)
+        self.trace_attributes = (
+            {} if trace_attributes is None else trace_attributes)
+
+
 class _NoopPropagator:
-    def inject_span(span, carrier):
+    def __init__(self, tracer):
+        self._tracer = tracer
+
+    def inject_span(self, span, carrier):
         pass
-    def join_trace(operation_name, carrier):
-        return None
+
+    def join_trace(self, operation_name, carrier):
+        return self._tracer._noop_span
