@@ -44,7 +44,7 @@ class Injector(object):
         :param span: the Span instance to inject
         :param carrier: the format-specific carrier object to inject into
         """
-        pass
+        raise NotImplementedError()
 
 
 class Extractor(object):
@@ -76,7 +76,7 @@ class Extractor(object):
         :return: a Span instance joined to the trace state in `carrier` or None
             if no such trace state could be found.
         """
-        return None
+        raise NotImplementedError()
 
 
 class InvalidCarrierException(Exception):
