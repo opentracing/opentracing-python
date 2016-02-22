@@ -29,9 +29,9 @@ class VerifyAPICompatibilityCheck(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             api_check.tracer()
 
-    def test_default_trace_attribute_check_mode(self):
+    def test_default_baggage_check_mode(self):
         api_check = APICompatibilityCheckMixin()
-        assert api_check.check_trace_attribute_values() is True
+        assert api_check.check_baggage_values() is True
 
     def test_attribute_check_works(self):
         api_check = APICompatibilityCheckMixin()
@@ -39,4 +39,4 @@ class VerifyAPICompatibilityCheck(unittest.TestCase):
         # no-op tracer does not store attributes, so the test with default
         # value of `check_trace_attribute_values()` should fail.
         with self.assertRaises(AssertionError):
-            api_check.test_trace_attributes()
+            api_check.test_baggage()

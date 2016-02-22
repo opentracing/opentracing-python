@@ -126,15 +126,15 @@ class SplitBinaryCarrier(object):
        boundaries. For example, in Dapper this would include a trace_id, a
        span_id, and a bitmask representing the sampling status for the given
        trace.
-     - trace_attributes: any Trace Attributes for the encoded Span (per
-       Span.SetTraceAttribute).
+     - baggage: any Baggage items for the encoded Span (per
+       Span.set_baggage_item()).
     """
 
-    def __init__(self, tracer_state=None, trace_attributes=None):
+    def __init__(self, tracer_state=None, baggage=None):
         self.tracer_state = (
             bytearray() if tracer_state is None else tracer_state)
-        self.trace_attributes = (
-            bytearray() if trace_attributes is None else trace_attributes)
+        self.baggage = (
+            bytearray() if baggage is None else baggage)
 
 
 class SplitTextCarrier(object):
@@ -147,15 +147,15 @@ class SplitTextCarrier(object):
        boundaries. For example, in Dapper this would include a trace_id, a
        span_id, and a bitmask representing the sampling status for the given
        trace.
-     - trace_attributes: any Trace Attributes for the encoded Span (per
-       Span.SetTraceAttribute).
+     - baggage: any Baggage items for the encoded Span (per
+       Span.set_baggage_item()).
     """
 
-    def __init__(self, tracer_state=None, trace_attributes=None):
+    def __init__(self, tracer_state=None, baggage=None):
         self.tracer_state = (
             {} if tracer_state is None else tracer_state)
-        self.trace_attributes = (
-            {} if trace_attributes is None else trace_attributes)
+        self.baggage = (
+            {} if baggage is None else baggage)
 
 
 class _NoopPropagator:

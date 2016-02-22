@@ -68,13 +68,13 @@ def test_injector():
     tracer.injector(Format.SPLIT_BINARY).inject_span(
         span=span, carrier=bin_carrier)
     assert bin_carrier.tracer_state == bytearray()
-    assert bin_carrier.trace_attributes == bytearray()
+    assert bin_carrier.baggage == bytearray()
 
     text_carrier = SplitTextCarrier()
     tracer.injector(Format.SPLIT_TEXT).inject_span(
         span=span, carrier=text_carrier)
     assert text_carrier.tracer_state == {}
-    assert text_carrier.trace_attributes == {}
+    assert text_carrier.baggage == {}
 
 
 def test_extractor():
