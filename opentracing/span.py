@@ -43,25 +43,6 @@ class Span(object):
     def __init__(self, tracer):
         self._tracer = tracer
 
-    def __enter__(self):
-        """Invoked when span is used as a context manager.
-
-        :return: returns the Span itself
-        """
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        """Ends context manager and calls finish() on the span.
-
-        If exception has occurred during execution, it is automatically added
-        as a tag to the span.
-        """
-        if exc_type:
-            self.log_event('python.exception', {'type': exc_type,
-                                                'val': exc_val,
-                                                'tb': exc_tb})
-        self.finish()
-
     def set_operation_name(self, operation_name):
         """Sets or changes the operation name.
 
@@ -123,26 +104,26 @@ class Span(object):
         """
         return self
 
-    def set_trace_attribute(self, key, value):
-        """Stores a Trace Attribute in the span as a key/value pair.
+    def set_baggage_item(self, key, value):
+        """Stores a Baggage item in the span as a key/value pair.
 
         Enables powerful distributed context propagation functionality where
         arbitrary application data can be carried along the full path of
         request execution throughout the system.
 
-        Note 1: attributes are only propagated to the future (recursive)
-        children of this Span.
+        Note 1: Baggage is only propagated to the future (recursive) children
+        of this Span.
 
-        Note 2: attributes are sent in-band with every subsequent local and
-        remote calls, so this feature must be used with care.
+        Note 2: Baggage is sent in-band with every subsequent local and remote
+        calls, so this feature must be used with care.
 
         Note 3: keys are case-insensitive, to allow propagation via HTTP
         headers. Keys must match regexp `(?i:[a-z0-9][-a-z0-9]*)`
 
-        :param key: trace attribute key
+        :param key: Baggage item key
         :type key: str
 
-        :param value: trace attribute value
+        :param value: Baggage item value
         :type value: str
 
         :rtype : Span
@@ -150,16 +131,16 @@ class Span(object):
         """
         return self
 
-    def get_trace_attribute(self, key):
-        """Retrieves value of the Trace Attribute with the given key.
+    def get_baggage_item(self, key):
+        """Retrieves value of the Baggage item with the given key.
 
         Key is case-insensitive.
 
-        :param key: key of the Trace Attribute
+        :param key: key of the Baggage item
         :type key: str
 
         :rtype : str
-        :return: value of the Trace Attribute with given key, or None.
+        :return: value of the Baggage item with given key, or None.
         """
         return None
 
@@ -170,6 +151,25 @@ class Span(object):
         :return: returns the Tracer that created this Span.
         """
         return self._tracer
+
+    def __enter__(self):
+        """Invoked when span is used as a context manager.
+
+        :return: returns the Span itself
+        """
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Ends context manager and calls finish() on the span.
+
+        If exception has occurred during execution, it is automatically added
+        as a tag to the span.
+        """
+        if exc_type:
+            self.log_event('python.exception', {'type': exc_type,
+                                                'val': exc_val,
+                                                'tb': exc_tb})
+        self.finish()
 
 
 def start_child_span(parent_span, operation_name, tags=None, start_time=None):

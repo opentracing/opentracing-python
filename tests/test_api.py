@@ -27,5 +27,5 @@ class APICheckNoopTracer(unittest.TestCase, APICompatibilityCheckMixin):
     def tracer(self):
         return Tracer()
 
-    def check_trace_attribute_values(self):
+    def check_baggage_values(self):
         return False

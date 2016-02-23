@@ -21,6 +21,7 @@ from __future__ import absolute_import
 import time
 import opentracing
 
+
 class APICompatibilityCheckMixin(object):
     """
     A mixin class for validation that a given tracer implementation
@@ -30,12 +31,12 @@ class APICompatibilityCheckMixin(object):
     def tracer(self):
         raise NotImplementedError('Subclass must implement tracer()')
 
-    def check_trace_attribute_values(self):
-        """If true, the test will validate trace attributes by
-        storing and retrieving them from the trace context. If false,
-        it will only attempt to store and retrieve the attributes to check
-        the API compliance, but not actually validate stored values.
-        The latter mode is only useful for no-op tracer.
+    def check_baggage_values(self):
+        """If true, the test will validate Baggage items by storing and
+        retrieving them from the trace context. If false, it will only attempt
+        to store and retrieve the Baggage items to check the API compliance,
+        but not actually validate stored values.  The latter mode is only
+        useful for no-op tracer.
         """
         return True
 
@@ -68,7 +69,8 @@ class APICompatibilityCheckMixin(object):
         tracer = self.tracer()
         parent_span = tracer.start_span(operation_name='parent')
         assert parent_span is not None
-        child_span = opentracing.start_child_span(parent_span, operation_name='Leela')
+        child_span = opentracing.start_child_span(
+            parent_span, operation_name='Leela')
         child_span.finish()
         parent_span.finish()
         tracer.flush()
@@ -119,11 +121,11 @@ class APICompatibilityCheckMixin(object):
                 event='unfrozen',
                 payload={'year': 2999})
 
-    def test_trace_attributes(self):
+    def test_baggage(self):
         with self.tracer().start_span(operation_name='Fry') as span:
-            span.set_trace_attribute('Kiff-loves', 'Amy')
-            val = span.get_trace_attribute('kiff-Loves')  # case change
-            if self.check_trace_attribute_values():
+            span.set_baggage_item('Kiff-loves', 'Amy')
+            val = span.get_baggage_item('kiff-Loves')  # case change
+            if self.check_baggage_values():
                 assert 'Amy' == val
             pass
 
@@ -133,26 +135,29 @@ class APICompatibilityCheckMixin(object):
             self.tracer().injector(opentracing.Format.SPLIT_TEXT).inject_span(
                 span=span, carrier=text_carrier)
             assert type(text_carrier.tracer_state) is dict
-            assert (text_carrier.trace_attributes is None or
-                    type(text_carrier.trace_attributes) is dict)
-            with self.tracer().extractor(opentracing.Format.SPLIT_TEXT).join_trace(
+            assert (text_carrier.baggage is None or
+                    type(text_carrier.baggage) is dict)
+            with self.tracer().extractor(
+                opentracing.Format.SPLIT_TEXT).join_trace(
                 None,
                 carrier=text_carrier
             ) as reassembled_span:
-                reassembled_span.set_trace_attribute(
+                reassembled_span.set_baggage_item(
                     'middle-name', 'Rodriguez')
 
     def test_binary_propagation(self):
         with self.tracer().start_span(operation_name='Bender') as span:
             bin_carrier = opentracing.SplitBinaryCarrier()
-            self.tracer().injector(opentracing.Format.SPLIT_BINARY).inject_span(
+            self.tracer().injector(
+                opentracing.Format.SPLIT_BINARY).inject_span(
                 span=span, carrier=bin_carrier)
             assert type(bin_carrier.tracer_state) is bytearray
-            assert (bin_carrier.trace_attributes is None or
-                    type(bin_carrier.trace_attributes) is bytearray)
-            with self.tracer().extractor(opentracing.Format.SPLIT_BINARY).join_trace(
+            assert (bin_carrier.baggage is None or
+                    type(bin_carrier.baggage) is bytearray)
+            with self.tracer().extractor(
+                opentracing.Format.SPLIT_BINARY).join_trace(
                 None,
                 carrier=bin_carrier
             ) as reassembled_span:
-                reassembled_span.set_trace_attribute(
+                reassembled_span.set_baggage_item(
                     'middle-name', 'Rodriguez')

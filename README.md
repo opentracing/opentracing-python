@@ -124,8 +124,8 @@ Somewhere in your service that's about to make an outgoing call:
         )
         for key, value in text_carrier.tracer_state.iteritems():
             request.add_header(key, value)
-        if text_carrier.trace_attributes:
-            for key, value in text_carrier.trace_attributes.iteritems():
+        if text_carrier.baggage:
+            for key, value in text_carrier.baggage.iteritems():
                 request.add_header(key, value)
     
         return outbound_span
