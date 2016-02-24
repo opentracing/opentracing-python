@@ -1,4 +1,4 @@
-[![Gitter chat](http://img.shields.io/badge/gitter-join%20chat%20%E2%86%92-brightgreen.svg)](https://gitter.im/opentracing/public) [![Build Status](https://travis-ci.org/opentracing/opentracing-python.svg?branch=master)](https://travis-ci.org/opentracing/opentracing-python)
+[![Gitter chat](http://img.shields.io/badge/gitter-join%20chat%20%E2%86%92-brightgreen.svg)](https://gitter.im/opentracing/public) [![Build Status](https://travis-ci.org/opentracing/opentracing-python.svg?branch=master)](https://travis-ci.org/opentracing/opentracing-python) [![PyPI version](https://badge.fury.io/py/opentracing.svg)](https://badge.fury.io/py/opentracing)
 
 # OpenTracing API for Python
 
