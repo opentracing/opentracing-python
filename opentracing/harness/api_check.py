@@ -123,7 +123,8 @@ class APICompatibilityCheckMixin(object):
 
     def test_baggage(self):
         with self.tracer().start_span(operation_name='Fry') as span:
-            span.set_baggage_item('Kiff-loves', 'Amy')
+            span_ref = span.set_baggage_item('Kiff-loves', 'Amy')
+            assert span_ref is span
             val = span.get_baggage_item('kiff-Loves')  # case change
             if self.check_baggage_values():
                 assert 'Amy' == val
