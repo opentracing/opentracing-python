@@ -3,10 +3,10 @@
 History
 -------
 
-0.7.0 (unreleased)
-------------------
+1.0rc1 (2016-02-24)
+-------------------
 
-- Removed TraceContext
+- Upgrade to 1.0 RC specification
 
 
 0.6.3 (2016-01-16)
