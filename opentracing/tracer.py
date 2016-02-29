@@ -72,7 +72,7 @@ class Tracer(object):
             is defined by python `==` equality.
         :param carrier: the format-specific carrier object to inject into
         """
-        return None
+        pass
 
     def join(self, operation_name, format, carrier):
         """Returns a Span instance with operation name `operation_name`
