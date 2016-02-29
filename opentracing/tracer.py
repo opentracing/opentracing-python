@@ -21,7 +21,6 @@
 from __future__ import absolute_import
 from concurrent.futures import Future
 from .span import Span
-from .propagation import _NoopPropagator
 
 
 class Tracer(object):
@@ -34,7 +33,6 @@ class Tracer(object):
 
     def __init__(self):
         self._noop_span = Span(self)
-        self._noop_propagator = _NoopPropagator(self)
 
     def start_span(self,
                    operation_name=None,
@@ -58,35 +56,53 @@ class Tracer(object):
         """
         return self._noop_span
 
-    def injector(self, format):
-        """Returns an Injector instance corresponding to `format`.
+    def inject(self, span, format, carrier):
+        """Injects `span` into `carrier`.
 
-        See the opentracing.propagation.Format class/namespace for standard
-        (and required) formats.
+        The type of `carrier` is determined by `format`. See the
+        opentracing.propagation.Format class/namespace for standard (and
+        required) formats.
 
+        Implementations may raise opentracing.UnsupportedFormatException if
+        `format` is unknown or disallowed.
+
+        :param span: the Span instance to inject
         :param format: a python object instance that represents a given
-            Injector format. `format` may be of any type, and `format` equality
+            carrier format. `format` may be of any type, and `format` equality
             is defined by python `==` equality.
-
-        :return: an Injector instance corresponding to `format`, or None if the
-            Tracer implementation does not support `format`.
+        :param carrier: the format-specific carrier object to inject into
         """
-        return self._noop_propagator
+        pass
 
-    def extractor(self, format):
-        """Returns an Extractor instance corresponding to `format`.
+    def join(self, operation_name, format, carrier):
+        """Returns a Span instance with operation name `operation_name`
+        that's joined to the trace state embedded within `carrier`, or None if
+        no such trace state could be found.
 
-        See the opentracing.propagation.Format class/namespace for standard
-        (and required) formats.
+        The type of `carrier` is determined by `format`. See the
+        opentracing.propagation.Format class/namespace for standard (and
+        required) formats.
 
+        Implementations may raise opentracing.UnsupportedFormatException if
+        `format` is unknown or disallowed.
+
+        Implementations may raise opentracing.InvalidCarrierException,
+        opentracing.TraceCorruptedException, or implementation-specific errors
+        if there are problems with `carrier`.
+
+        Upon success, the returned Span instance is already started.
+
+        :param operation_name: the operation name for the returned Span (which
+            can be set later via Span.set_operation_name())
         :param format: a python object instance that represents a given
-            Extractor format. `format` may be of any type, and `format`
-            equality is defined by python `==` equality.
+            carrier format. `format` may be of any type, and `format` equality
+            is defined by python `==` equality.
+        :param carrier: the format-specific carrier object to join with
 
-        :return: an Extractor instance corresponding to `format`, or None if
-            the Tracer implementation does not support `format`.
+        :return: a Span instance joined to the trace state in `carrier` or None
+            if no such trace state could be found.
         """
-        return self._noop_propagator
+        return self._noop_span
 
     def flush(self):
         """Flushes any trace data that may be buffered in memory, presumably

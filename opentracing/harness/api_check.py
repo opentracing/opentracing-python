@@ -133,15 +133,17 @@ class APICompatibilityCheckMixin(object):
     def test_text_propagation(self):
         with self.tracer().start_span(operation_name='Bender') as span:
             text_carrier = opentracing.SplitTextCarrier()
-            self.tracer().injector(opentracing.Format.SPLIT_TEXT).inject_span(
-                span=span, carrier=text_carrier)
+            self.tracer().inject(
+                span=span,
+                format=opentracing.Format.SPLIT_TEXT,
+                carrier=text_carrier)
             assert type(text_carrier.tracer_state) is dict
             assert (text_carrier.baggage is None or
                     type(text_carrier.baggage) is dict)
-            with self.tracer().extractor(
-                opentracing.Format.SPLIT_TEXT).join_trace(
+            with self.tracer().join(
                 None,
-                carrier=text_carrier
+                format=opentracing.Format.SPLIT_TEXT,
+                carrier=text_carrier,
             ) as reassembled_span:
                 reassembled_span.set_baggage_item(
                     'middle-name', 'Rodriguez')
@@ -149,15 +151,16 @@ class APICompatibilityCheckMixin(object):
     def test_binary_propagation(self):
         with self.tracer().start_span(operation_name='Bender') as span:
             bin_carrier = opentracing.SplitBinaryCarrier()
-            self.tracer().injector(
-                opentracing.Format.SPLIT_BINARY).inject_span(
-                span=span, carrier=bin_carrier)
+            self.tracer().inject(
+                span=span,
+                format=opentracing.Format.SPLIT_BINARY,
+                carrier=bin_carrier)
             assert type(bin_carrier.tracer_state) is bytearray
             assert (bin_carrier.baggage is None or
                     type(bin_carrier.baggage) is bytearray)
-            with self.tracer().extractor(
-                opentracing.Format.SPLIT_BINARY).join_trace(
+            with self.tracer().join(
                 None,
+                format=opentracing.Format.SPLIT_BINARY,
                 carrier=bin_carrier
             ) as reassembled_span:
                 reassembled_span.set_baggage_item(

@@ -60,33 +60,29 @@ def test_span():
     parent.finish()
 
 
-def test_injector():
+def test_inject():
     tracer = Tracer()
     span = tracer.start_span()
 
     bin_carrier = SplitBinaryCarrier()
-    tracer.injector(Format.SPLIT_BINARY).inject_span(
-        span=span, carrier=bin_carrier)
+    tracer.inject(span=span, format=Format.SPLIT_BINARY, carrier=bin_carrier)
     assert bin_carrier.tracer_state == bytearray()
     assert bin_carrier.baggage == bytearray()
 
     text_carrier = SplitTextCarrier()
-    tracer.injector(Format.SPLIT_TEXT).inject_span(
-        span=span, carrier=text_carrier)
+    tracer.inject(span=span, format=Format.SPLIT_TEXT, carrier=text_carrier)
     assert text_carrier.tracer_state == {}
     assert text_carrier.baggage == {}
 
 
-def test_extractor():
+def test_join():
     tracer = Tracer()
     noop_span = tracer._noop_span
 
     bin_carrier = SplitBinaryCarrier()
-    span = tracer.extractor(Format.SPLIT_BINARY).join_trace(
-        'op_name', carrier=bin_carrier)
+    span = tracer.join('op_name', Format.SPLIT_BINARY, carrier=bin_carrier)
     assert noop_span == span
 
     text_carrier = SplitTextCarrier()
-    span = tracer.extractor(Format.SPLIT_TEXT).join_trace(
-        'op_name', carrier=text_carrier)
+    span = tracer.join('op_name', Format.SPLIT_TEXT, carrier=text_carrier)
     assert noop_span == span
