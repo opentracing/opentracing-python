@@ -3,10 +3,10 @@
 History
 -------
 
-1.0rc2 (unreleased)
+1.0rc2 (2016-03-11)
 -------------------
 
-- Nothing changed yet.
+- Remove the Injector/Extractor layer
 
 
 1.0rc1 (2016-02-24)
