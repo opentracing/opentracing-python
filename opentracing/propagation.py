@@ -54,52 +54,16 @@ class Format:
     These static constants are intended for use in the Tracer.inject() and
     Tracer.join() methods. E.g.,
 
-        tracer.inject(span, Format.SPLIT_BINARY, split_binary_carrier)
+        tracer.inject(span, Format.BINARY, binary_carrier)
 
     """
 
-    # The SPLIT_BINARY format pairs with a SplitBinaryCarrier carrier object.
-    SPLIT_BINARY = 'split_binary'
+    # The BINARY format injects Spans into and joins Spans from an opaque
+    # bytearray carrier. For both Tracer.inject() and Tracer.join() the carrier
+    # should be a bytearray instance. Tracer.inject() must append to the
+    # bytearray carrier (rather than replace its contents).
+    BINARY = 'binary'
 
-    # The SPLIT_TEXT format pairs with a SplitTextCarrier carrier object.
-    SPLIT_TEXT = 'split_text'
-
-
-class SplitBinaryCarrier(object):
-    """The SplitBinaryCarrier is a carrier to be used with Format.SPLIT_BINARY.
-
-    The SplitBinaryCarrier has two properties, and each is represented as a
-    bytearray:
-     - tracer_state: Tracer-specific context that must cross process
-       boundaries. For example, in Dapper this would include a trace_id, a
-       span_id, and a bitmask representing the sampling status for the given
-       trace.
-     - baggage: any Baggage items for the encoded Span (per
-       Span.set_baggage_item()).
-    """
-
-    def __init__(self, tracer_state=None, baggage=None):
-        self.tracer_state = (
-            bytearray() if tracer_state is None else tracer_state)
-        self.baggage = (
-            bytearray() if baggage is None else baggage)
-
-
-class SplitTextCarrier(object):
-    """The SplitTextCarrier is a carrier to be used with Format.SPLIT_TEXT.
-
-    The SplitTextCarrier has two properties, and each is represented as a
-    string->string dict:
-     - tracer_state: Tracer-specific context that must cross process
-       boundaries. For example, in Dapper this would include a trace_id, a
-       span_id, and a bitmask representing the sampling status for the given
-       trace.
-     - baggage: any Baggage items for the encoded Span (per
-       Span.set_baggage_item()).
-    """
-
-    def __init__(self, tracer_state=None, baggage=None):
-        self.tracer_state = (
-            {} if tracer_state is None else tracer_state)
-        self.baggage = (
-            {} if baggage is None else baggage)
+    # The TEXT_MAP format injects Spans into and joins Spans from a python dict
+    # carrier that maps from strings to strings.
+    TEXT_MAP = 'text_map'

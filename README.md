@@ -59,12 +59,10 @@ Somewhere in your server's request handler code:
         
     
     def before_request(request, tracer):
-        text_carrier = opentracing.SplitTextCarrier(
-            request.headers, request.headers)
         span = tracer.join(
             operation_name=request.operation,
-            format=Format.SPLIT_TEXT,
-            carrier=text_carrier,
+            format=Format.TEXT_MAP,
+            carrier=request.headers,
         )
         if span is None:
             span = tracer.start_span(operation_name=request.operation)
@@ -118,17 +116,14 @@ Somewhere in your service that's about to make an outgoing call:
         if port:
             outbound_span.set_tag(tags.PEER_PORT, port)
     
-        text_carrier = opentracing.SplitTextCarrier()
+        text_carrier = {}
         opentracing.tracer.inject(
             span=outbound_span,
-            format=Format.SPLIT_TEXT,
+            format=Format.TEXT_MAP,
             carrier=text_carrier)
         )
-        for key, value in text_carrier.tracer_state.iteritems():
+        for key, value in text_carrier.iteritems():
             request.add_header(key, value)
-        if text_carrier.baggage:
-            for key, value in text_carrier.baggage.iteritems():
-                request.add_header(key, value)
     
         return outbound_span
 ```
