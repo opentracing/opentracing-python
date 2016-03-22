@@ -3,7 +3,7 @@
 History
 -------
 
-1.0rc4 (unreleased)
+1.0rc3 (2016-03-22)
 -------------------
 
 - No changes yet
