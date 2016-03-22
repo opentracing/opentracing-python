@@ -3,10 +3,10 @@
 History
 -------
 
-1.0rc3 (unreleased)
+1.0rc3 (2016-03-22)
 -------------------
 
-- Nothing changed yet.
+- Move to simpler carrier formats
 
 
 1.0rc2 (2016-03-11)
