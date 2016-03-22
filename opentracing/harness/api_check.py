@@ -132,17 +132,14 @@ class APICompatibilityCheckMixin(object):
 
     def test_text_propagation(self):
         with self.tracer().start_span(operation_name='Bender') as span:
-            text_carrier = opentracing.SplitTextCarrier()
+            text_carrier = {}
             self.tracer().inject(
                 span=span,
-                format=opentracing.Format.SPLIT_TEXT,
+                format=opentracing.Format.TEXT_MAP,
                 carrier=text_carrier)
-            assert type(text_carrier.tracer_state) is dict
-            assert (text_carrier.baggage is None or
-                    type(text_carrier.baggage) is dict)
             with self.tracer().join(
                 None,
-                format=opentracing.Format.SPLIT_TEXT,
+                format=opentracing.Format.TEXT_MAP,
                 carrier=text_carrier,
             ) as reassembled_span:
                 reassembled_span.set_baggage_item(
@@ -150,17 +147,14 @@ class APICompatibilityCheckMixin(object):
 
     def test_binary_propagation(self):
         with self.tracer().start_span(operation_name='Bender') as span:
-            bin_carrier = opentracing.SplitBinaryCarrier()
+            bin_carrier = bytearray()
             self.tracer().inject(
                 span=span,
-                format=opentracing.Format.SPLIT_BINARY,
+                format=opentracing.Format.BINARY,
                 carrier=bin_carrier)
-            assert type(bin_carrier.tracer_state) is bytearray
-            assert (bin_carrier.baggage is None or
-                    type(bin_carrier.baggage) is bytearray)
             with self.tracer().join(
                 None,
-                format=opentracing.Format.SPLIT_BINARY,
+                format=opentracing.Format.BINARY,
                 carrier=bin_carrier
             ) as reassembled_span:
                 reassembled_span.set_baggage_item(
