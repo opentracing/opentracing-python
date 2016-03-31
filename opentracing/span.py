@@ -20,6 +20,7 @@
 
 from __future__ import absolute_import
 
+import re
 
 class Span(object):
     """
@@ -196,3 +197,19 @@ def start_child_span(parent_span, operation_name, tags=None, start_time=None):
         tags=tags,
         start_time=start_time
     )
+
+
+baggage_key_re = re.compile('^(?i)([a-z0-9][-a-z0-9]*)$')
+
+def canonicalize_baggage_key(key):
+    """canonicalize_baggage_key returns a canonicalized key if it's valid.
+
+    :param key: a string that is expected to match the pattern specified by
+        `get_baggage_item`.
+
+    :return: Returns the canonicalized key if it's valid, otherwise it returns
+        None.
+    """
+    if baggage_key_re.match(key) is not None:
+        return key.lower()
+    return None
