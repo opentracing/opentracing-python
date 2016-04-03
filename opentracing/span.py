@@ -119,7 +119,10 @@ class Span(object):
         calls, so this feature must be used with care.
 
         Note 3: keys are case-insensitive, to allow propagation via HTTP
-        headers. Keys must match regexp `(?i:[a-z0-9][-a-z0-9]*)`
+        headers. Keys must match regexp `(?i:[a-z0-9][-a-z0-9]*)`. See
+        `canonicalize_baggage_key()` for a way of checking and canonicalizing
+        a key. If a key doesn't meet these guidelines, the behavior of
+        `set_baggage_item()` will be undefined.
 
         :param key: Baggage item key
         :type key: str
@@ -199,13 +202,13 @@ def start_child_span(parent_span, operation_name, tags=None, start_time=None):
     )
 
 
-baggage_key_re = re.compile('^(?i)([a-z0-9][-a-z0-9]*)$')
+_baggage_key_re = re.compile('^(?i)([a-z0-9][-a-z0-9]*)$')
 
 def canonicalize_baggage_key(key):
     """canonicalize_baggage_key returns a canonicalized key if it's valid.
 
     :param key: a string that is expected to match the pattern specified by
-        `get_baggage_item`.
+        `get_baggage_item()`.
 
     :return: Returns the canonicalized key if it's valid, otherwise it returns
         None.
