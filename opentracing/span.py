@@ -213,6 +213,6 @@ def canonicalize_baggage_key(key):
     :return: Returns the canonicalized key if it's valid, otherwise it returns
         None.
     """
-    if baggage_key_re.match(key) is not None:
+    if _baggage_key_re.match(key) is not None:
         return key.lower()
     return None
