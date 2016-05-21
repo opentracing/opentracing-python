@@ -6,7 +6,7 @@ History
 1.0rc4 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Add standard tags per http://opentracing.io/data-semantics/
 
 
 1.0rc3 (2016-03-22)

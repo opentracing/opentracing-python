@@ -20,7 +20,7 @@
 from __future__ import absolute_import
 from .span import Span  # noqa
 from .span import start_child_span  # noqa
-from .span import canonicalize_baggage_key #noqa
+from .span import canonicalize_baggage_key  # noqa
 from .tracer import Tracer  # noqa
 from .propagation import Format  # noqa
 from .propagation import InvalidCarrierException  # noqa
