@@ -70,7 +70,7 @@ class Format:
     # NOTE: Since HTTP headers are a particularly important use case for the
     # TEXT_MAP carrier, dict key parameters identify their respective values in
     # a case-insensitive manner.
-    # 
+    #
     # NOTE: The TEXT_MAP carrier dict may contain unrelated data (e.g.,
     # arbitrary HTTP headers). As such, the Tracer implementation should use a
     # prefix or other convention to distinguish Tracer-specific key:value

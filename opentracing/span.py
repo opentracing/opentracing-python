@@ -22,6 +22,7 @@ from __future__ import absolute_import
 
 import re
 
+
 class Span(object):
     """
     Span represents a unit of work executed on behalf of a trace. Examples of
@@ -203,6 +204,7 @@ def start_child_span(parent_span, operation_name, tags=None, start_time=None):
 
 
 _baggage_key_re = re.compile('^(?i)([a-z0-9][-a-z0-9]*)$')
+
 
 def canonicalize_baggage_key(key):
     """canonicalize_baggage_key returns a canonicalized key if it's valid.

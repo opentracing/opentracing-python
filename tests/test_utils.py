@@ -21,13 +21,14 @@
 from __future__ import absolute_import
 from opentracing import canonicalize_baggage_key
 
+
 def test_canonicalize_baggage_key():
-    badKey = "some-weird-sign!#"
-    assert canonicalize_baggage_key(badKey) == None
+    badKey = 'some-weird-sign!#'
+    assert canonicalize_baggage_key(badKey) is None
 
-    badKey2 = "-another-sign"
-    assert canonicalize_baggage_key(badKey2) == None
+    badKey2 = '-another-sign'
+    assert canonicalize_baggage_key(badKey2) is None
 
-    goodKey = "000-Capitalized-9"
+    goodKey = '000-Capitalized-9'
     canonicalKey = canonicalize_baggage_key(goodKey)
     assert canonicalKey == goodKey.lower()

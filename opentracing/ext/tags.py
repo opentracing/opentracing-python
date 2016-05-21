@@ -37,7 +37,7 @@ SPAN_KIND_RPC_CLIENT = 'client'
 SPAN_KIND_RPC_SERVER = 'server'
 
 # ---------------------------------------------------------------------------
-# COMPONENT (string) ia s low-cardinality identifier of the module, library, 
+# COMPONENT (string) ia s low-cardinality identifier of the module, library,
 # or package that is generating a span.
 # ---------------------------------------------------------------------------
 COMPONENT = 'component'
@@ -71,7 +71,7 @@ PEER_PORT = 'peer.port'
 # HTTP tags
 # ---------------------------------------------------------------------------
 
-# HTTP_URL string) should be the URL of the request being handled in this 
+# HTTP_URL (string) should be the URL of the request being handled in this
 # segment of the trace, in standard URI format. The protocol is optional.
 HTTP_URL = 'http.url'
 
@@ -79,7 +79,6 @@ HTTP_URL = 'http.url'
 # Both upper/lower case values are allowed.
 HTTP_METHOD = 'http.method'
 
-# HTTP_STATUS_CODE (int) is the numeric HTTP status code (200, 404, etc) 
+# HTTP_STATUS_CODE (int) is the numeric HTTP status code (200, 404, etc)
 # of the HTTP response.
 HTTP_STATUS_CODE = 'http.status_code'
-
