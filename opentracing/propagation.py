@@ -40,7 +40,7 @@ class InvalidCarrierException(Exception):
 
 
 class TraceCorruptedException(Exception):
-    """TraceCorruptedException should be used when the underlynig trace state
+    """TraceCorruptedException should be used when the underlying trace state
     is seemingly present but not well-formed.
 
     See Tracer.inject() and Tracer.join().
