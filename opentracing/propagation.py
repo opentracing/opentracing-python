@@ -25,7 +25,7 @@ class UnsupportedFormatException(Exception):
     """UnsupportedFormatException should be used when the provided format
     value is unknown or disallowed by the Tracer.
 
-    See Tracer.inject() and Tracer.join().
+    See Tracer.inject() and Tracer.extract().
     """
     pass
 
@@ -34,16 +34,16 @@ class InvalidCarrierException(Exception):
     """InvalidCarrierException should be used when the provided carrier
     instance does not match what the `format` argument requires.
 
-    See Tracer.inject() and Tracer.join().
+    See Tracer.inject() and Tracer.extract().
     """
     pass
 
 
-class TraceCorruptedException(Exception):
-    """TraceCorruptedException should be used when the underlying trace state
-    is seemingly present but not well-formed.
+class SpanContextCorruptedException(Exception):
+    """SpanContextCorruptedException should be used when the underlying span
+    context state is seemingly present but not well-formed.
 
-    See Tracer.inject() and Tracer.join().
+    See Tracer.inject() and Tracer.extract().
     """
     pass
 
@@ -52,24 +52,20 @@ class Format:
     """A namespace for builtin carrier formats.
 
     These static constants are intended for use in the Tracer.inject() and
-    Tracer.join() methods. E.g.,
+    Tracer.extract() methods. E.g.,
 
         tracer.inject(span, Format.BINARY, binary_carrier)
 
     """
 
-    # The BINARY format injects Spans into and joins Spans from an opaque
-    # bytearray carrier. For both Tracer.inject() and Tracer.join() the carrier
-    # should be a bytearray instance. Tracer.inject() must append to the
-    # bytearray carrier (rather than replace its contents).
+    # The BINARY format injects Spans into and extracts SpanContexts from an
+    # opaque bytearray carrier. For both Tracer.inject() and Tracer.extract()
+    # the carrier should be a bytearray instance. Tracer.inject() must append
+    # to the bytearray carrier (rather than replace its contents).
     BINARY = 'binary'
 
-    # The TEXT_MAP format injects Spans into and joins Spans from a python dict
-    # carrier that maps from strings to strings.
-    #
-    # NOTE: Since HTTP headers are a particularly important use case for the
-    # TEXT_MAP carrier, dict key parameters identify their respective values in
-    # a case-insensitive manner.
+    # The TEXT_MAP format injects Spans into and extracts SpanContexts from a
+    # python dict carrier that maps from strings to strings.
     #
     # NOTE: The TEXT_MAP carrier dict may contain unrelated data (e.g.,
     # arbitrary HTTP headers). As such, the Tracer implementation should use a

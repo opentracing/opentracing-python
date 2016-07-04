@@ -20,6 +20,7 @@
 
 from __future__ import absolute_import
 import mock
+from opentracing import ChildOf
 from opentracing import Format
 from opentracing import Tracer
 from opentracing.ext import tags
@@ -28,7 +29,7 @@ from opentracing.ext import tags
 def test_span():
     tracer = Tracer()
     parent = tracer.start_span('parent')
-    child = tracer.start_span('test', parent=parent)
+    child = tracer.start_span('test', references=ChildOf(parent.context))
     assert parent == child
     child.log_event('cache_hit', ['arg1', 'arg2'])
 
@@ -63,22 +64,22 @@ def test_inject():
     span = tracer.start_span()
 
     bin_carrier = bytearray()
-    tracer.inject(span=span, format=Format.BINARY, carrier=bin_carrier)
+    tracer.inject(span_context=span.context, format=Format.BINARY, carrier=bin_carrier)
     assert bin_carrier == bytearray()
 
     text_carrier = {}
-    tracer.inject(span=span, format=Format.TEXT_MAP, carrier=text_carrier)
+    tracer.inject(span_context=span.context, format=Format.TEXT_MAP, carrier=text_carrier)
     assert text_carrier == {}
 
 
-def test_join():
+def test_extract():
     tracer = Tracer()
     noop_span = tracer._noop_span
 
     bin_carrier = bytearray()
-    span = tracer.join('op_name', Format.BINARY, carrier=bin_carrier)
-    assert noop_span == span
+    span_ctx = tracer.extract(Format.BINARY, carrier=bin_carrier)
+    assert noop_span.context == span_ctx
 
     text_carrier = {}
-    span = tracer.join('op_name', Format.TEXT_MAP, carrier=text_carrier)
-    assert noop_span == span
+    span_ctx = tracer.extract(Format.TEXT_MAP, carrier=text_carrier)
+    assert noop_span.context == span_ctx

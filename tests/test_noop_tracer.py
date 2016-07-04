@@ -20,6 +20,7 @@
 
 from __future__ import absolute_import
 from concurrent.futures import Future
+from opentracing import ChildOf
 from opentracing import Tracer
 
 
@@ -27,8 +28,5 @@ def test_tracer():
     tracer = Tracer()
     span = tracer.start_span(operation_name='root')
     child = tracer.start_span(operation_name='child',
-                              parent=span)
+                              references=ChildOf(span))
     assert span == child
-    fut = tracer.flush()
-    assert type(fut) is Future
-    fut.result(timeout=1)

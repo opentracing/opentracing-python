@@ -49,21 +49,19 @@ class APICompatibilityCheckMixin(object):
             span.log_event('birthplace',
                            payload={'hospital': 'Brooklyn Pre-Med Hospital',
                                     'city': 'Old New York'})
-        tracer.flush()
 
     def test_start_span_with_parent(self):
         tracer = self.tracer()
         parent_span = tracer.start_span(operation_name='parent')
         assert parent_span is not None
         span = tracer.start_span(operation_name='Leela',
-                                 parent=parent_span)
+                                 references=opentracing.ChildOf(parent_span.context))
         span.finish()
         span = tracer.start_span(operation_name='Leela',
-                                 parent=parent_span,
+                                 references=opentracing.ChildOf(parent_span.context),
                                  tags={'birthplace': 'sewers'})
         span.finish()
         parent_span.finish()
-        tracer.flush()
 
     def test_start_child_span(self):
         tracer = self.tracer()
@@ -73,7 +71,6 @@ class APICompatibilityCheckMixin(object):
             parent_span, operation_name='Leela')
         child_span.finish()
         parent_span.finish()
-        tracer.flush()
 
     def test_set_operation_name(self):
         span = self.tracer().start_span().set_operation_name('Farnsworth')
@@ -123,9 +120,9 @@ class APICompatibilityCheckMixin(object):
 
     def test_baggage(self):
         with self.tracer().start_span(operation_name='Fry') as span:
-            span_ref = span.set_baggage_item('Kiff-loves', 'Amy')
-            assert span_ref is span
-            val = span.get_baggage_item('kiff-Loves')  # case change
+            ctx_ref = span.context.set_baggage_item('Kiff-loves', 'Amy')
+            assert ctx_ref is span.context
+            val = span.context.get_baggage_item('kiff-Loves')  # case change
             if self.check_baggage_values():
                 assert 'Amy' == val
             pass
@@ -134,28 +131,24 @@ class APICompatibilityCheckMixin(object):
         with self.tracer().start_span(operation_name='Bender') as span:
             text_carrier = {}
             self.tracer().inject(
-                span=span,
+                span_context=span.context,
                 format=opentracing.Format.TEXT_MAP,
                 carrier=text_carrier)
-            with self.tracer().join(
-                None,
+            extracted_ctx = self.tracer().extract(
                 format=opentracing.Format.TEXT_MAP,
-                carrier=text_carrier,
-            ) as reassembled_span:
-                reassembled_span.set_baggage_item(
-                    'middle-name', 'Rodriguez')
+                carrier=text_carrier)
+            extracted_ctx.set_baggage_item(
+                'middle-name', 'Rodriguez')
 
     def test_binary_propagation(self):
         with self.tracer().start_span(operation_name='Bender') as span:
             bin_carrier = bytearray()
             self.tracer().inject(
-                span=span,
+                span_context=span.context,
                 format=opentracing.Format.BINARY,
                 carrier=bin_carrier)
-            with self.tracer().join(
-                None,
+            extracted_ctx = self.tracer().extract(
                 format=opentracing.Format.BINARY,
-                carrier=bin_carrier
-            ) as reassembled_span:
-                reassembled_span.set_baggage_item(
-                    'middle-name', 'Rodriguez')
+                carrier=bin_carrier)
+            extracted_ctx.set_baggage_item(
+                'middle-name', 'Rodriguez')
