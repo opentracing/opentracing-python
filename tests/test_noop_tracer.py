@@ -19,7 +19,6 @@
 # THE SOFTWARE.
 
 from __future__ import absolute_import
-from concurrent.futures import Future
 from opentracing import ChildOf
 from opentracing import Tracer
 

@@ -20,7 +20,6 @@
 
 from __future__ import absolute_import
 from collections import namedtuple
-from concurrent.futures import Future
 from .span import Span
 from .span import SpanContext
 

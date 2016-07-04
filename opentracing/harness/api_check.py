@@ -54,12 +54,14 @@ class APICompatibilityCheckMixin(object):
         tracer = self.tracer()
         parent_span = tracer.start_span(operation_name='parent')
         assert parent_span is not None
-        span = tracer.start_span(operation_name='Leela',
-                                 references=opentracing.ChildOf(parent_span.context))
+        span = tracer.start_span(
+            operation_name='Leela',
+            references=opentracing.ChildOf(parent_span.context))
         span.finish()
-        span = tracer.start_span(operation_name='Leela',
-                                 references=opentracing.ChildOf(parent_span.context),
-                                 tags={'birthplace': 'sewers'})
+        span = tracer.start_span(
+            operation_name='Leela',
+            references=opentracing.ChildOf(parent_span.context),
+            tags={'birthplace': 'sewers'})
         span.finish()
         parent_span.finish()
 

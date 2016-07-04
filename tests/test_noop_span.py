@@ -64,11 +64,17 @@ def test_inject():
     span = tracer.start_span()
 
     bin_carrier = bytearray()
-    tracer.inject(span_context=span.context, format=Format.BINARY, carrier=bin_carrier)
+    tracer.inject(
+        span_context=span.context,
+        format=Format.BINARY,
+        carrier=bin_carrier)
     assert bin_carrier == bytearray()
 
     text_carrier = {}
-    tracer.inject(span_context=span.context, format=Format.TEXT_MAP, carrier=text_carrier)
+    tracer.inject(
+        span_context=span.context,
+        format=Format.TEXT_MAP,
+        carrier=text_carrier)
     assert text_carrier == {}
 
 

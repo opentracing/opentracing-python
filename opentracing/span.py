@@ -20,7 +20,6 @@
 
 from __future__ import absolute_import
 
-import re
 
 class SpanContext(object):
     def set_baggage_item(self, key, value):
