@@ -3,8 +3,8 @@
 History
 -------
 
-1.0rc4 (2016-05-21)
--------------------
+2.0.1 (2016-07-04)
+------------------
 
 - Add standard tags per http://opentracing.io/data-semantics/
 
