@@ -3,8 +3,13 @@
 History
 -------
 
-2.0.1 (2016-07-04)
+2.0.0 (unreleased)
 ------------------
+
+- Support SpanContext (and real semvers)
+
+1.0rc4 (2016-05-21)
+-------------------
 
 - Add standard tags per http://opentracing.io/data-semantics/
 

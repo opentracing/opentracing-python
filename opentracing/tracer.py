@@ -33,8 +33,8 @@ class Tracer(object):
     """
 
     def __init__(self):
-        self._noop_span = Span(self)
         self._noop_span_context = SpanContext()
+        self._noop_span = Span(self, self._noop_span_context)
 
     def start_span(self,
                    operation_name=None,

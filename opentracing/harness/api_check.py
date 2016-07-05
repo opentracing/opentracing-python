@@ -124,7 +124,7 @@ class APICompatibilityCheckMixin(object):
         with self.tracer().start_span(operation_name='Fry') as span:
             ctx_ref = span.context.set_baggage_item('Kiff-loves', 'Amy')
             assert ctx_ref is span.context
-            val = span.context.get_baggage_item('kiff-Loves')  # case change
+            val = span.context.get_baggage_item('Kiff-loves')
             if self.check_baggage_values():
                 assert 'Amy' == val
             pass

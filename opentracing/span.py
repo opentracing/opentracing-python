@@ -22,6 +22,16 @@ from __future__ import absolute_import
 
 
 class SpanContext(object):
+    """SpanContext represents Span state that must propagate to descendant
+    Spans and across process boundaries.
+    
+    SpanContext is logically divided into two pieces: the user-level "Baggage"
+    (see set_baggage_item and get_baggage_item) that propagates across Span
+    boundaries and any Tracer-implementation-specific fields that are needed to
+    identify or otherwise contextualize the associated Span instance (e.g., a
+    <trace_id, span_id, sampled> tuple).
+    """
+
     def set_baggage_item(self, key, value):
         """Stores a Baggage item in the span as a key/value pair.
 
@@ -76,12 +86,28 @@ class Span(object):
     In the Context Manager syntax it's not necessary to call span.finish()
     """
 
-    def __init__(self, tracer):
+    def __init__(self, tracer, context):
         self._tracer = tracer
+        self._context = context
 
     @property
     def context(self):
-        return self.tracer._noop_span_context
+        """Provides access to the SpanContext associated with this Span.
+
+        The SpanContext contains state that propagates from Span to Span in a
+        larger trace.
+
+        :return: returns the SpanContext associated with this Span.
+        """
+        return self._context
+
+    @property
+    def tracer(self):
+        """Provides access to the Tracer that created this Span.
+
+        :return: returns the Tracer that created this Span.
+        """
+        return self._tracer
 
     def set_operation_name(self, operation_name):
         """Changes the operation name.
@@ -141,14 +167,6 @@ class Span(object):
         :return: returns the span itself, for chaining the calls
         """
         return self
-
-    @property
-    def tracer(self):
-        """Provides access to the Tracer that created this Span.
-
-        :return: returns the Tracer that created this Span.
-        """
-        return self._tracer
 
     def __enter__(self):
         """Invoked when span is used as a context manager.
