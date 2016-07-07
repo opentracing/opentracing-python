@@ -19,8 +19,9 @@
 # THE SOFTWARE.
 
 from __future__ import absolute_import
-from concurrent.futures import Future
+from collections import namedtuple
 from .span import Span
+from .span import SpanContext
 
 
 class Tracer(object):
@@ -32,21 +33,35 @@ class Tracer(object):
     """
 
     def __init__(self):
-        self._noop_span = Span(self)
+        self._noop_span_context = SpanContext()
+        self._noop_span = Span(self, self._noop_span_context)
 
     def start_span(self,
                    operation_name=None,
-                   parent=None,
+                   references=None,
                    tags=None,
                    start_time=None):
         """Starts and returns a new Span representing a unit of work.
 
+
+        Starting a root Span (a Span with no causal references):
+
+            tracer.start_span('...')
+
+
+        Starting a child Span (see also start_child_span()):
+
+            tracer.start_span(
+                '...',
+                references=opentracing.ChildOf(parent_span.context))
+
+
         :param operation_name: name of the operation represented by the new
             span from the perspective of the current service.
-        :param parent: an optional parent Span. If specified, the returned Span
-            will be a child of `parent` in `parent`'s trace. If unspecified,
-            the returned Span will be the root of its own trace.
-        :param tags: optional dictionary of Span Tags. The caller gives up
+        :param references: (optional) either a single Reference object or a
+            list of Reference objects that identify one or more parent
+            SpanContexts. (See the Reference documentation for detail)
+        :param tags: an optional dictionary of Span Tags. The caller gives up
             ownership of that dictionary, because the Tracer may use it as-is
             to avoid extra data copying.
         :param start_time: an explicit Span start time as a unix timestamp per
@@ -56,17 +71,17 @@ class Tracer(object):
         """
         return self._noop_span
 
-    def inject(self, span, format, carrier):
-        """Injects `span` into `carrier`.
+    def inject(self, span_context, format, carrier):
+        """Injects `span_context` into `carrier`.
 
         The type of `carrier` is determined by `format`. See the
-        opentracing.propagation.Format class/namespace for standard (and
-        required) formats.
+        opentracing.propagation.Format class/namespace for the built-in
+        OpenTracing formats.
 
         Implementations may raise opentracing.UnsupportedFormatException if
         `format` is unknown or disallowed.
 
-        :param span: the Span instance to inject
+        :param span_context: the SpanContext instance to inject
         :param format: a python object instance that represents a given
             carrier format. `format` may be of any type, and `format` equality
             is defined by python `==` equality.
@@ -74,42 +89,100 @@ class Tracer(object):
         """
         pass
 
-    def join(self, operation_name, format, carrier):
-        """Returns a Span instance with operation name `operation_name`
-        that's joined to the trace state embedded within `carrier`, or None if
-        no such trace state could be found.
+    def extract(self, format, carrier):
+        """Returns a SpanContext instance extracted from a `carrier` of the
+        given `format`, or None if no such SpanContext could be found.
 
         The type of `carrier` is determined by `format`. See the
-        opentracing.propagation.Format class/namespace for standard (and
-        required) formats.
+        opentracing.propagation.Format class/namespace for the built-in
+        OpenTracing formats.
 
         Implementations may raise opentracing.UnsupportedFormatException if
         `format` is unknown or disallowed.
 
         Implementations may raise opentracing.InvalidCarrierException,
-        opentracing.TraceCorruptedException, or implementation-specific errors
-        if there are problems with `carrier`.
+        opentracing.SpanContextCorruptedException, or implementation-specific
+        errors if there are problems with `carrier`.
 
-        Upon success, the returned Span instance is already started.
-
-        :param operation_name: the operation name for the returned Span (which
-            can be set later via Span.set_operation_name())
         :param format: a python object instance that represents a given
             carrier format. `format` may be of any type, and `format` equality
             is defined by python `==` equality.
-        :param carrier: the format-specific carrier object to join with
+        :param carrier: the format-specific carrier object to extract from
 
-        :return: a Span instance joined to the trace state in `carrier` or None
-            if no such trace state could be found.
+        :return: a SpanContext instance extracted from `carrier` or None if no
+            such span context could be found.
         """
-        return self._noop_span
+        return self._noop_span_context
 
-    def flush(self):
-        """Flushes any trace data that may be buffered in memory, presumably
-        out of the process.
 
-        :return: Returns a :py:class:futures.Future
-        """
-        fut = Future()
-        fut.set_result(True)
-        return fut
+class ReferenceType:
+    """A namespace for OpenTracing reference types.
+
+    See http://opentracing.io/spec for more detail about references, reference
+    types, and CHILD_OF and FOLLOWS_FROM in particular.
+    """
+    CHILD_OF = 'child_of'
+    FOLLOWS_FROM = 'follows_from'
+
+
+# We inherit from namedtuple (rather than assign) so that we can specify a
+# standard docstring.
+class Reference(namedtuple('Reference', ['type', 'span_context'])):
+    """A Reference pairs a reference type with a SpanContext referee.
+
+    References are used by Tracer.start_span() to describe the relationships
+    between Spans.
+    """
+    pass
+
+
+def ChildOf(span_context):
+    """ChildOf is a helper that creates CHILD_OF References.
+
+    :param span_context: the (causal parent) SpanContext to reference
+
+    :rtype: Reference
+    :return: A Reference suitable for Tracer.start_span(..., references=...)
+    """
+    return Reference(ReferenceType.CHILD_OF, span_context)
+
+
+def FollowsFrom(span_context):
+    """FollowsFrom is a helper that creates FOLLOWS_FROM References.
+
+    :param span_context: the (causal parent) SpanContext to reference
+
+    :rtype: Reference
+    :return: A Reference suitable for Tracer.start_span(..., references=...)
+    """
+    return Reference(ReferenceType.FOLLOWS_FROM, span_context)
+
+
+def start_child_span(parent_span, operation_name, tags=None, start_time=None):
+    """A shorthand method that starts a ChildOf span for a given parent span.
+
+    Equivalent to calling
+
+        parent_span.tracer().start_span(
+            operation_name,
+            references=opentracing.ChildOf(parent_span.context),
+            tags=tags,
+            start_time=start_time)
+
+    :param parent_span: the Span which will act as the parent in the returned
+        Span's ChildOf reference
+    :param operation_name: the operation name for the child Span instance
+    :param tags: optional dict of Span Tags. The caller gives up ownership of
+        that dict, because the Tracer may use it as-is to avoid extra data
+        copying.
+    :param start_time: an explicit Span start time as a unix timestamp per
+        time.time().
+
+    :return: Returns an already-started Span instance.
+    """
+    return parent_span.tracer.start_span(
+        operation_name=operation_name,
+        references=ChildOf(parent_span.context),
+        tags=tags,
+        start_time=start_time
+    )

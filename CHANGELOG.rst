@@ -3,6 +3,12 @@
 History
 -------
 
+2.0.0 (unreleased)
+------------------
+
+- Support SpanContext (and real semvers)
+
+
 1.0rc4 (2016-05-21)
 -------------------
 
