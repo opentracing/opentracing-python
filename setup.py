@@ -4,8 +4,8 @@ from setuptools import setup
 setup(
     name='opentracing',
     version='2.0.0.dev0',
-    author='Yuri Shkuro, The OpenTracing Authors',
-    author_email='shkuro@gmail.com',
+    author='The OpenTracing Authors',
+    author_email='opentracing@googlegroups.com',
     description='OpenTracing API for Python. See documentation at http://opentracing.io',
     license='MIT',
     url='https://github.com/opentracing/opentracing-python',
