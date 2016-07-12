@@ -20,7 +20,7 @@
 
 from __future__ import absolute_import
 import mock
-from opentracing import ChildOf
+from opentracing import child_of
 from opentracing import Format
 from opentracing import Tracer
 from opentracing.ext import tags
@@ -29,7 +29,7 @@ from opentracing.ext import tags
 def test_span():
     tracer = Tracer()
     parent = tracer.start_span('parent')
-    child = tracer.start_span('test', references=ChildOf(parent.context))
+    child = tracer.start_span('test', references=child_of(parent.context))
     assert parent == child
     child.log_event('cache_hit', ['arg1', 'arg2'])
 

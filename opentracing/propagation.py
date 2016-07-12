@@ -48,13 +48,13 @@ class SpanContextCorruptedException(Exception):
     pass
 
 
-class Format:
+class Format(object):
     """A namespace for builtin carrier formats.
 
     These static constants are intended for use in the Tracer.inject() and
     Tracer.extract() methods. E.g.,
 
-        tracer.inject(span, Format.BINARY, binary_carrier)
+        tracer.inject(span.context, Format.BINARY, binary_carrier)
 
     """
 
