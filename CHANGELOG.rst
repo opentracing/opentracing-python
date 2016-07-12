@@ -6,6 +6,20 @@ History
 2.0.0 (unreleased)
 ------------------
 
+- Support SpanContext
+
+
+2.0.0.dev1 (2016-07-12)
+-----------------------
+
+- Rename ChildOf/FollowsFrom to child_of/follows_from
+- Rename span_context to referee in Reference
+- Document expected behavior when referee=None
+
+
+2.0.0.dev0 (2016-07-11)
+-----------------------
+
 - Support SpanContext (and real semvers)
 
 
