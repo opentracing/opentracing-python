@@ -34,7 +34,7 @@ class Tracer(object):
 
     def __init__(self):
         self._noop_span_context = SpanContext()
-        self._noop_span = Span(self, self._noop_span_context)
+        self._noop_span = Span(tracer=self, context=self._noop_span_context)
 
     def start_span(self,
                    operation_name=None,
@@ -53,7 +53,7 @@ class Tracer(object):
 
             tracer.start_span(
                 '...',
-                references=opentracing.ChildOf(parent_span.context))
+                references=opentracing.child_of(parent_span.context))
 
 
         :param operation_name: name of the operation represented by the new
@@ -115,62 +115,76 @@ class Tracer(object):
         return self._noop_span_context
 
 
-class ReferenceType:
+class ReferenceType(object):
     """A namespace for OpenTracing reference types.
 
-    See http://opentracing.io/spec for more detail about references, reference
-    types, and CHILD_OF and FOLLOWS_FROM in particular.
+    See http://opentracing.io/spec for more detail about references,
+    reference types, and CHILD_OF and FOLLOWS_FROM in particular.
     """
     CHILD_OF = 'child_of'
     FOLLOWS_FROM = 'follows_from'
 
 
-# We inherit from namedtuple (rather than assign) so that we can specify a
-# standard docstring.
-class Reference(namedtuple('Reference', ['type', 'span_context'])):
+# We use namedtuple since references are meant to be immutable.
+# We subclass it to expose a standard docstring.
+class Reference(namedtuple('Reference', ['type', 'referee'])):
     """A Reference pairs a reference type with a SpanContext referee.
 
     References are used by Tracer.start_span() to describe the relationships
     between Spans.
+
+    Tracer implementations must ignore references where referee is None.
+    This behavior allows for simpler code when an inbound RPC request
+    contains no tracing information and as a result tracer.extract()
+    returns None:
+
+        parent_ref = tracer.extract(opentracing.TEXT_MAP, request.headers)
+        span = tracer.start_span(
+            'operation', references=child_of(parent_ref)
+        )
+
+    See `child_of` and `follows_from` helpers for creating these references.
     """
     pass
 
 
-def ChildOf(span_context):
-    """ChildOf is a helper that creates CHILD_OF References.
+def child_of(referee=None):
+    """child_of is a helper that creates CHILD_OF References.
 
-    :param span_context: the (causal parent) SpanContext to reference
-
-    :rtype: Reference
-    :return: A Reference suitable for Tracer.start_span(..., references=...)
-    """
-    return Reference(ReferenceType.CHILD_OF, span_context)
-
-
-def FollowsFrom(span_context):
-    """FollowsFrom is a helper that creates FOLLOWS_FROM References.
-
-    :param span_context: the (causal parent) SpanContext to reference
+    :param referee: the (causal parent) SpanContext to reference.
+        If None is passed, this reference must be ignored by the tracer.
 
     :rtype: Reference
     :return: A Reference suitable for Tracer.start_span(..., references=...)
     """
-    return Reference(ReferenceType.FOLLOWS_FROM, span_context)
+    return Reference(type=ReferenceType.CHILD_OF, referee=referee)
+
+
+def follows_from(referee=None):
+    """follows_from is a helper that creates FOLLOWS_FROM References.
+
+    :param referee: the (causal parent) SpanContext to reference
+        If None is passed, this reference must be ignored by the tracer.
+
+    :rtype: Reference
+    :return: A Reference suitable for Tracer.start_span(..., references=...)
+    """
+    return Reference(type=ReferenceType.FOLLOWS_FROM, referee=referee)
 
 
 def start_child_span(parent_span, operation_name, tags=None, start_time=None):
-    """A shorthand method that starts a ChildOf span for a given parent span.
+    """A shorthand method that starts a child_of span for a given parent span.
 
     Equivalent to calling
 
         parent_span.tracer().start_span(
             operation_name,
-            references=opentracing.ChildOf(parent_span.context),
+            references=opentracing.child_of(parent_span.context),
             tags=tags,
             start_time=start_time)
 
     :param parent_span: the Span which will act as the parent in the returned
-        Span's ChildOf reference
+        Span's child_of reference.
     :param operation_name: the operation name for the child Span instance
     :param tags: optional dict of Span Tags. The caller gives up ownership of
         that dict, because the Tracer may use it as-is to avoid extra data
@@ -182,7 +196,7 @@ def start_child_span(parent_span, operation_name, tags=None, start_time=None):
     """
     return parent_span.tracer.start_span(
         operation_name=operation_name,
-        references=ChildOf(parent_span.context),
+        references=child_of(parent_span.context),
         tags=tags,
         start_time=start_time
     )

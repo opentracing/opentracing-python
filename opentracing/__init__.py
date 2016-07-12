@@ -20,8 +20,8 @@
 from __future__ import absolute_import
 from .span import Span  # noqa
 from .span import SpanContext  # noqa
-from .tracer import ChildOf  # noqa
-from .tracer import FollowsFrom  # noqa
+from .tracer import child_of  # noqa
+from .tracer import follows_from  # noqa
 from .tracer import Reference  # noqa
 from .tracer import ReferenceType  # noqa
 from .tracer import Tracer  # noqa
