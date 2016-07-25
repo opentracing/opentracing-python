@@ -149,7 +149,7 @@ class Reference(namedtuple('Reference', ['type', 'referee'])):
     contains no tracing information and as a result tracer.extract()
     returns None:
 
-        parent_ref = tracer.extract(opentracing.TEXT_MAP, request.headers)
+        parent_ref = tracer.extract(opentracing.HTTP_HEADERS, request.headers)
         span = tracer.start_span(
             'operation', references=child_of(parent_ref)
         )

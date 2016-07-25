@@ -58,17 +58,36 @@ class Format(object):
 
     """
 
-    # The BINARY format injects Spans into and extracts SpanContexts from an
-    # opaque bytearray carrier. For both Tracer.inject() and Tracer.extract()
-    # the carrier should be a bytearray instance. Tracer.inject() must append
-    # to the bytearray carrier (rather than replace its contents).
+    # The BINARY format represents SpanContexts in an opaque bytearray carrier.
+    #
+    # For both Tracer.inject() and Tracer.extract() the carrier should be a
+    # bytearray instance. Tracer.inject() must append to the bytearray carrier
+    # (rather than replace its contents).
     BINARY = 'binary'
 
-    # The TEXT_MAP format injects Spans into and extracts SpanContexts from a
-    # python dict carrier that maps from strings to strings.
+    # The TEXT_MAP format represents SpanContexts in a python dict mapping from
+    # strings to strings.
+    #
+    # Both the keys and the values have unrestricted character sets (unlike the
+    # HTTP_HEADERS format).
     #
     # NOTE: The TEXT_MAP carrier dict may contain unrelated data (e.g.,
-    # arbitrary HTTP headers). As such, the Tracer implementation should use a
+    # arbitrary gRPC metadata). As such, the Tracer implementation should use a
     # prefix or other convention to distinguish Tracer-specific key:value
     # pairs.
     TEXT_MAP = 'text_map'
+
+    # The HTTP_HEADERS format represents SpanContexts in a python dict mapping
+    # from character-restricted strings to strings.
+    #
+    # Keys and values in the HTTP_HEADERS carrier must be suitable for use as
+    # HTTP headers (without modification or further escaping). That is, the
+    # keys have a greatly restricted character set, casing for the keys may not
+    # be preserved by various intermediaries, and the values should be
+    # URL-escaped.
+    #
+    # NOTE: The HTTP_HEADERS carrier dict may contain unrelated data (e.g.,
+    # arbitrary gRPC metadata). As such, the Tracer implementation should use a
+    # prefix or other convention to distinguish Tracer-specific key:value
+    # pairs.
+    HTTP_HEADERS = 'http_headers'
