@@ -138,16 +138,16 @@ class ReferenceType(object):
 
 # We use namedtuple since references are meant to be immutable.
 # We subclass it to expose a standard docstring.
-class Reference(namedtuple('Reference', ['type', 'referee'])):
-    """A Reference pairs a reference type with a SpanContext referee.
+class Reference(namedtuple('Reference', ['type', 'referenced_context'])):
+    """A Reference pairs a reference type with a referenced SpanContext.
 
     References are used by Tracer.start_span() to describe the relationships
     between Spans.
 
-    Tracer implementations must ignore references where referee is None.
-    This behavior allows for simpler code when an inbound RPC request
-    contains no tracing information and as a result tracer.extract()
-    returns None:
+    Tracer implementations must ignore references where referenced_context is
+    None.  This behavior allows for simpler code when an inbound RPC request
+    contains no tracing information and as a result tracer.extract() returns
+    None:
 
         parent_ref = tracer.extract(opentracing.HTTP_HEADERS, request.headers)
         span = tracer.start_span(
@@ -159,28 +159,32 @@ class Reference(namedtuple('Reference', ['type', 'referee'])):
     pass
 
 
-def child_of(referee=None):
+def child_of(referenced_context=None):
     """child_of is a helper that creates CHILD_OF References.
 
-    :param referee: the (causal parent) SpanContext to reference.
+    :param referenced_context: the (causal parent) SpanContext to reference.
         If None is passed, this reference must be ignored by the tracer.
 
     :rtype: Reference
     :return: A Reference suitable for Tracer.start_span(..., references=...)
     """
-    return Reference(type=ReferenceType.CHILD_OF, referee=referee)
+    return Reference(
+        type=ReferenceType.CHILD_OF,
+        referenced_context=referenced_context)
 
 
-def follows_from(referee=None):
+def follows_from(referenced_context=None):
     """follows_from is a helper that creates FOLLOWS_FROM References.
 
-    :param referee: the (causal parent) SpanContext to reference
+    :param referenced_context: the (causal parent) SpanContext to reference
         If None is passed, this reference must be ignored by the tracer.
 
     :rtype: Reference
     :return: A Reference suitable for Tracer.start_span(..., references=...)
     """
-    return Reference(type=ReferenceType.FOLLOWS_FROM, referee=referee)
+    return Reference(
+        type=ReferenceType.FOLLOWS_FROM,
+        referenced_context=referenced_context)
 
 
 def start_child_span(parent_span, operation_name, tags=None, start_time=None):

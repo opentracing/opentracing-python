@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='opentracing',
-    version='2.0.0.dev2',
+    version='2.0.0.dev3',
     author='The OpenTracing Authors',
     author_email='opentracing@googlegroups.com',
     description='OpenTracing API for Python. See documentation at http://opentracing.io',
@@ -28,7 +28,7 @@ setup(
     extras_require={
         'tests': [
             'doubles',
-            'flake8',
+            'flake8<3',  # see https://github.com/zheller/flake8-quotes/issues/29
             'flake8-quotes',
             'mock<1.1.0',
             'pytest>=2.7,<3',
