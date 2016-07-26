@@ -28,7 +28,7 @@ setup(
     extras_require={
         'tests': [
             'doubles',
-            'flake8',
+            'flake8<3',  # see https://github.com/zheller/flake8-quotes/issues/29
             'flake8-quotes',
             'mock<1.1.0',
             'pytest>=2.7,<3',
