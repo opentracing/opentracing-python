@@ -169,8 +169,8 @@ def child_of(referenced_context=None):
     :return: A Reference suitable for Tracer.start_span(..., references=...)
     """
     return Reference(
-            type=ReferenceType.CHILD_OF,
-            referenced_context=referenced_context)
+        type=ReferenceType.CHILD_OF,
+        referenced_context=referenced_context)
 
 
 def follows_from(referenced_context=None):
@@ -183,8 +183,8 @@ def follows_from(referenced_context=None):
     :return: A Reference suitable for Tracer.start_span(..., references=...)
     """
     return Reference(
-            type=ReferenceType.FOLLOWS_FROM,
-            referenced_context=referenced_context)
+        type=ReferenceType.FOLLOWS_FROM,
+        referenced_context=referenced_context)
 
 
 def start_child_span(parent_span, operation_name, tags=None, start_time=None):
