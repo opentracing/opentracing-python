@@ -144,10 +144,10 @@ class Reference(namedtuple('Reference', ['type', 'referenced_context'])):
     References are used by Tracer.start_span() to describe the relationships
     between Spans.
 
-    Tracer implementations must ignore references where referenced_context is None.
-    This behavior allows for simpler code when an inbound RPC request
-    contains no tracing information and as a result tracer.extract()
-    returns None:
+    Tracer implementations must ignore references where referenced_context is
+    None.  This behavior allows for simpler code when an inbound RPC request
+    contains no tracing information and as a result tracer.extract() returns
+    None:
 
         parent_ref = tracer.extract(opentracing.HTTP_HEADERS, request.headers)
         span = tracer.start_span(
