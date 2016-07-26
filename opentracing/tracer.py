@@ -38,6 +38,7 @@ class Tracer(object):
 
     def start_span(self,
                    operation_name=None,
+                   child_of=None,
                    references=None,
                    tags=None,
                    start_time=None):
@@ -53,14 +54,24 @@ class Tracer(object):
 
             tracer.start_span(
                 '...',
-                references=opentracing.child_of(parent_span.context))
+                child_of=parent_span)
+
+
+        Starting a child Span in a more verbose way:
+
+            tracer.start_span(
+                '...',
+                references=[opentracing.child_of(parent_span)])
 
 
         :param operation_name: name of the operation represented by the new
             span from the perspective of the current service.
-        :param references: (optional) either a single Reference object or a
-            list of Reference objects that identify one or more parent
-            SpanContexts. (See the Reference documentation for detail)
+        :param child_of: (optional) a Span or SpanContext instance representing
+            the parent in a REFERENCE_CHILD_OF Reference. If specified, the
+            `references` parameter must be omitted.
+        :param references: (optional) a list of Reference objects that identify
+            one or more parent SpanContexts. (See the Reference documentation
+            for detail)
         :param tags: an optional dictionary of Span Tags. The caller gives up
             ownership of that dictionary, because the Tracer may use it as-is
             to avoid extra data copying.
@@ -138,7 +149,7 @@ class Reference(namedtuple('Reference', ['type', 'referee'])):
     contains no tracing information and as a result tracer.extract()
     returns None:
 
-        parent_ref = tracer.extract(opentracing.TEXT_MAP, request.headers)
+        parent_ref = tracer.extract(opentracing.HTTP_HEADERS, request.headers)
         span = tracer.start_span(
             'operation', references=child_of(parent_ref)
         )
@@ -196,7 +207,7 @@ def start_child_span(parent_span, operation_name, tags=None, start_time=None):
     """
     return parent_span.tracer.start_span(
         operation_name=operation_name,
-        references=child_of(parent_span.context),
+        child_of=parent_span,
         tags=tags,
         start_time=start_time
     )
