@@ -21,6 +21,7 @@
 from __future__ import absolute_import
 from concurrent.futures import Future
 from .span import Span
+from .propagation import Format, UnsupportedFormatException
 
 
 class Tracer(object):
@@ -72,7 +73,9 @@ class Tracer(object):
             is defined by python `==` equality.
         :param carrier: the format-specific carrier object to inject into
         """
-        pass
+        if format == Format.TEXT_MAP or format == Format.BINARY:
+            return
+        raise UnsupportedFormatException(format)
 
     def join(self, operation_name, format, carrier):
         """Returns a Span instance with operation name `operation_name`
@@ -102,7 +105,9 @@ class Tracer(object):
         :return: a Span instance joined to the trace state in `carrier` or None
             if no such trace state could be found.
         """
-        return self._noop_span
+        if format == Format.TEXT_MAP or format == Format.BINARY:
+            return self._noop_span
+        raise UnsupportedFormatException(format)
 
     def flush(self):
         """Flushes any trace data that may be buffered in memory, presumably
