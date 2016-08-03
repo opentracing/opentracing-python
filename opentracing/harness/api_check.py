@@ -19,7 +19,11 @@
 # THE SOFTWARE.
 from __future__ import absolute_import
 import time
+
+import pytest
+
 import opentracing
+from opentracing import Format
 
 
 class APICompatibilityCheckMixin(object):
@@ -154,3 +158,23 @@ class APICompatibilityCheckMixin(object):
                 carrier=bin_carrier)
             extracted_ctx.set_baggage_item(
                 'middle-name', 'Rodriguez')
+
+    def test_mandatory_formats(self):
+        formats = [
+            (Format.TEXT_MAP, {}),
+            (Format.HTTP_HEADERS, {}),
+            (Format.TEXT_MAP, bytearray()),
+        ]
+        with self.tracer().start_span(operation_name='Bender') as span:
+            for fmt, carrier in formats:
+                # expecting no exceptions
+                span.tracer.inject(span.context, fmt, carrier)
+                span.tracer.extract(fmt, carrier)
+
+    def test_unknown_format(self):
+        custom_format = 'kiss my shiny metal ...'
+        with self.tracer().start_span(operation_name='Bender') as span:
+            with pytest.raises(opentracing.UnsupportedFormatException):
+                span.tracer.inject(span.context, custom_format, {})
+            with pytest.raises(opentracing.UnsupportedFormatException):
+                span.tracer.extract(custom_format, {})

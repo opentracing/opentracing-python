@@ -6,7 +6,7 @@ History
 2.0.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Raise exception on unknown format
 
 
 2.0.0.dev3 (2016-07-26)

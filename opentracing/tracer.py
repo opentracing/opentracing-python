@@ -22,6 +22,7 @@ from __future__ import absolute_import
 from collections import namedtuple
 from .span import Span
 from .span import SpanContext
+from .propagation import Format, UnsupportedFormatException
 
 
 class Tracer(object):
@@ -31,6 +32,8 @@ class Tracer(object):
     This implementation both defines the public Tracer API, and provides
     a default no-op behavior.
     """
+
+    _supported_formats = [Format.TEXT_MAP, Format.BINARY, Format.HTTP_HEADERS]
 
     def __init__(self):
         self._noop_span_context = SpanContext()
@@ -89,7 +92,7 @@ class Tracer(object):
         opentracing.propagation.Format class/namespace for the built-in
         OpenTracing formats.
 
-        Implementations may raise opentracing.UnsupportedFormatException if
+        Implementations MUST raise opentracing.UnsupportedFormatException if
         `format` is unknown or disallowed.
 
         :param span_context: the SpanContext instance to inject
@@ -98,7 +101,9 @@ class Tracer(object):
             is defined by python `==` equality.
         :param carrier: the format-specific carrier object to inject into
         """
-        pass
+        if format in Tracer._supported_formats:
+            return
+        raise UnsupportedFormatException(format)
 
     def extract(self, format, carrier):
         """Returns a SpanContext instance extracted from a `carrier` of the
@@ -108,7 +113,7 @@ class Tracer(object):
         opentracing.propagation.Format class/namespace for the built-in
         OpenTracing formats.
 
-        Implementations may raise opentracing.UnsupportedFormatException if
+        Implementations MUST raise opentracing.UnsupportedFormatException if
         `format` is unknown or disallowed.
 
         Implementations may raise opentracing.InvalidCarrierException,
@@ -123,7 +128,9 @@ class Tracer(object):
         :return: a SpanContext instance extracted from `carrier` or None if no
             such span context could be found.
         """
-        return self._noop_span_context
+        if format in Tracer._supported_formats:
+            return self._noop_span_context
+        raise UnsupportedFormatException(format)
 
 
 class ReferenceType(object):
