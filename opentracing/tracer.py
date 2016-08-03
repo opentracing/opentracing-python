@@ -33,6 +33,8 @@ class Tracer(object):
     a default no-op behavior.
     """
 
+    _supported_formats = [Format.TEXT_MAP, Format.BINARY, Format.HTTP_HEADERS]
+
     def __init__(self):
         self._noop_span_context = SpanContext()
         self._noop_span = Span(tracer=self, context=self._noop_span_context)
@@ -99,7 +101,7 @@ class Tracer(object):
             is defined by python `==` equality.
         :param carrier: the format-specific carrier object to inject into
         """
-        if format == Format.TEXT_MAP or format == Format.BINARY:
+        if format in Tracer._supported_formats:
             return
         raise UnsupportedFormatException(format)
 
@@ -126,7 +128,7 @@ class Tracer(object):
         :return: a SpanContext instance extracted from `carrier` or None if no
             such span context could be found.
         """
-        if format == Format.TEXT_MAP or format == Format.BINARY:
+        if format in Tracer._supported_formats:
             return self._noop_span_context
         raise UnsupportedFormatException(format)
 
