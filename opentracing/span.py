@@ -153,7 +153,8 @@ class Span(object):
         """
         Returns a copy of current Baggage in the Span as a dictionary.
 
-        Note: this may be relatively expensive operation as it make a copy.
+        Note: this may be a relatively expensive operation as it makes
+        a copy of the existing baggage and returns a new dictionary.
 
         :rtype : dict
         :return: copy of current baggage, or None
