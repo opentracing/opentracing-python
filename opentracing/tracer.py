@@ -90,7 +90,7 @@ class Tracer(object):
         opentracing.propagation.Format class/namespace for the built-in
         OpenTracing formats.
 
-        Implementations may raise opentracing.UnsupportedFormatException if
+        Implementations MUST raise opentracing.UnsupportedFormatException if
         `format` is unknown or disallowed.
 
         :param span_context: the SpanContext instance to inject
@@ -111,7 +111,7 @@ class Tracer(object):
         opentracing.propagation.Format class/namespace for the built-in
         OpenTracing formats.
 
-        Implementations may raise opentracing.UnsupportedFormatException if
+        Implementations MUST raise opentracing.UnsupportedFormatException if
         `format` is unknown or disallowed.
 
         Implementations may raise opentracing.InvalidCarrierException,
