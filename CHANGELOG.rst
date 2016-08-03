@@ -3,12 +3,18 @@
 History
 -------
 
+<<<<<<< HEAD
 2.0.1 (unreleased)
 ------------------
+=======
+1.0rc6 (unreleased)
+-------------------
+>>>>>>> eee0a16
 
 - Nothing changed yet.
 
 
+<<<<<<< HEAD
 2.0.0.dev3 (2016-07-26)
 -----------------------
 
@@ -27,6 +33,12 @@ History
 -----------------------
 
 - Support SpanContext (and real semvers)
+=======
+1.0rc5 (2016-08-03)
+-------------------
+
+- Add baggage_copy() method
+>>>>>>> eee0a16
 
 
 1.0rc4 (2016-05-21)
