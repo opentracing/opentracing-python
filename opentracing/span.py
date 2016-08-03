@@ -149,6 +149,17 @@ class Span(object):
         """
         return None
 
+    def baggage_copy(self):
+        """
+        Returns a copy of current Baggage in the Span as a dictionary.
+
+        Note: this may be relatively expensive operation as it make a copy.
+
+        :rtype : dict
+        :return: copy of current baggage, or None
+        """
+        return None
+
     @property
     def tracer(self):
         """Provides access to the Tracer that created this Span.

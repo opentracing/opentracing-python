@@ -126,8 +126,10 @@ class APICompatibilityCheckMixin(object):
             span_ref = span.set_baggage_item('Kiff-loves', 'Amy')
             assert span_ref is span
             val = span.get_baggage_item('kiff-Loves')  # case change
+            copy = span.baggage_copy()
             if self.check_baggage_values():
                 assert 'Amy' == val
+                assert copy is not None
             pass
 
     def test_text_propagation(self):
