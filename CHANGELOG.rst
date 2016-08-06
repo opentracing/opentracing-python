@@ -3,10 +3,10 @@
 History
 -------
 
-1.0rc6 (unreleased)
+1.0rc6 (2016-08-05)
 -------------------
 
-- Nothing changed yet.
+- Raise exception on unknown format
 
 
 1.0rc5 (2016-08-03)
