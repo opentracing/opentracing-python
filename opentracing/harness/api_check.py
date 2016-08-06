@@ -163,7 +163,7 @@ class APICompatibilityCheckMixin(object):
         formats = [
             (Format.TEXT_MAP, {}),
             (Format.HTTP_HEADERS, {}),
-            (Format.TEXT_MAP, bytearray()),
+            (Format.BINARY, bytearray()),
         ]
         with self.tracer().start_span(operation_name='Bender') as span:
             for fmt, carrier in formats:
