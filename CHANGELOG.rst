@@ -3,7 +3,7 @@
 History
 -------
 
-2.0.1 (unreleased)
+1.1.0 (2016-08-06)
 ------------------
 
 - Move set/get_baggage back to Span; add SpanContext.baggage
