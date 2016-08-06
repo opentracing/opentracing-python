@@ -33,10 +33,15 @@ class VerifyAPICompatibilityCheck(unittest.TestCase):
         api_check = APICompatibilityCheckMixin()
         assert api_check.check_baggage_values() is True
 
-    def test_attribute_check_works(self):
+    def test_baggage_check_works(self):
         api_check = APICompatibilityCheckMixin()
         setattr(api_check, 'tracer', lambda: Tracer())
-        # no-op tracer does not store attributes, so the test with default
-        # value of `check_trace_attribute_values()` should fail.
+
+        # no-op tracer does not store baggage, so the test with default
+        # value of `check_baggage_values()` should fail.
         with self.assertRaises(AssertionError):
-            api_check.test_baggage()
+            api_check.test_span_baggage()
+
+        # second check that assert on empty baggage will fail too
+        with self.assertRaises(AssertionError):
+            api_check.test_context_baggage()

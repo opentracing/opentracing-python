@@ -124,13 +124,22 @@ class APICompatibilityCheckMixin(object):
                 event='unfrozen',
                 payload={'year': 2999})
 
-    def test_baggage(self):
+    def test_span_baggage(self):
         with self.tracer().start_span(operation_name='Fry') as span:
-            ctx_ref = span.context.set_baggage_item('Kiff-loves', 'Amy')
-            assert ctx_ref is span.context
-            val = span.context.get_baggage_item('Kiff-loves')
+            assert span.context.baggage == {}
+            span_ref = span.set_baggage_item('Kiff-loves', 'Amy')
+            assert span_ref is span
+            val = span.get_baggage_item('Kiff-loves')
             if self.check_baggage_values():
                 assert 'Amy' == val
+            pass
+
+    def test_context_baggage(self):
+        with self.tracer().start_span(operation_name='Fry') as span:
+            assert span.context.baggage == {}
+            span.set_baggage_item('Kiff-loves', 'Amy')
+            if self.check_baggage_values():
+                assert span.context.baggage == {'Kiff-loves': 'Amy'}
             pass
 
     def test_text_propagation(self):
@@ -143,8 +152,7 @@ class APICompatibilityCheckMixin(object):
             extracted_ctx = self.tracer().extract(
                 format=opentracing.Format.TEXT_MAP,
                 carrier=text_carrier)
-            extracted_ctx.set_baggage_item(
-                'middle-name', 'Rodriguez')
+            assert extracted_ctx.baggage == {}
 
     def test_binary_propagation(self):
         with self.tracer().start_span(operation_name='Bender') as span:
@@ -156,8 +164,7 @@ class APICompatibilityCheckMixin(object):
             extracted_ctx = self.tracer().extract(
                 format=opentracing.Format.BINARY,
                 carrier=bin_carrier)
-            extracted_ctx.set_baggage_item(
-                'middle-name', 'Rodriguez')
+            assert extracted_ctx.baggage == {}
 
     def test_mandatory_formats(self):
         formats = [

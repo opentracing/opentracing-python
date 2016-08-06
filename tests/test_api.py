@@ -24,6 +24,10 @@ from opentracing.harness.api_check import APICompatibilityCheckMixin
 
 
 class APICheckNoopTracer(unittest.TestCase, APICompatibilityCheckMixin):
+    """
+    Run tests from APICompatibilityCheckMixin against default No-op Tracer.
+    """
+
     def tracer(self):
         return Tracer()
 
