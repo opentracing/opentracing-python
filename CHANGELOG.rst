@@ -6,6 +6,7 @@ History
 2.0.1 (unreleased)
 ------------------
 
+- Move set/get_baggage back to Span; add SpanContext.baggage
 - Raise exception on unknown format
 
 

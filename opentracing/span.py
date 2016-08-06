@@ -32,40 +32,22 @@ class SpanContext(object):
     <trace_id, span_id, sampled> tuple).
     """
 
-    def set_baggage_item(self, key, value):
-        """Stores a Baggage item in the span as a key/value pair.
+    EMPTY_BAGGAGE = {}  # TODO would be nice to make this immutable
 
-        Enables powerful distributed context propagation functionality where
-        arbitrary application data can be carried along the full path of
-        request execution throughout the system.
-
-        Note 1: Baggage is only propagated to the future (recursive) children
-        of this SpanContext.
-
-        Note 2: Baggage is sent in-band with every subsequent local and remote
-        calls, so this feature must be used with care.
-
-        :param key: Baggage item key
-        :type key: str
-
-        :param value: Baggage item value
-        :type value: str
-
-        :rtype : SpanContext
-        :return: itself, for chaining the calls.
+    @property
+    def baggage(self):
         """
-        return self
+        Return baggage associated with this SpanContext.
+        If no baggage has been added to the span, returns an empty dict.
 
-    def get_baggage_item(self, key):
-        """Retrieves value of the Baggage item with the given key.
+        The caller must not modify the returned dictionary.
 
-        :param key: key of the Baggage item
-        :type key: str
+        See also: Span.set_baggage_item() / Span.get_baggage_item()
 
-        :rtype : str
-        :return: value of the Baggage item with given key, or None.
+        :rtype: dict
+        :return: returns baggage associated with this SpanContext or {}.
         """
-        return None
+        return SpanContext.EMPTY_BAGGAGE
 
 
 class Span(object):
@@ -167,6 +149,41 @@ class Span(object):
         :return: returns the span itself, for chaining the calls
         """
         return self
+
+    def set_baggage_item(self, key, value):
+        """Stores a Baggage item in the span as a key/value pair.
+
+        Enables powerful distributed context propagation functionality where
+        arbitrary application data can be carried along the full path of
+        request execution throughout the system.
+
+        Note 1: Baggage is only propagated to the future (recursive) children
+        of this Span.
+
+        Note 2: Baggage is sent in-band with every subsequent local and remote
+        calls, so this feature must be used with care.
+
+        :param key: Baggage item key
+        :type key: str
+
+        :param value: Baggage item value
+        :type value: str
+
+        :rtype : Span
+        :return: itself, for chaining the calls.
+        """
+        return self
+
+    def get_baggage_item(self, key):
+        """Retrieves value of the Baggage item with the given key.
+
+        :param key: key of the Baggage item
+        :type key: str
+
+        :rtype : str
+        :return: value of the Baggage item with given key, or None.
+        """
+        return None
 
     def __enter__(self):
         """Invoked when span is used as a context manager.
