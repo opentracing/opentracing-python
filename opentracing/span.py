@@ -136,7 +136,7 @@ class Span(object):
 
             span.log_kv({
                 "event": "time to first byte",
-                "packet_size": packet.size()})
+                "packet.size": packet.size()})
 
             span.log_kv({"event": "two minutes ago"}, time.time() - 120)
 
@@ -208,8 +208,11 @@ class Span(object):
 
     def log_event(self, event, payload=None):
         """DEPRECATED"""
-        return self
+        if payload is None:
+            return self.log_kv({"event": event})
+        else:
+            return self.log_kv({"event": event, "payload": payload})
 
     def log(self, **kwargs):
         """DEPRECATED"""
-        return self
+        return self.log_kv(kwargs)
