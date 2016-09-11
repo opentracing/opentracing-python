@@ -211,9 +211,9 @@ class Span(object):
     def log_event(self, event, payload=None):
         """DEPRECATED"""
         if payload is None:
-            return self.log_kv({"event": event})
+            return self.log_kv({'event': event})
         else:
-            return self.log_kv({"event": event, "payload": payload})
+            return self.log_kv({'event': event, 'payload': payload})
 
     def log(self, **kwargs):
         """DEPRECATED"""
