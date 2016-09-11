@@ -3,10 +3,10 @@
 History
 -------
 
-1.1.1 (unreleased)
+1.2.0 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add Span.log_kv and deprecate older logging methods
 
 
 1.1.0 (2016-08-06)
