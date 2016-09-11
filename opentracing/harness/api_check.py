@@ -112,6 +112,15 @@ class APICompatibilityCheckMixin(object):
 
     def test_span_logs(self):
         span = self.tracer().start_span(operation_name='Fry')
+
+        # Newer API
+        span.log_kv(
+            {'frozen.year': 1999, 'frozen.place': 'Cryogenics Labs'})
+        span.log_kv(
+            {'defrosted.year': 2999, 'defrosted.place': 'Cryogenics Labs'},
+            time.time())
+
+        # Older API
         span.\
             log_event('frozen', {'year': 1999, 'place': 'Cryogenics Labs'}). \
             log_event('defrosted', {'year': 2999}). \

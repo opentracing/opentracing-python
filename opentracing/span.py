@@ -201,9 +201,11 @@ class Span(object):
         as a tag to the span.
         """
         if exc_type:
-            self.log_event('python.exception', {'type': exc_type,
-                                                'val': exc_val,
-                                                'tb': exc_tb})
+            self.log_kv({
+                'python.exception.type': exc_type,
+                'python.exception.val': exc_val,
+                'python.exception.tb': exc_tb,
+                })
         self.finish()
 
     def log_event(self, event, payload=None):
