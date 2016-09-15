@@ -25,7 +25,7 @@ abstract Recorder interface, as well as a
 The work of instrumentation libraries generally consists of three steps:
 
 1. When a service receives a new request (over HTTP or some other protocol),
-it uses OpenTracing's inject/join API to join to an active trace, creating a
+it uses OpenTracing's inject/extract API to continue an active trace, creating a
 Span object in the process. If the request does not contain an active trace,
 the service starts a new trace and a new *root* Span.
 2. The service needs to store the current Span in some request-local storage,
@@ -35,7 +35,7 @@ of the service making an RPC to another service.
 retrieved from request-local storage, a child span must be created (e.g., by
 using the `start_child_span()` helper), and that child span must be embedded
 into the outbound request (e.g., using HTTP headers) via OpenTracing's
-inject/join API.
+inject/extract API.
 
 Below are the code examples for steps 1 and 3. Implementation of request-local
 storage needed for step 2 is specific to the service and/or frameworks /
@@ -59,13 +59,13 @@ Somewhere in your server's request handler code:
         
     
     def before_request(request, tracer):
-        span = tracer.join(
-            operation_name=request.operation,
-            format=Format.TEXT_MAP,
+        span_context = tracer.extract(
+            format=Format.HTTP_HEADERS,
             carrier=request.headers,
         )
-        if span is None:
-            span = tracer.start_span(operation_name=request.operation)
+        span = tracer.start_span(
+            operation_name=request.operation,
+            child_of(span_context))
         span.set_tag('http.url', request.full_url)
     
         remote_ip = request.remote_ip
@@ -116,13 +116,13 @@ Somewhere in your service that's about to make an outgoing call:
         if port:
             outbound_span.set_tag(tags.PEER_PORT, port)
     
-        text_carrier = {}
+        http_header_carrier = {}
         opentracing.tracer.inject(
             span=outbound_span,
-            format=Format.TEXT_MAP,
-            carrier=text_carrier)
+            format=Format.HTTP_HEADERS,
+            carrier=http_header_carrier)
         )
-        for key, value in text_carrier.iteritems():
+        for key, value in http_header_carrier.iteritems():
             request.add_header(key, value)
     
         return outbound_span

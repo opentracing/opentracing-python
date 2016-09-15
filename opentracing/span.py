@@ -129,24 +129,26 @@ class Span(object):
         """
         return self
 
-    def log_event(self, event, payload=None):
-        """Logs an event to the span, with the current timestamp.
+    def log_kv(self, key_values, timestamp=None):
+        """Adds a log record to the Span.
 
-        :param event: an event name as a string
-        :param payload: an arbitrary structured payload. Implementations may
-            choose to ignore none, some, or all of the payload.
-        :return: returns the span itself, for chaining the calls
-        """
-        return self
+        For example,
 
-    def log(self, **kwargs):
-        """Records a generic Log event at an arbitrary timestamp.
+            span.log_kv({
+                "event": "time to first byte",
+                "packet.size": packet.size()})
 
-        :param timestamp: the log timestamp as a unix timestamp per time.time()
-        :param event: an event name as a string
-        :param payload: an arbitrary structured payload. Implementations may
-            choose to ignore none, some, or all of the payload.
-        :return: returns the span itself, for chaining the calls
+            span.log_kv({"event": "two minutes ago"}, time.time() - 120)
+
+        :param key_values: A dict of string keys and values of any type
+        :type key_values: dict
+
+        :param timestamp: A unix timestamp per time.time(); current time if
+        None
+        :type timestamp: float
+
+        :return: Returns the Span itself, for call chaining.
+        :rtype: Span
         """
         return self
 
@@ -199,7 +201,20 @@ class Span(object):
         as a tag to the span.
         """
         if exc_type:
-            self.log_event('python.exception', {'type': exc_type,
-                                                'val': exc_val,
-                                                'tb': exc_tb})
+            self.log_kv({
+                'python.exception.type': exc_type,
+                'python.exception.val': exc_val,
+                'python.exception.tb': exc_tb,
+                })
         self.finish()
+
+    def log_event(self, event, payload=None):
+        """DEPRECATED"""
+        if payload is None:
+            return self.log_kv({'event': event})
+        else:
+            return self.log_kv({'event': event, 'payload': payload})
+
+    def log(self, **kwargs):
+        """DEPRECATED"""
+        return self.log_kv(kwargs)

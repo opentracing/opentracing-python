@@ -20,6 +20,7 @@
 
 from __future__ import absolute_import
 import mock
+import time
 from opentracing import child_of
 from opentracing import Format
 from opentracing import Tracer
@@ -31,24 +32,28 @@ def test_span():
     parent = tracer.start_span('parent')
     child = tracer.start_span('test', references=child_of(parent.context))
     assert parent == child
+    child.log_kv({'event': 'cache_hit', 'size.bytes': 42})
+    child.log_kv({'event': 'cache_miss'}, time.time())
     child.log_event('cache_hit', ['arg1', 'arg2'])
 
     with mock.patch.object(parent, 'finish') as finish:
         with mock.patch.object(parent, 'log_event') as log_event:
-            try:
-                with parent:
-                    raise ValueError()
-            except ValueError:
-                pass
-            assert finish.call_count == 1
-            assert log_event.call_count == 1
+            with mock.patch.object(parent, 'log_kv') as log_kv:
+                try:
+                    with parent:
+                        raise ValueError()
+                except ValueError:
+                    pass
+                assert finish.call_count == 1
+                assert log_event.call_count == 0
+                assert log_kv.call_count == 1
 
     with mock.patch.object(parent, 'finish') as finish:
-        with mock.patch.object(parent, 'log_event') as log_event:
+        with mock.patch.object(parent, 'log_event') as log_kv:
             with parent:
                 pass
             assert finish.call_count == 1
-            assert log_event.call_count == 0
+            assert log_kv.call_count == 0
 
     parent.set_tag('x', 'y').set_tag('z', 1)  # test chaining
     parent.set_tag(tags.PEER_SERVICE, 'test-service')
