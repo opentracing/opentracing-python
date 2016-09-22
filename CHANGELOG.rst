@@ -3,7 +3,7 @@
 History
 -------
 
-1.2.1 (unreleased)
+1.2.1 (2016-09-22)
 ------------------
 
 - Make Span.log(self, **kwargs) smarter
