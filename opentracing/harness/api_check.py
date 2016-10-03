@@ -126,6 +126,8 @@ class APICompatibilityCheckMixin(object):
             log_event('defrosted', {'year': 2999}). \
             log_event('became his own grandfather', 1947)
         span.\
+            log(event='frozen'). \
+            log(payload={'year': 1999}). \
             log(timestamp=time.time(),
                 event='frozen',
                 payload={'year': 1999}). \
