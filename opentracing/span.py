@@ -218,11 +218,11 @@ class Span(object):
     def log(self, **kwargs):
         """DEPRECATED"""
         key_values = {}
-        if kwargs['event'] is not None:
+        if 'event' in kwargs:
             key_values['event'] = kwargs['event']
-        if kwargs['payload'] is not None:
+        if 'payload' in kwargs:
             key_values['payload'] = kwargs['payload']
         timestamp = None
-        if kwargs['timestamp'] is not None:
+        if 'timestamp' in kwargs:
             timestamp = kwargs['timestamp']
         return self.log_kv(key_values, timestamp)
