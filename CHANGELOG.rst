@@ -3,10 +3,10 @@
 History
 -------
 
-1.2.2 (unreleased)
+1.2.2 (2016-10-03)
 ------------------
 
-- Nothing changed yet.
+- Fix KeyError when checking kwargs for optional values
 
 
 1.2.1 (2016-09-22)
