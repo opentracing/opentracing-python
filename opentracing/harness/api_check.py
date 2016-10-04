@@ -103,6 +103,13 @@ class APICompatibilityCheckMixin(object):
         else:
             raise AssertionError('Expected ValueError')  # pragma: no cover
 
+    def test_span_tag_value_types(self):
+        with self.tracer().start_span(operation_name='ManyTypes') as span:
+            span. \
+                set_tag('an_int', 9). \
+                set_tag('a_bool', True). \
+                set_tag('a_string', 'aoeuidhtns')
+
     def test_span_tags_with_chaining(self):
         span = self.tracer().start_span(operation_name='Farnsworth')
         span. \
