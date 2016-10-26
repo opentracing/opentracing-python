@@ -108,6 +108,9 @@ class APICompatibilityCheckMixin(object):
         span. \
             set_tag('birthday', '9 April, 2841'). \
             set_tag('loves', 'different lengths of wires')
+        span. \
+            set_tag('unicode_val', u'non-ascii: \u200b'). \
+            set_tag(u'unicode_key_\u200b', 'ascii val')
         span.finish()
 
     def test_span_logs(self):
