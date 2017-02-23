@@ -37,6 +37,11 @@ SPAN_KIND_RPC_CLIENT = 'client'
 SPAN_KIND_RPC_SERVER = 'server'
 
 # ---------------------------------------------------------------------------
+# ERROR indicates whether a Span ended in an error state.
+# ---------------------------------------------------------------------------
+ERROR = 'error'
+
+# ---------------------------------------------------------------------------
 # COMPONENT (string) ia s low-cardinality identifier of the module, library,
 # or package that is generating a span.
 # ---------------------------------------------------------------------------
