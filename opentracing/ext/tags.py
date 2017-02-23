@@ -37,6 +37,11 @@ SPAN_KIND_RPC_CLIENT = 'client'
 SPAN_KIND_RPC_SERVER = 'server'
 
 # ---------------------------------------------------------------------------
+# ERROR indicates whether a Span ended in an error state.
+# ---------------------------------------------------------------------------
+ERROR = 'error'
+
+# ---------------------------------------------------------------------------
 # COMPONENT (string) ia s low-cardinality identifier of the module, library,
 # or package that is generating a span.
 # ---------------------------------------------------------------------------
@@ -55,8 +60,11 @@ SAMPLING_PRIORITY = 'sampling.priority'
 # PEER_SERVICE (string) records the service name of the peer
 PEER_SERVICE = 'peer.service'
 
-# PEER_HOSTNAME records the host name of the peer
+# PEER_HOSTNAME (string) records the host name of the peer
 PEER_HOSTNAME = 'peer.hostname'
+
+# PEER_ADDRESS (string) records the ip address of the peer
+PEER_ADDRESS = 'peer.address'
 
 # PEER_HOST_IPV4 (uint32) records IP v4 host address of the peer
 PEER_HOST_IPV4 = 'peer.ipv4'
@@ -82,3 +90,35 @@ HTTP_METHOD = 'http.method'
 # HTTP_STATUS_CODE (int) is the numeric HTTP status code (200, 404, etc)
 # of the HTTP response.
 HTTP_STATUS_CODE = 'http.status_code'
+
+# ---------------------------------------------------------------------------
+# DATABASE tags
+# ---------------------------------------------------------------------------
+
+# DATABASE_INSTANCE (string) The database instance name. E.g., In java, if
+# the jdbc.url="jdbc:mysql://127.0.0.1:3306/customers", the instance
+# name is "customers"
+DATABASE_INSTANCE = 'db.instance'
+
+# DATABASE_STATEMENT (string) A database statement for the given database
+# type. E.g., for db.type="SQL", "SELECT * FROM user_table";
+# for db.type="redis", "SET mykey 'WuValue'".
+DATABASE_STATEMENT = 'db.statement'
+
+# DATABASE_TYPE (string) For any SQL database, "sql". For others,
+# the lower-case database category, e.g. "cassandra", "hbase", or "redis".
+DATABASE_TYPE = 'db.type'
+
+# DATABASE_USER (string) Username for accessing database. E.g.,
+# "readonly_user" or "reporting_user"
+DATABASE_USER = 'db.user'
+
+# ---------------------------------------------------------------------------
+# MESSAGE_BUS tags
+# ---------------------------------------------------------------------------
+
+# MESSAGE_BUS_DESTINATION (string) An address at which messages can be
+# exchanged. E.g. A Kafka record has an associated "topic name" that can
+# be extracted by the instrumented producer or consumer and stored
+# using this tag.
+MESSAGE_BUS_DESTINATION = 'message_bus.destination'
