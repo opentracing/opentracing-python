@@ -19,6 +19,9 @@
 # THE SOFTWARE.
 from __future__ import absolute_import
 
+# The following tags are described in greater detail at the following url:
+# https://github.com/opentracing/specification/blob/master/semantic_conventions.md
+
 # Here we define standard names for tags that can be added to spans by the
 # instrumentation code. The actual tracing systems are not required to
 # retain these as tags in the stored spans if they have other means of
