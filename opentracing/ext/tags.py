@@ -63,7 +63,9 @@ PEER_SERVICE = 'peer.service'
 # PEER_HOSTNAME (string) records the host name of the peer
 PEER_HOSTNAME = 'peer.hostname'
 
-# PEER_ADDRESS (string) records the ip address of the peer
+# PEER_ADDRESS (string) suitable for use in a networking client library.
+# This may be a "ip:port", a bare "hostname", a FQDN, or even a
+# JDBC substring like "mysql://prod-db:3306"
 PEER_ADDRESS = 'peer.address'
 
 # PEER_HOST_IPV4 (uint32) records IP v4 host address of the peer
