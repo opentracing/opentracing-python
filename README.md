@@ -12,12 +12,12 @@ the [OpenTracing project](http://opentracing.io) and
 
 ## Status
 
-In the current version, `opentracing-python` provides only the API and a 
-basic no-op implementation that can be used by instrumentation libraries to 
+In the current version, `opentracing-python` provides only the API and a
+basic no-op implementation that can be used by instrumentation libraries to
 collect and propagate distributed tracing context.
 
-Future versions will include a reference implementation utilizing an 
-abstract Recorder interface, as well as a 
+Future versions will include a reference implementation utilizing an
+abstract Recorder interface, as well as a
 [Zipkin](http://openzipkin.github.io)-compatible Tracer.
 
 ## Usage
@@ -56,8 +56,8 @@ Somewhere in your server's request handler code:
             with RequestContext(span):
                 # actual business logic
                 handle_request_for_real(request)
-        
-    
+
+
     def before_request(request, tracer):
         span_context = tracer.extract(
             format=Format.HTTP_HEADERS,
@@ -67,19 +67,19 @@ Somewhere in your server's request handler code:
             operation_name=request.operation,
             child_of(span_context))
         span.set_tag('http.url', request.full_url)
-    
+
         remote_ip = request.remote_ip
         if remote_ip:
             span.set_tag(tags.PEER_HOST_IPV4, remote_ip)
-    
+
         caller_name = request.caller_name
         if caller_name:
             span.set_tag(tags.PEER_SERVICE, caller_name)
-    
+
         remote_port = request.remote_port
         if remote_port:
             span.set_tag(tags.PEER_PORT, remote_port)
-    
+
         return span
 ```
 
@@ -93,11 +93,11 @@ Somewhere in your service that's about to make an outgoing call:
     with before_http_request(
         request=out_request,
         current_span_extractor=RequestContext.get_current_span):
-    
+
         # actual call
         return urllib2.urlopen(request)
-    
-    
+
+
     def before_http_request(request, current_span_extractor):
         op = request.operation
         parent_span = current_span_extractor()
@@ -105,7 +105,7 @@ Somewhere in your service that's about to make an outgoing call:
             operation_name=op,
             parent=parent_span
         )
-    
+
         outbound_span.set_tag('http.url', request.full_url)
         service_name = request.service_name
         host, port = request.host_port
@@ -115,7 +115,7 @@ Somewhere in your service that's about to make an outgoing call:
             outbound_span.set_tag(tags.PEER_HOST_IPV4, host)
         if port:
             outbound_span.set_tag(tags.PEER_PORT, port)
-    
+
         http_header_carrier = {}
         opentracing.tracer.inject(
             span=outbound_span,
@@ -124,7 +124,7 @@ Somewhere in your service that's about to make an outgoing call:
         )
         for key, value in http_header_carrier.iteritems():
             request.add_header(key, value)
-    
+
         return outbound_span
 ```
 
