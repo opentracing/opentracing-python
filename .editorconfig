@@ -26,3 +26,6 @@ indent_style = tab
 [{package.json,.travis.yml}]
 indent_style = space
 indent_size = 2
+
+# Remove any whitespace characters preceding newline characters
+trim_trailing_whitespace = true
