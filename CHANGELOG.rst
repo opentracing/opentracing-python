@@ -1,12 +1,12 @@
 .. :changelog:
 
 History
--------
+=======
 
 1.2.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Added sphinx-generated documentation.
 
 
 1.2.2 (2016-10-03)
