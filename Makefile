@@ -70,6 +70,7 @@ coverage:
 	open htmlcov/index.html
 
 docs:
+	pip show -q opentracing || python setup.py develop
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 

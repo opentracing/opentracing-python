@@ -134,7 +134,7 @@ class Span(object):
     def log_kv(self, key_values, timestamp=None):
         """Adds a log record to the Span.
 
-        For example,
+        For example::
 
             span.log_kv({
                 "event": "time to first byte",
@@ -146,7 +146,7 @@ class Span(object):
         :type key_values: dict
 
         :param timestamp: A unix timestamp per time.time(); current time if
-        None
+            None
         :type timestamp: float
 
         :return: Returns the Span itself, for call chaining.

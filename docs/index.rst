@@ -3,4 +3,5 @@
 .. toctree::
    :hidden:
 
+   api
    changelog
