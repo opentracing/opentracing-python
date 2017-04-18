@@ -137,7 +137,7 @@ Development
 -----------
 
 Tests
------
+^^^^^
 
 .. code-block:: sh
 
@@ -147,7 +147,7 @@ Tests
    make test
 
 Documentation
--------------
+^^^^^^^^^^^^^
 
 .. code-block:: sh
 
@@ -159,7 +159,7 @@ Documentation
 The documentation is written to *docs/_build/html*.
 
 Releases
---------
+^^^^^^^^
 
 Before new release, add a summary of changes since last version to CHANGELOG.rst
 
