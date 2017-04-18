@@ -142,9 +142,21 @@ Tests
 .. code-block:: sh
 
    virtualenv env
-   source env/bin/activate
+   . ./env/bin/activate
    make bootstrap
    make test
+
+Documentation
+-------------
+
+.. code-block:: sh
+
+   virtualenv env
+   . ./env/bin/activate
+   make bootstrap
+   make docs
+
+The documentation is written to *docs/_build/html*.
 
 Releases
 --------
