@@ -1,11 +1,14 @@
 Python API
 ==========
 
-Tracing
--------
-
 Classes
-^^^^^^^
+-------
+.. autoclass:: opentracing.Span
+   :members:
+
+.. autoclass:: opentracing.SpanContext
+   :members:
+
 .. autoclass:: opentracing.Tracer
    :members:
 
@@ -15,26 +18,16 @@ Classes
 .. autoclass:: opentracing.Reference
    :members:
 
+.. autoclass:: opentracing.Format
+   :members:
+
 Utility Functions
-^^^^^^^^^^^^^^^^^
+-----------------
 .. autofunction:: opentracing.start_child_span
 
 .. autofunction:: opentracing.child_of
 
 .. autofunction:: opentracing.follows_from
-
-Spans
------
-.. autoclass:: opentracing.Span
-   :members:
-
-.. autoclass:: opentracing.SpanContext
-   :members:
-
-Propagation
------------
-.. autoclass:: opentracing.Format
-   :members:
 
 Exceptions
 ----------
