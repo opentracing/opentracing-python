@@ -7,6 +7,7 @@ setup(
     author='The OpenTracing Authors',
     author_email='opentracing@googlegroups.com',
     description='OpenTracing API for Python. See documentation at http://opentracing.io',
+    long_description='\n'+open('README.rst').read(),
     license='MIT',
     url='https://github.com/opentracing/opentracing-python',
     keywords=['opentracing'],

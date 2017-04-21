@@ -4,3 +4,5 @@ recursive-include example *.thrift
 recursive-include tests *.py
 include *
 global-exclude *.pyc
+graft docs
+prune docs/_build

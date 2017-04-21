@@ -50,19 +50,19 @@ class Tracer(object):
         """Starts and returns a new Span representing a unit of work.
 
 
-        Starting a root Span (a Span with no causal references):
+        Starting a root Span (a Span with no causal references)::
 
             tracer.start_span('...')
 
 
-        Starting a child Span (see also start_child_span()):
+        Starting a child Span (see also start_child_span())::
 
             tracer.start_span(
                 '...',
                 child_of=parent_span)
 
 
-        Starting a child Span in a more verbose way:
+        Starting a child Span in a more verbose way::
 
             tracer.start_span(
                 '...',
@@ -156,7 +156,7 @@ class Reference(namedtuple('Reference', ['type', 'referenced_context'])):
     Tracer implementations must ignore references where referenced_context is
     None.  This behavior allows for simpler code when an inbound RPC request
     contains no tracing information and as a result tracer.extract() returns
-    None:
+    None::
 
         parent_ref = tracer.extract(opentracing.HTTP_HEADERS, request.headers)
         span = tracer.start_span(
