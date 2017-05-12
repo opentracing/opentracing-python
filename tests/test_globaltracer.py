@@ -68,4 +68,3 @@ def test_inject():
     globaltracer.get().inject(1, 2, 3)
     assert tracer.inject.call_count == 1
     assert tracer.inject.call_args == ((1, 2, 3),)
-
