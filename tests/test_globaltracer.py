@@ -3,13 +3,16 @@ from opentracing import Tracer
 from opentracing.ext import globaltracer
 import mock
 
+
 def reset_globaltracer():
     globaltracer._GlobalTracer.reset()
+
 
 def test_get():
     reset_globaltracer()
     tracer = globaltracer.get()
     assert tracer is not None
+
 
 def test_register_none():
     reset_globaltracer()
@@ -19,16 +22,19 @@ def test_register_none():
     except ValueError:
         value_error = True
 
-    assert value_error == True
+    assert value_error is True
+
 
 def test_register_global():
     reset_globaltracer()
     globaltracer.register(globaltracer.get())
 
+
 def test_register_same():
     reset_globaltracer()
     tracer = mock.Mock(spec=Tracer)
     globaltracer.register(tracer)
+
 
 def test_register_already():
     reset_globaltracer()
@@ -39,7 +45,8 @@ def test_register_already():
     except ValueError:
         value_error = True
 
-    assert value_error == True
+    assert value_error is True
+
 
 def test_start_span():
     reset_globaltracer()
@@ -51,6 +58,7 @@ def test_start_span():
     assert tracer.start_span.call_count == 1
     assert tracer.start_span.call_args == ((1, 2, 3, 4, 5),)
 
+
 def test_extract():
     reset_globaltracer()
     tracer = mock.Mock(spec=Tracer)
@@ -59,6 +67,7 @@ def test_extract():
     globaltracer.get().extract(1, 2)
     assert tracer.extract.call_count == 1
     assert tracer.extract.call_args == ((1, 2),)
+
 
 def test_inject():
     reset_globaltracer()

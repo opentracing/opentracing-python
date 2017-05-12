@@ -24,6 +24,7 @@ import logging
 import threading
 from ..tracer import Tracer
 
+
 def get():
     """Returns the constant global tracer instance.
     All methods are forwarded to the currently configured tracer.
@@ -31,6 +32,7 @@ def get():
     takes place.
     """
     return _GlobalTracer.tracer()
+
 
 def register(tracer):
     """Registers a tracer to back the behaviour of the global tracer.
@@ -40,6 +42,7 @@ def register(tracer):
         :param tracer: Tracer to use as global tracer.
     """
     _GlobalTracer.register(tracer)
+
 
 class _GlobalTracer(Tracer):
     _instance = None
@@ -64,7 +67,7 @@ class _GlobalTracer(Tracer):
 
         with cls._lock:
             if isinstance(tracer, _GlobalTracer):
-                logging.warn('Attempted to register the GlobalTracer ' \
+                logging.warn('Attempted to register the GlobalTracer '
                              'as delegate of itself.')
                 return
 
@@ -73,7 +76,7 @@ class _GlobalTracer(Tracer):
             if type(global_tracer._tracer) is Tracer:
                 global_tracer._tracer = tracer
             elif global_tracer._tracer is not tracer:
-                raise ValueError('There is already a current global ' \
+                raise ValueError('There is already a current global '
                                  'tracer registered.')
 
     def start_span(self,
@@ -97,5 +100,5 @@ class _GlobalTracer(Tracer):
     def __str__(self):
         return 'GlobalTracer{0}'.format(self._tracer.__str__())
 
-_GlobalTracer._instance = _GlobalTracer()
 
+_GlobalTracer._instance = _GlobalTracer()
