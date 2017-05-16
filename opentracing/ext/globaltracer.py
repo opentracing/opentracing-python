@@ -50,7 +50,7 @@ class _GlobalTracer(Tracer):
 
     def __init__(self):
         super(_GlobalTracer, self).__init__()
-        self.tracer = Tracer()
+        self._tracer = Tracer()
 
     @classmethod
     def reset(cls):
