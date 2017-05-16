@@ -48,6 +48,14 @@ def test_register_already():
     assert value_error is True
 
 
+def test_is_registered():
+    reset_globaltracer()
+    assert globaltracer.is_registered() is False
+
+    globaltracer.register(mock.Mock(spec=Tracer))
+    assert globaltracer.is_registered() is True
+
+
 def test_start_span():
     reset_globaltracer()
     tracer = mock.Mock(spec=Tracer)

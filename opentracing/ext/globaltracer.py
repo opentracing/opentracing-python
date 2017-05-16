@@ -44,6 +44,10 @@ def register(tracer):
     _GlobalTracer.register(tracer)
 
 
+def is_registered():
+    return _GlobalTracer.is_registered()
+
+
 class _GlobalTracer(Tracer):
     _instance = None
     _lock = threading.Lock()
@@ -78,6 +82,12 @@ class _GlobalTracer(Tracer):
             elif global_tracer._tracer is not tracer:
                 raise ValueError('There is already a current global '
                                  'tracer registered.')
+
+    @classmethod
+    def is_registered(cls):
+        with cls._lock:
+            global_tracer = cls._instance
+            return type(global_tracer._tracer) is not Tracer
 
     def start_span(self,
                    operation_name=None,
