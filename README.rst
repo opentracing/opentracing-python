@@ -55,7 +55,7 @@ Somewhere in your server's request handler code:
 .. code-block:: python
 
    def handle_request(request):
-       span - before_request(request, opentracing.tracer)
+       span = before_request(request, opentracing.tracer)
        # use span as Context Manager to ensure span.finish() will be called
        with span:
            # store span in some request-local storage
@@ -65,24 +65,24 @@ Somewhere in your server's request handler code:
 
 
    def before_request(request, tracer):
-       span_context - tracer.extract(
-           format-Format.HTTP_HEADERS,
-           carrier-request.headers,
+       span_context = tracer.extract(
+           format=Format.HTTP_HEADERS,
+           carrier=request.headers,
        )
-       span - tracer.start_span(
-           operation_name-request.operation,
+       span = tracer.start_span(
+           operation_name=request.operation,
            child_of(span_context))
        span.set_tag('http.url', request.full_url)
 
-       remote_ip - request.remote_ip
+       remote_ip = request.remote_ip
        if remote_ip:
            span.set_tag(tags.PEER_HOST_IPV4, remote_ip)
 
-       caller_name - request.caller_name
+       caller_name = request.caller_name
        if caller_name:
            span.set_tag(tags.PEER_SERVICE, caller_name)
 
-       remote_port - request.remote_port
+       remote_port = request.remote_port
        if remote_port:
            span.set_tag(tags.PEER_PORT, remote_port)
 
@@ -97,24 +97,24 @@ Somewhere in your service that's about to make an outgoing call:
 
    # create and serialize a child span and use it as context manager
    with before_http_request(
-       request-out_request,
-       current_span_extractor-RequestContext.get_current_span):
+       request=out_request,
+       current_span_extractor=RequestContext.get_current_span):
 
        # actual call
        return urllib2.urlopen(request)
 
 
    def before_http_request(request, current_span_extractor):
-       op - request.operation
-       parent_span - current_span_extractor()
-       outbound_span - opentracing.tracer.start_span(
-           operation_name-op,
-           parent-parent_span
+       op = request.operation
+       parent_span = current_span_extractor()
+       outbound_span = opentracing.tracer.start_span(
+           operation_name=op,
+           parent=parent_span
        )
 
        outbound_span.set_tag('http.url', request.full_url)
-       service_name - request.service_name
-       host, port - request.host_port
+       service_name = request.service_name
+       host, port = request.host_port
        if service_name:
            outbound_span.set_tag(tags.PEER_SERVICE, service_name)
        if host:
@@ -122,12 +122,12 @@ Somewhere in your service that's about to make an outgoing call:
        if port:
            outbound_span.set_tag(tags.PEER_PORT, port)
 
-       http_header_carrier - {}
+       http_header_carrier = {}
        opentracing.tracer.inject(
-           span-outbound_span,
-           format-Format.HTTP_HEADERS,
-           carrier-http_header_carrier)
-       )
+           span=outbound_span,
+           format=Format.HTTP_HEADERS,
+           carrier=http_header_carrier)
+           
        for key, value in http_header_carrier.iteritems():
            request.add_header(key, value)
 
