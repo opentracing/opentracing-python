@@ -1,6 +1,4 @@
-# Copyright (c) 2016 The OpenTracing Authors.
-#
-# Copyright (c) 2015 Uber Technologies, Inc.
+# Copyright (c) 2017 The OpenTracing Authors.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -19,23 +17,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
-from __future__ import absolute_import
-from .span import ActiveSpan  # noqa
-from .span import Span  # noqa
-from .span import SpanContext  # noqa
-from .tracer import ActiveSpanSource  # noqa
-from .tracer import child_of  # noqa
-from .tracer import follows_from  # noqa
-from .tracer import Reference  # noqa
-from .tracer import ReferenceType  # noqa
-from .tracer import Tracer  # noqa
-from .tracer import start_child_span  # noqa
-from .propagation import Format  # noqa
-from .propagation import InvalidCarrierException  # noqa
-from .propagation import SpanContextCorruptedException  # noqa
-from .propagation import UnsupportedFormatException  # noqa
 
-# Global variable that should be initialized to an instance of real tracer.
-# Note: it should be accessed via 'opentracing.tracer', not via
-# 'from opentracing import tracer', the latter seems to take a copy.
-tracer = Tracer()
+from __future__ import absolute_import
+from opentracing import ActiveSpanSource
+
+
+def test_active_span_source():
+    source = ActiveSpanSource()
+    active_span = source.make_active(None)
+    assert active_span == source.active_span
