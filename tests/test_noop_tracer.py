@@ -27,7 +27,7 @@ from opentracing import Tracer
 
 def test_tracer():
     tracer = Tracer()
-    span = tracer.start_span(operation_name='root')
-    child = tracer.start_span(operation_name='child',
-                              references=child_of(span))
+    span = tracer.start_manual_span(operation_name='root')
+    child = tracer.start_manual_span(operation_name='child',
+                                     references=child_of(span))
     assert span == child

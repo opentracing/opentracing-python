@@ -31,8 +31,9 @@ from opentracing.ext import tags
 
 def test_span():
     tracer = Tracer()
-    parent = tracer.start_span('parent')
-    child = tracer.start_span('test', references=child_of(parent.context))
+    parent = tracer.start_manual_span('parent')
+    child = tracer.start_manual_span('test',
+                                     references=child_of(parent.context))
     assert parent == child
     child.log_kv({'event': 'cache_hit', 'size.bytes': 42})
     child.log_kv({'event': 'cache_miss'}, time.time())
@@ -68,7 +69,7 @@ def test_span():
 
 def test_inject():
     tracer = Tracer()
-    span = tracer.start_span()
+    span = tracer.start_manual_span()
 
     bin_carrier = bytearray()
     tracer.inject(

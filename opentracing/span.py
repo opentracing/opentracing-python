@@ -64,7 +64,7 @@ class Span(object):
 
     .. code-block:: python
 
-        with tracer.start_span(operation_name='go_fishing') as span:
+        with tracer.start_active_span(operation_name='go_fishing') as span:
             call_some_service()
 
     In the Context Manager syntax it's not necessary to call span.finish()
@@ -73,6 +73,7 @@ class Span(object):
     def __init__(self, tracer, context):
         self._tracer = tracer
         self._context = context
+        self._deactivate_on_finish = False
 
     @property
     def context(self):
@@ -108,10 +109,15 @@ class Span(object):
         With the exception of the `Span.context` property, the semantics of all
         other Span methods are undefined after `finish()` has been invoked.
 
+        If the `Span` has been created using the in-process context
+        propagation, it will be automatically deactivated from the current
+        `ActiveSpanSource`.
+
         :param finish_time: an explicit Span finish timestamp as a unix
             timestamp per time.time()
         """
-        pass
+        if self._deactivate_on_finish and self._tracer:
+            self._tracer.active_span_source.deactivate(self)
 
     def set_tag(self, key, value):
         """Attaches a key/value pair to the span.

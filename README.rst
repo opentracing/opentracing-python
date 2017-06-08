@@ -69,7 +69,7 @@ Somewhere in your server's request handler code:
            format=Format.HTTP_HEADERS,
            carrier=request.headers,
        )
-       span = tracer.start_span(
+       span = tracer.start_manual_span(
            operation_name=request.operation,
            child_of(span_context))
        span.set_tag('http.url', request.full_url)
@@ -107,7 +107,7 @@ Somewhere in your service that's about to make an outgoing call:
    def before_http_request(request, current_span_extractor):
        op = request.operation
        parent_span = current_span_extractor()
-       outbound_span = opentracing.tracer.start_span(
+       outbound_span = opentracing.tracer.start_manual_span(
            operation_name=op,
            parent=parent_span
        )
@@ -127,7 +127,7 @@ Somewhere in your service that's about to make an outgoing call:
            span=outbound_span,
            format=Format.HTTP_HEADERS,
            carrier=http_header_carrier)
-           
+
        for key, value in http_header_carrier.iteritems():
            request.add_header(key, value)
 
