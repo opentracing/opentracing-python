@@ -70,9 +70,19 @@ class Span(object):
     In the Context Manager syntax it's not necessary to call span.finish()
     """
 
-    def __init__(self, tracer, context):
+    def __init__(self, tracer, context, deactivate_on_finish=False):
         self._tracer = tracer
         self._context = context
+        self._deactivate_on_finish = deactivate_on_finish
+
+    @property
+    def deactivate_on_finish(self):
+        """Return whether the Span is marked to be deactivated
+        through Tracer.active_span_source on finish() time.
+
+        :return: returns whether the Span will be deactivated on finish().
+        """
+        return self._deactivate_on_finish
 
     @property
     def context(self):

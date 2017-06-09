@@ -24,6 +24,7 @@ from __future__ import absolute_import
 from collections import namedtuple
 from .span import Span
 from .span import SpanContext
+from .activespansource import ActiveSpanSource
 from .propagation import Format, UnsupportedFormatException
 
 
@@ -40,31 +41,54 @@ class Tracer(object):
     def __init__(self):
         self._noop_span_context = SpanContext()
         self._noop_span = Span(tracer=self, context=self._noop_span_context)
+        self._noop_active_span_source = ActiveSpanSource()
+
+    @property
+    def active_span_source(self):
+        """Provides access to the ActiveSpanSource that manages
+        the active span.
+
+        :return: returns the ActiveSpanSource for this Tracer.
+        """
+        return self._noop_active_span_source
 
     def start_span(self,
                    operation_name=None,
                    child_of=None,
                    references=None,
                    tags=None,
-                   start_time=None):
-        """Starts and returns a new Span representing a unit of work.
+                   start_time=None,
+                   ignore_active_span=False):
+        """Deprecated. Use start_manual_span() instead.
+        """
+        return self._noop_span
+
+    def start_active_span(self,
+                          operation_name=None,
+                          child_of=None,
+                          references=None,
+                          tags=None,
+                          start_time=None,
+                          ignore_active_span=False):
+        """Starts and returns a new Span representing a unit of work,
+        registering it as the active span via ActiveSpanSource.
 
 
         Starting a root Span (a Span with no causal references)::
 
-            tracer.start_span('...')
+            tracer.start_active_span('...')
 
 
         Starting a child Span (see also start_child_span())::
 
-            tracer.start_span(
+            tracer.start_active_span(
                 '...',
                 child_of=parent_span)
 
 
         Starting a child Span in a more verbose way::
 
-            tracer.start_span(
+            tracer.start_active_span(
                 '...',
                 references=[opentracing.child_of(parent_span)])
 
@@ -82,8 +106,25 @@ class Tracer(object):
             to avoid extra data copying.
         :param start_time: an explicit Span start time as a unix timestamp per
             time.time()
+        :param ignore_active_span: If True, do not create an implicit reference
+            to ActiveSpanSource.active_span.
 
         :return: Returns an already-started Span instance.
+        """
+        return self._noop_span
+
+    def start_manual_span(self,
+                          operation_name=None,
+                          child_of=None,
+                          references=None,
+                          tags=None,
+                          start_time=None,
+                          ignore_active_span=False):
+        """Starts and returns a new Span representing a unit of work,
+        like start_active_span(), but the returned Span has not been
+        registered via ActiveSpanSource.
+
+        For parameters reference, see `start_manual_span`.
         """
         return self._noop_span
 
@@ -196,12 +237,16 @@ def follows_from(referenced_context=None):
         referenced_context=referenced_context)
 
 
-def start_child_span(parent_span, operation_name, tags=None, start_time=None):
+def start_child_span(parent_span,
+                     operation_name,
+                     tags=None,
+                     start_time=None,
+                     ignore_active_span=False):
     """A shorthand method that starts a child_of span for a given parent span.
 
     Equivalent to calling
 
-        parent_span.tracer().start_span(
+        parent_span.tracer().start_manual_span(
             operation_name,
             references=opentracing.child_of(parent_span.context),
             tags=tags,
@@ -218,9 +263,10 @@ def start_child_span(parent_span, operation_name, tags=None, start_time=None):
 
     :return: Returns an already-started Span instance.
     """
-    return parent_span.tracer.start_span(
+    return parent_span.tracer.start_manual_span(
         operation_name=operation_name,
         child_of=parent_span,
         tags=tags,
-        start_time=start_time
+        start_time=start_time,
+        ignore_active_span=ignore_active_span,
     )
