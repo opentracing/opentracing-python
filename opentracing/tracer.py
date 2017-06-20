@@ -56,7 +56,8 @@ class Tracer(object):
                           child_of=None,
                           references=None,
                           tags=None,
-                          start_time=None):
+                          start_time=None,
+                          ignore_active_span=False):
         """Starts and returns a new `Span` representing a unit of work. This
         method uses in-process context propagation to keep track of the current
         active `Span`, if available and if no references are provided.
@@ -88,6 +89,8 @@ class Tracer(object):
             to avoid extra data copying.
         :param start_time: an explicit Span start time as a unix timestamp per
             time.time()
+        :param ignore_active_span: an explicit flag that ignores the current
+            active `Span` and creates a root `Span`.
 
         :return: Returns an already-started `Span` instance, marked as active.
         """
@@ -99,6 +102,7 @@ class Tracer(object):
             references=references,
             tags=tags,
             start_time=start_time,
+            ignore_active_span=ignore_active_span,
         )
 
         # set the Span as active
@@ -110,7 +114,8 @@ class Tracer(object):
                           child_of=None,
                           references=None,
                           tags=None,
-                          start_time=None):
+                          start_time=None,
+                          ignore_active_span=False):
         """Starts and returns a new Span representing a unit of work. This
         method uses in-process context propagation to keep track of the current
         active `Span`, if available and if no references are provided.
@@ -147,6 +152,8 @@ class Tracer(object):
             to avoid extra data copying.
         :param start_time: an explicit Span start time as a unix timestamp per
             time.time()
+        :param ignore_active_span: an explicit flag that ignores the current
+            active `Span` and creates a root `Span`.
 
         :return: Returns an already-started Span instance.
         """
