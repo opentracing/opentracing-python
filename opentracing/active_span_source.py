@@ -19,8 +19,6 @@
 # THE SOFTWARE.
 
 from __future__ import absolute_import
-from .span import Span
-from .span import SpanContext
 
 
 class BaseActiveSpanSource(object):
@@ -38,8 +36,7 @@ class BaseActiveSpanSource(object):
         """
         raise NotImplementedError
 
-    @property
-    def active_span(self):
+    def get_active_span(self):
         """Returns the `Span` that is currently activated for this source.
 
         :return: the current active `Span`
@@ -62,16 +59,11 @@ class NoopActiveSpanSource(BaseActiveSpanSource):
     active `Span`. This is a cheap noop implementation that is used when
     a specific `Tracer` implementation is not used.
     """
-    def __init__(self):
-        self._noop_span_context = SpanContext()
-        self._noop_span = Span(None, context=self._noop_span_context)
-
     def make_active(self, span):
         pass
 
-    @property
-    def active_span(self):
-        return self._noop_span
+    def get_active_span(self):
+        pass
 
     def deactivate(self, span):
         pass
