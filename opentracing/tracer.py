@@ -51,27 +51,38 @@ class Tracer(object):
     def active_span(self):
         return self._active_span_source.get_active_span()
 
-    def start_active_span(self, operation_name, tags=None, start_time=None):
+    def start_active_span(self,
+                          operation_name=None,
+                          child_of=None,
+                          references=None,
+                          tags=None,
+                          start_time=None):
         """Starts and returns a new `Span` representing a unit of work. This
-        method differs from `start_manual_span` because it uses in-process
-        context propagation to keep track of the current active `Span` (if
-        available).
+        method uses in-process context propagation to keep track of the current
+        active `Span`, if available and if no references are provided.
 
         Starting a root `Span` with no casual references and a child `Span`
         in a different function, is possible without passing the parent
         reference around::
 
             def handle_request(request):
-                root_span = tracer.start_active_span('request.handler')
-                data = get_data(request)
+                with tracer.start_active_span('request.handler'):
+                    data = get_data(request)
 
             def get_data(request):
                 # child_span has `root_span` as a parent
-                child_span = tracer.start_active_span('db.query')
+                with tracer.start_active_span('db.query'):
+                    # get some data ...
 
 
         :param operation_name: name of the operation represented by the new
             span from the perspective of the current service.
+        :param child_of: (optional) a Span or SpanContext instance representing
+            the parent in a REFERENCE_CHILD_OF Reference. If specified, the
+            `references` parameter must be omitted.
+        :param references: (optional) a list of Reference objects that identify
+            one or more parent SpanContexts. (See the Reference documentation
+            for detail)
         :param tags: an optional dictionary of Span Tags. The caller gives up
             ownership of that dictionary, because the Tracer may use it as-is
             to avoid extra data copying.
@@ -80,18 +91,17 @@ class Tracer(object):
 
         :return: Returns an already-started `Span` instance, marked as active.
         """
-        # use an ActiveSpanSource to retrieve the current Span
-        active_span = self._active_span_source.get_active_span()
-
-        # create a new root Span or a child if a parent is available
+        # create a new Span considering the current active `Span` or the
+        # provided references
         span = self.start_manual_span(
             operation_name=operation_name,
-            child_of=active_span,
+            child_of=child_of,
+            references=references,
             tags=tags,
             start_time=start_time,
         )
 
-        # set Span as active
+        # set the Span as active
         self._active_span_source.make_active(span)
         return span
 
@@ -101,8 +111,9 @@ class Tracer(object):
                           references=None,
                           tags=None,
                           start_time=None):
-        """Starts and returns a new Span representing a unit of work.
-
+        """Starts and returns a new Span representing a unit of work. This
+        method uses in-process context propagation to keep track of the current
+        active `Span`, if available and if no references are provided.
 
         Starting a root Span (a Span with no causal references)::
 
