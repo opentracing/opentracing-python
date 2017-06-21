@@ -49,7 +49,7 @@ class Tracer(object):
 
     @property
     def active_span(self):
-        return self._active_span_source.get_active_span()
+        return self._active_span_source.get_active()
 
     def start_active_span(self,
                           operation_name=None,

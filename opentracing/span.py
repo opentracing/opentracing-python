@@ -52,28 +52,18 @@ class SpanContext(object):
         return SpanContext.EMPTY_BAGGAGE
 
 
-class Span(object):
+class BaseSpan(object):
     """
-    Span represents a unit of work executed on behalf of a trace. Examples of
-    spans include a remote procedure call, or a in-process method call to a
+    BaseSpan represents a unit of work executed on behalf of a trace. Examples
+    of spans include a remote procedure call, or a in-process method call to a
     sub-component. Every span in a trace may have zero or more causal parents,
     and these relationships transitively form a DAG. It is common for spans to
     have at most one parent, and thus most traces are merely tree structures.
-
-    Span implements a Context Manager API that allows the following usage:
-
-    .. code-block:: python
-
-        with tracer.start_active_span(operation_name='go_fishing') as span:
-            call_some_service()
-
-    In the Context Manager syntax it's not necessary to call span.finish()
     """
 
     def __init__(self, tracer, context):
         self._tracer = tracer
         self._context = context
-        self._deactivate_on_finish = False
 
     @property
     def context(self):
@@ -116,8 +106,7 @@ class Span(object):
         :param finish_time: an explicit Span finish timestamp as a unix
             timestamp per time.time()
         """
-        if self._deactivate_on_finish and self._tracer:
-            self._tracer.active_span_source.deactivate(self)
+        pass
 
     def set_tag(self, key, value):
         """Attaches a key/value pair to the span.
@@ -234,3 +223,58 @@ class Span(object):
         if 'timestamp' in kwargs:
             timestamp = kwargs['timestamp']
         return self.log_kv(key_values, timestamp)
+
+
+class ContinuationMixin(object):
+    """
+    Continuation mixin that provides additional primitives to a `Span` class,
+    so that it can be deactivated and resumed later during in-process
+    propagation.
+
+    If the application needs to defer work that should be part of the same
+    `Span`, the `ContinuationMixin` provides a `capture` method that adds a
+    marker to the span so that it can be deactivated without finishing. In
+    another asynchronous executor and/or thread, it can be activated again.
+    """
+    def capture(self):
+        """
+        Capture the `Span` tracing session as well as any 3rd-party execution
+        context of interest. After calling this method, the `Span` may be used
+        later in a closure or callback function where it may be resumed and
+        reactivated using the tracer `ActiveSpanSource.make_active()`.
+
+        IMPORTANT: the caller MUST activate and then deactivate the `Span`
+        otherwise it will never automatically finish. That is, calling
+        `capture()` increments a refcount that must be decremented somewhere
+        else.
+        """
+        pass
+
+    def deactivate(self):
+        """
+        Mark the end of the active period for the current `Span` in this
+        asynchronous executor and/or thread. When the last refcount has been
+        decremented through `deactivate()`, it is automatically finished.
+
+        NOTE: Calling `deactivate()` more than once on a single `Span` instance
+        leads to undefined behavior.
+        """
+        pass
+
+
+class Span(ContinuationMixin, BaseSpan):
+    """
+    Span represents a OpenTracing span's implementation that combines the
+    `BaseSpan` API with an extended `ContinuationMixin` to provide fine-grain
+    in-process propagation.
+
+    Span implements a Context Manager API that allows the following usage:
+
+    .. code-block:: python
+
+        with tracer.start_active_span(operation_name='go_fishing') as span:
+            call_some_service()
+
+    In the Context Manager syntax it's not necessary to call span.finish()
+    """
+    pass

@@ -36,20 +36,10 @@ class BaseActiveSpanSource(object):
         """
         raise NotImplementedError
 
-    def get_active_span(self):
+    def get_active(self):
         """Returns the `Span` that is currently activated for this source.
 
         :return: the current active `Span`
-        """
-        raise NotImplementedError
-
-    def deactivate(self, span):
-        """Deactivate the given `Span`, restoring the previous active one.
-        This method must take in consideration that a `Span` may be deactivated
-        when it's not really active. In that case, the current active stack
-        must not be changed.
-
-        :param span: the `Span` that must be deactivated
         """
         raise NotImplementedError
 
@@ -62,8 +52,5 @@ class NoopActiveSpanSource(BaseActiveSpanSource):
     def make_active(self, span):
         pass
 
-    def get_active_span(self):
-        pass
-
-    def deactivate(self, span):
+    def get_active(self):
         pass
