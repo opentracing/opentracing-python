@@ -1,4 +1,4 @@
-# Copyright (c) 2016 The OpenTracing Authors.
+# Copyright (c) 2016-2017 The OpenTracing Authors.
 #
 # Copyright (c) 2015 Uber Technologies, Inc.
 #
@@ -22,6 +22,8 @@
 
 from __future__ import absolute_import
 from collections import namedtuple
+import warnings
+
 from .span import Span
 from .span import SpanContext
 from .propagation import Format, UnsupportedFormatException
@@ -71,7 +73,7 @@ class Tracer(object):
                     data = get_data(request)
 
             def get_data(request):
-                # child_span has `root_span` as a parent
+                # `db.query` is child of `request.handler`
                 with tracer.start_active_span('db.query'):
                     # get some data ...
 
@@ -158,6 +160,28 @@ class Tracer(object):
         :return: Returns an already-started Span instance.
         """
         return self._noop_span
+
+    def start_span(self,
+                   operation_name=None,
+                   child_of=None,
+                   references=None,
+                   tags=None,
+                   start_time=None):
+        """DEPRECATED: this method is part of the previous API and must
+        not be used. Use `start_active_span()` or `start_manual_span()`
+        instead.
+        """
+        # TODO: print the WARNING only once otherwise it will flood
+        # users' logs. `warnings.simplefilter` helps on that.
+        warnings.warn('Deprecated!', DeprecationWarning, stacklevel=2)
+        return self.start_manual_span(
+            operation_name=operation_name,
+            child_of=child_of,
+            references=references,
+            tags=tags,
+            start_time=start_time,
+            ignore_active_span=True,
+        )
 
     def inject(self, span_context, format, carrier):
         """Injects `span_context` into `carrier`.
