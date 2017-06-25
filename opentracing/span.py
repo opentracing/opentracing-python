@@ -1,4 +1,4 @@
-# Copyright (c) 2016 The OpenTracing Authors.
+# Copyright (c) 2016-2017 The OpenTracing Authors.
 #
 # Copyright (c) 2015 Uber Technologies, Inc.
 #
@@ -232,16 +232,16 @@ class ContinuationMixin(object):
     propagation.
 
     If the application needs to defer work that should be part of the same
-    `Span`, the `ContinuationMixin` provides a `capture` method that adds a
-    marker to the span so that it can be deactivated without finishing. In
-    another asynchronous executor and/or thread, it can be activated again.
+    `Span`, the `ContinuationMixin` provides a `capture` method that increments
+    a counter to the span so that it can be deactivated without finishing. In
+    another asynchronous executor and/or thread, it can be resumed.
     """
     def capture(self):
         """
         Capture the `Span` tracing session as well as any 3rd-party execution
         context of interest. After calling this method, the `Span` may be used
         later in a closure or callback function where it may be resumed and
-        reactivated using the tracer `ActiveSpanSource.make_active()`.
+        reactivated using the tracer `active_span_source.make_active()`.
 
         IMPORTANT: the caller MUST activate and then deactivate the `Span`
         otherwise it will never automatically finish. That is, calling
