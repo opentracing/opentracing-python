@@ -96,20 +96,7 @@ class Tracer(object):
 
         :return: Returns an already-started `Span` instance, marked as active.
         """
-        # create a new Span considering the current active `Span` or the
-        # provided references
-        span = self.start_manual_span(
-            operation_name=operation_name,
-            child_of=child_of,
-            references=references,
-            tags=tags,
-            start_time=start_time,
-            ignore_active_span=ignore_active_span,
-        )
-
-        # set the Span as active
-        self._active_span_source.make_active(span)
-        return span
+        return self._noop_span
 
     def start_manual_span(self,
                           operation_name=None,
