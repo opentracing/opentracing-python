@@ -203,7 +203,7 @@ class BaseSpan(object):
                 'python.exception.val': exc_val,
                 'python.exception.tb': exc_tb,
                 })
-        self.finish()
+        self.deactivate()
 
     def log_event(self, event, payload=None):
         """DEPRECATED"""
@@ -259,7 +259,7 @@ class ContinuationMixin(object):
         NOTE: Calling `deactivate()` more than once on a single `Span` instance
         leads to undefined behavior.
         """
-        pass
+        self.finish()
 
 
 class Span(ContinuationMixin, BaseSpan):
