@@ -21,8 +21,8 @@
 from __future__ import absolute_import
 
 
-class BaseActiveSpanSource(object):
-    """BaseActiveSpanSource is the interface for a pluggable class that
+class ActiveSpanSource(object):
+    """ActiveSpanSource is the interface for a pluggable class that
     keeps track of the current active `Span`. It must be used as a
     base class in specific implementations.
     """
@@ -34,23 +34,11 @@ class BaseActiveSpanSource(object):
 
         :param span: the `Span` that is marked as active.
         """
-        raise NotImplementedError
+        pass
 
     def get_active(self):
         """Returns the `Span` that is currently activated for this source.
 
         :return: the current active `Span`
         """
-        raise NotImplementedError
-
-
-class NoopActiveSpanSource(BaseActiveSpanSource):
-    """NoopActiveSpanSource provides the logic to get and set the current
-    active `Span`. This is a cheap noop implementation that is used when
-    a specific `Tracer` implementation is not used.
-    """
-    def make_active(self, span):
-        pass
-
-    def get_active(self):
         pass

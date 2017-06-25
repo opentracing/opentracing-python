@@ -25,7 +25,7 @@ from collections import namedtuple
 from .span import Span
 from .span import SpanContext
 from .propagation import Format, UnsupportedFormatException
-from .active_span_source import NoopActiveSpanSource
+from .active_span_source import ActiveSpanSource
 
 
 class Tracer(object):
@@ -41,7 +41,7 @@ class Tracer(object):
     def __init__(self):
         self._noop_span_context = SpanContext()
         self._noop_span = Span(tracer=self, context=self._noop_span_context)
-        self._active_span_source = NoopActiveSpanSource()
+        self._active_span_source = ActiveSpanSource()
 
     @property
     def active_span_source(self):
