@@ -94,11 +94,14 @@ Outbound request
 Somewhere in your service that's about to make an outgoing call:
 
 .. code-block:: python
+   from opentracing.ext import tags
+   from opentracing.propagation import Format
+   from opentracing_instrumentation import request_context
 
    # create and serialize a child span and use it as context manager
    with before_http_request(
        request=out_request,
-       current_span_extractor=RequestContext.get_current_span):
+       current_span_extractor=request_context.get_current_span):
 
        # actual call
        return urllib2.urlopen(request)
@@ -109,7 +112,7 @@ Somewhere in your service that's about to make an outgoing call:
        parent_span = current_span_extractor()
        outbound_span = opentracing.tracer.start_span(
            operation_name=op,
-           parent=parent_span
+           child_of=parent_span
        )
 
        outbound_span.set_tag('http.url', request.full_url)
@@ -124,10 +127,10 @@ Somewhere in your service that's about to make an outgoing call:
 
        http_header_carrier = {}
        opentracing.tracer.inject(
-           span=outbound_span,
+           span_context=outbound_span,
            format=Format.HTTP_HEADERS,
            carrier=http_header_carrier)
-           
+
        for key, value in http_header_carrier.iteritems():
            request.add_header(key, value)
 
