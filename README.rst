@@ -94,6 +94,7 @@ Outbound request
 Somewhere in your service that's about to make an outgoing call:
 
 .. code-block:: python
+
    from opentracing.ext import tags
    from opentracing.propagation import Format
    from opentracing_instrumentation import request_context
