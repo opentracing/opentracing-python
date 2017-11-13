@@ -20,8 +20,8 @@
 
 from __future__ import absolute_import
 
-from opentracing.scope import Scope
-from opentracing.span import Span, SpanContext
+from .span import Span, SpanContext
+from .scope import Scope
 
 
 class ScopeManager(object):
