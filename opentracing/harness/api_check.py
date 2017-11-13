@@ -45,6 +45,7 @@ class APICompatibilityCheckMixin(object):
         return True
 
     def test_start_span(self):
+        # test for deprecated API
         tracer = self.tracer()
         span = tracer.start_span(operation_name='Fry')
         span.finish()
@@ -54,15 +55,49 @@ class APICompatibilityCheckMixin(object):
                            payload={'hospital': 'Brooklyn Pre-Med Hospital',
                                     'city': 'Old New York'})
 
-    def test_start_span_with_parent(self):
+    def test_start_active(self):
         tracer = self.tracer()
-        parent_span = tracer.start_span(operation_name='parent')
+        scope = tracer.start_active(
+            operation_name='Fry',
+            ignore_active_span=False,
+            finish_on_close=True,
+        )
+
+        assert scope.span() is not None
+
+    def test_scope_as_context_manager(self):
+        tracer = self.tracer()
+
+        with tracer.start_active(operation_name='antiquing') as scope:
+            assert scope.span() is not None
+
+    def test_start_manual(self):
+        tracer = self.tracer()
+        span = tracer.start_manual(operation_name='Fry')
+        span.finish()
+        with tracer.start_manual(operation_name='Fry',
+                                 tags={'birthday': 'August 14 1974'}) as span:
+            span.log_event('birthplace',
+                           payload={'hospital': 'Brooklyn Pre-Med Hospital',
+                                    'city': 'Old New York'})
+
+    def test_start_manual_ignore_active(self):
+        tracer = self.tracer()
+        span = tracer.start_manual(
+            operation_name='Fry',
+            ignore_active_span=False,
+        )
+        assert span is not None
+
+    def test_start_manual_with_parent(self):
+        tracer = self.tracer()
+        parent_span = tracer.start_manual(operation_name='parent')
         assert parent_span is not None
-        span = tracer.start_span(
+        span = tracer.start_manual(
             operation_name='Leela',
             child_of=parent_span)
         span.finish()
-        span = tracer.start_span(
+        span = tracer.start_manual(
             operation_name='Leela',
             references=[opentracing.follows_from(parent_span.context)],
             tags={'birthplace': 'sewers'})
@@ -71,7 +106,7 @@ class APICompatibilityCheckMixin(object):
 
     def test_start_child_span(self):
         tracer = self.tracer()
-        parent_span = tracer.start_span(operation_name='parent')
+        parent_span = tracer.start_manual(operation_name='parent')
         assert parent_span is not None
         child_span = opentracing.start_child_span(
             parent_span, operation_name='Leela')
@@ -79,23 +114,24 @@ class APICompatibilityCheckMixin(object):
         parent_span.finish()
 
     def test_set_operation_name(self):
-        span = self.tracer().start_span().set_operation_name('Farnsworth')
+        span = self.tracer().start_manual().set_operation_name('Farnsworth')
         span.finish()
 
     def test_span_as_context_manager(self):
+        tracer = self.tracer()
         finish = {'called': False}
 
         def mock_finish(*_):
             finish['called'] = True
 
-        with self.tracer().start_span(operation_name='antiquing') as span:
+        with tracer.start_manual(operation_name='antiquing') as span:
             setattr(span, 'finish', mock_finish)
         assert finish['called'] is True
 
         # now try with exception
         finish['called'] = False
         try:
-            with self.tracer().start_span(operation_name='antiquing') as span:
+            with tracer.start_manual(operation_name='antiquing') as span:
                 setattr(span, 'finish', mock_finish)
                 raise ValueError()
         except ValueError:
@@ -104,14 +140,14 @@ class APICompatibilityCheckMixin(object):
             raise AssertionError('Expected ValueError')  # pragma: no cover
 
     def test_span_tag_value_types(self):
-        with self.tracer().start_span(operation_name='ManyTypes') as span:
+        with self.tracer().start_manual(operation_name='ManyTypes') as span:
             span. \
                 set_tag('an_int', 9). \
                 set_tag('a_bool', True). \
                 set_tag('a_string', 'aoeuidhtns')
 
     def test_span_tags_with_chaining(self):
-        span = self.tracer().start_span(operation_name='Farnsworth')
+        span = self.tracer().start_manual(operation_name='Farnsworth')
         span. \
             set_tag('birthday', '9 April, 2841'). \
             set_tag('loves', 'different lengths of wires')
@@ -121,7 +157,7 @@ class APICompatibilityCheckMixin(object):
         span.finish()
 
     def test_span_logs(self):
-        span = self.tracer().start_span(operation_name='Fry')
+        span = self.tracer().start_manual(operation_name='Fry')
 
         # Newer API
         span.log_kv(
@@ -146,7 +182,7 @@ class APICompatibilityCheckMixin(object):
                 payload={'year': 2999})
 
     def test_span_baggage(self):
-        with self.tracer().start_span(operation_name='Fry') as span:
+        with self.tracer().start_manual(operation_name='Fry') as span:
             assert span.context.baggage == {}
             span_ref = span.set_baggage_item('Kiff-loves', 'Amy')
             assert span_ref is span
@@ -156,7 +192,7 @@ class APICompatibilityCheckMixin(object):
             pass
 
     def test_context_baggage(self):
-        with self.tracer().start_span(operation_name='Fry') as span:
+        with self.tracer().start_manual(operation_name='Fry') as span:
             assert span.context.baggage == {}
             span.set_baggage_item('Kiff-loves', 'Amy')
             if self.check_baggage_values():
@@ -164,7 +200,7 @@ class APICompatibilityCheckMixin(object):
             pass
 
     def test_text_propagation(self):
-        with self.tracer().start_span(operation_name='Bender') as span:
+        with self.tracer().start_manual(operation_name='Bender') as span:
             text_carrier = {}
             self.tracer().inject(
                 span_context=span.context,
@@ -176,7 +212,7 @@ class APICompatibilityCheckMixin(object):
             assert extracted_ctx.baggage == {}
 
     def test_binary_propagation(self):
-        with self.tracer().start_span(operation_name='Bender') as span:
+        with self.tracer().start_manual(operation_name='Bender') as span:
             bin_carrier = bytearray()
             self.tracer().inject(
                 span_context=span.context,
@@ -193,7 +229,7 @@ class APICompatibilityCheckMixin(object):
             (Format.HTTP_HEADERS, {}),
             (Format.BINARY, bytearray()),
         ]
-        with self.tracer().start_span(operation_name='Bender') as span:
+        with self.tracer().start_manual(operation_name='Bender') as span:
             for fmt, carrier in formats:
                 # expecting no exceptions
                 span.tracer.inject(span.context, fmt, carrier)
@@ -201,8 +237,12 @@ class APICompatibilityCheckMixin(object):
 
     def test_unknown_format(self):
         custom_format = 'kiss my shiny metal ...'
-        with self.tracer().start_span(operation_name='Bender') as span:
+        with self.tracer().start_manual(operation_name='Bender') as span:
             with pytest.raises(opentracing.UnsupportedFormatException):
                 span.tracer.inject(span.context, custom_format, {})
             with pytest.raises(opentracing.UnsupportedFormatException):
                 span.tracer.extract(custom_format, {})
+
+    def test_tracer_scope_manager(self):
+        # a Tracer should always have a ScopeManager
+        assert self.tracer().scope_manager
