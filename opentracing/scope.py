@@ -31,16 +31,14 @@ class Scope(object):
     still outstanding. A `Scope` defines when a given `Span` is scheduled
     and on the path.
     """
-    def __init__(self, span):
+    def __init__(self, span, finish_span_on_close=True):
         """
         Initialize a `Scope` for the given `Span` object
 
         :param span: the `Span` used for this `Scope`
+        :param finish_span_on_close: whether span should automatically be
+            finished when `Scope#close()` is called
         """
-        # TODO: maybe it should always be the NoopSpan?
-        # something similar to:
-        # self._noop_span_context = SpanContext()
-        # self._noop_span = Span(tracer=self, context=self._noop_span_context)
         self._span = span
 
     def span(self):

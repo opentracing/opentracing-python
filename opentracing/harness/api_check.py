@@ -18,8 +18,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 from __future__ import absolute_import
-import time
 
+import mock
+import time
 import pytest
 
 import opentracing
@@ -39,10 +40,25 @@ class APICompatibilityCheckMixin(object):
         """If true, the test will validate Baggage items by storing and
         retrieving them from the trace context. If false, it will only attempt
         to store and retrieve the Baggage items to check the API compliance,
-        but not actually validate stored values.  The latter mode is only
+        but not actually validate stored values. The latter mode is only
         useful for no-op tracer.
         """
         return True
+
+    def check_scope_manager(self):
+        """If true, the test suite will validate the `ScopeManager` propagation
+        and storage to ensure the correct parenting and active `Scope` are
+        properly defined by the implementation. If false, it will only use
+        the API without any assert. The latter mode is only useful for no-op
+        tracer.
+        """
+        return True
+
+    def is_parent(self, parent, span):
+        """Utility method that must be defined by Tracer implementers to define
+        how the test suite can check when a `Span` is a parent of another one.
+        """
+        return False
 
     def test_start_span(self):
         # test for deprecated API
@@ -56,14 +72,69 @@ class APICompatibilityCheckMixin(object):
                                     'city': 'Old New York'})
 
     def test_start_active(self):
+        # the first usage returns a `Scope` that wraps a root `Span`
         tracer = self.tracer()
-        scope = tracer.start_active(
-            operation_name='Fry',
-            ignore_active_span=False,
-            finish_on_close=True,
-        )
+        scope = tracer.start_active(operation_name='Fry')
 
         assert scope.span() is not None
+        if self.check_scope_manager():
+            assert self.is_parent(None, scope.span())
+
+    def test_start_active_parent(self):
+        # ensure the `ScopeManager` provides the right parenting
+        tracer = self.tracer()
+        with tracer.start_active(operation_name='Fry') as parent:
+            with tracer.start_active(operation_name='Farnsworth') as child:
+                if self.check_scope_manager():
+                    assert self.is_parent(parent.span(), child.span())
+
+    def test_start_active_ignore_active_scope(self):
+        # ensure the `ScopeManager` ignores the active `Scope`
+        # if the flag is set
+        tracer = self.tracer()
+        with tracer.start_active(operation_name='Fry') as parent:
+            with tracer.start_active(operation_name='Farnsworth',
+                                     ignore_active_span=True) as child:
+                if self.check_scope_manager():
+                    assert not self.is_parent(parent.span(), child.span())
+
+    def test_start_active_finish_on_close(self):
+        # ensure a `Span` is finished when the `Scope` close
+        tracer = self.tracer()
+        scope = tracer.start_active(operation_name='Fry')
+        with mock.patch.object(scope.span(), 'finish') as finish:
+            scope.close()
+
+        if self.check_scope_manager():
+            assert finish.call_count == 1
+
+    def test_start_active_not_finish_on_close(self):
+        # a `Span` is not finished when the flag is set
+        tracer = self.tracer()
+        scope = tracer.start_active(operation_name='Fry',
+                                    finish_on_close=False)
+        with mock.patch.object(scope.span(), 'finish') as finish:
+            scope.close()
+
+        assert finish.call_count == 0
+
+    def test_start_manual_propagation(self):
+        # `start_manual` must inherit the current active `Scope` span
+        tracer = self.tracer()
+        with tracer.start_active(operation_name='Fry') as parent:
+            with tracer.start_manual(operation_name='Farnsworth') as child:
+                if self.check_scope_manager():
+                    assert self.is_parent(parent.span(), child)
+
+    def test_start_manual_propagation_ignore_active_scope(self):
+        # `start_manual` doesn't inherit the current active `Scope` span
+        # if the flag is set
+        tracer = self.tracer()
+        with tracer.start_active(operation_name='Fry') as parent:
+            with tracer.start_manual(operation_name='Farnsworth',
+                                     ignore_active_span=True) as child:
+                if self.check_scope_manager():
+                    assert not self.is_parent(parent.span(), child)
 
     def test_scope_as_context_manager(self):
         tracer = self.tracer()
@@ -243,6 +314,38 @@ class APICompatibilityCheckMixin(object):
             with pytest.raises(opentracing.UnsupportedFormatException):
                 span.tracer.extract(custom_format, {})
 
-    def test_tracer_scope_manager(self):
-        # a Tracer should always have a ScopeManager
-        assert self.tracer().scope_manager
+    def test_tracer_start_active_scope(self):
+        # the Tracer ScopeManager should store the active Scope
+        tracer = self.tracer()
+        scope = tracer.start_active(operation_name='Fry')
+
+        if self.check_scope_manager():
+            assert scope == tracer.scope_manager.active()
+
+        scope.close()
+
+    def test_tracer_start_manual_scope(self):
+        # the Tracer ScopeManager should not store the new Span
+        tracer = self.tracer()
+        span = tracer.start_manual(operation_name='Fry')
+
+        if self.check_scope_manager():
+            assert tracer.scope_manager.active() is None
+
+        span.finish()
+
+    def test_tracer_scope_manager_active(self):
+        # a `ScopeManager` has no scopes in its initial state
+        tracer = self.tracer()
+
+        if self.check_scope_manager():
+            assert tracer.scope_manager.active() is None
+
+    def test_tracer_scope_manager_activate(self):
+        # a `ScopeManager` should activate any `Span`
+        tracer = self.tracer()
+        span = tracer.start_manual(operation_name='Fry')
+        tracer.scope_manager.activate(span)
+
+        if self.check_scope_manager():
+            assert tracer.scope_manager.active().span() == span

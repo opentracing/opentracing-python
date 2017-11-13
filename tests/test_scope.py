@@ -30,7 +30,7 @@ from opentracing.span import Span, SpanContext
 def test_scope_wrapper():
     # ensure `Scope` wraps the `Span` argument
     span = Span(tracer=Tracer(), context=SpanContext())
-    scope = Scope(span)
+    scope = Scope(span, finish_span_on_close=False)
     assert scope._span == span
     assert scope.span() == span
 

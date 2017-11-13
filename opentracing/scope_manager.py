@@ -31,7 +31,9 @@ class ScopeManager(object):
     `Span` / `Scope` (via `ScopeManager#active()`).
     """
     def __init__(self):
-        # TODO: check that if it's required
+        # TODO: `tracer` should not be None, but we don't have a reference;
+        # should we move the NOOP SpanContext, Span, Scope to somewhere
+        # else so that they're globally reachable?
         self._noop_span = Span(tracer=None, context=SpanContext())
         self._noop_scope = Scope(self._noop_span)
 
