@@ -45,3 +45,9 @@ class VerifyAPICompatibilityCheck(unittest.TestCase):
         # second check that assert on empty baggage will fail too
         with self.assertRaises(AssertionError):
             api_check.test_context_baggage()
+
+    def test_scope_manager_check_works(self):
+        api_check = APICompatibilityCheckMixin()
+        setattr(api_check, 'tracer', lambda: Tracer())
+
+        # TODO: list here all scope_manager checks

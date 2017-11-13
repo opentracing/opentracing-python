@@ -43,7 +43,7 @@ class Tracer(object):
         self._scope_manager = ScopeManager()
         self._noop_span_context = SpanContext()
         self._noop_span = Span(tracer=self, context=self._noop_span_context)
-        self._noop_scope = Scope(self._noop_span)
+        self._noop_scope = Scope(self._scope_manager, self._noop_span)
 
     @property
     def scope_manager(self):
@@ -56,7 +56,7 @@ class Tracer(object):
                      references=None,
                      tags=None,
                      start_time=None,
-                     ignore_active_span=False,
+                     ignore_active_scope=False,
                      finish_on_close=True):
         """
         Returns a newly started and activated `Scope`.
@@ -90,7 +90,7 @@ class Tracer(object):
             to avoid extra data copying.
         :param start_time: an explicit Span start time as a unix timestamp per
             time.time().
-        :param ignore_active_span: an explicit flag that ignores the current
+        :param ignore_active_scope: an explicit flag that ignores the current
             active `Span` and creates a root `Span`.
         :param finish_on_close: whether span should automatically be finished
             when `Scope#close()` is called.
@@ -105,7 +105,7 @@ class Tracer(object):
                      references=None,
                      tags=None,
                      start_time=None,
-                     ignore_active_span=False):
+                     ignore_active_scope=False):
         """Starts and returns a new Span representing a unit of work.
 
 
@@ -141,7 +141,7 @@ class Tracer(object):
             to avoid extra data copying.
         :param start_time: an explicit Span start time as a unix timestamp per
             time.time()
-        :param ignore_active_span: an explicit flag that ignores the current
+        :param ignore_active_scope: an explicit flag that ignores the current
             active `Span` and creates a root `Span`.
 
         :return: Returns an already-started Span instance.

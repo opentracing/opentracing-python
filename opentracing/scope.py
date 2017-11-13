@@ -31,14 +31,15 @@ class Scope(object):
     still outstanding. A `Scope` defines when a given `Span` is scheduled
     and on the path.
     """
-    def __init__(self, span, finish_span_on_close=True):
+    def __init__(self, manager, span, finish_on_close=True):
         """
         Initialize a `Scope` for the given `Span` object
 
         :param span: the `Span` used for this `Scope`
-        :param finish_span_on_close: whether span should automatically be
+        :param finish_on_close: whether span should automatically be
             finished when `Scope#close()` is called
         """
+        self._manager = manager
         self._span = span
 
     def span(self):

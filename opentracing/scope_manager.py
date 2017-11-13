@@ -35,14 +35,14 @@ class ScopeManager(object):
         # should we move the NOOP SpanContext, Span, Scope to somewhere
         # else so that they're globally reachable?
         self._noop_span = Span(tracer=None, context=SpanContext())
-        self._noop_scope = Scope(self._noop_span)
+        self._noop_scope = Scope(self, self._noop_span)
 
-    def activate(self, span, finish_span_on_close=True):
+    def activate(self, span, finish_on_close=True):
         """
         Make a `Span` instance active.
 
         :param span: the `Span` that should become active
-        :param finish_span_on_close: whether span should automatically be
+        :param finish_on_close: whether span should automatically be
         finished when `Scope#close()` is called
         :return: a `Scope` instance to control the end of the active period for
         the `Span`. It is a programming error to neglect to call
