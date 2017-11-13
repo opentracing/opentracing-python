@@ -1,6 +1,4 @@
-# Copyright (c) 2016 The OpenTracing Authors.
-#
-# Copyright (c) 2015 Uber Technologies, Inc.
+# Copyright (c) 2017 The OpenTracing Authors.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,13 +19,26 @@
 # THE SOFTWARE.
 
 from __future__ import absolute_import
-from opentracing import child_of
-from opentracing import Tracer
 
 
-def test_tracer():
-    tracer = Tracer()
-    span = tracer.start_manual_span(operation_name='root')
-    child = tracer.start_manual_span(operation_name='child',
-                                     references=child_of(span))
-    assert span == child
+class ActiveSpanSource(object):
+    """ActiveSpanSource is the interface for a pluggable class that
+    keeps track of the current active `Span`. It must be used as a
+    base class in specific implementations.
+    """
+    def make_active(self, span):
+        """Sets the given `Span` as active, so that it is used as a parent
+        when creating new spans. The implementation must keep track of the
+        active spans sequence, so that previous spans can be resumed
+        after a deactivation.
+
+        :param span: the `Span` that is marked as active.
+        """
+        pass
+
+    def get_active(self):
+        """Returns the `Span` that is currently activated for this source.
+
+        :return: the current active `Span`
+        """
+        pass
