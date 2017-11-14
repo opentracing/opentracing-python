@@ -25,8 +25,7 @@ from .scope import Scope
 
 
 class ScopeManager(object):
-    """
-    The `ScopeManager` interface abstracts both the activation of `Span`
+    """The `ScopeManager` interface abstracts both the activation of `Span`
     instances (via `ScopeManager#activate(Span)`) and access to an active
     `Span` / `Scope` (via `ScopeManager#active()`).
     """
@@ -38,8 +37,7 @@ class ScopeManager(object):
         self._noop_scope = Scope(self, self._noop_span)
 
     def activate(self, span, finish_on_close=True):
-        """
-        Make a `Span` instance active.
+        """Make a `Span` instance active.
 
         :param span: the `Span` that should become active
         :param finish_on_close: whether span should automatically be
@@ -52,8 +50,7 @@ class ScopeManager(object):
         return self._noop_scope
 
     def active(self):
-        """
-        Return the currently active `Scope` which can be used to access the
+        """Return the currently active `Scope` which can be used to access the
         currently active `Scope#span()`.
 
         If there is a non-null `Scope`, its wrapped `Span` becomes an implicit

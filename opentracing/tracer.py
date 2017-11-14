@@ -47,7 +47,7 @@ class Tracer(object):
 
     @property
     def scope_manager(self):
-        """Accessor for `ScopeManager`."""
+        """ScopeManager accessor"""
         return self._scope_manager
 
     def start_active(self,
@@ -58,10 +58,8 @@ class Tracer(object):
                      start_time=None,
                      ignore_active_scope=False,
                      finish_on_close=True):
-        """
-        Returns a newly started and activated `Scope`.
-
-        The returned `Scope` supports with-statement contexts. For example:
+        """Returns a newly started and activated `Scope`.
+        Returned `Scope` supports with-statement contexts. For example:
 
             with tracer.start_active('...') as scope:
                 scope.span().set_tag('http.method', 'GET')
@@ -91,7 +89,7 @@ class Tracer(object):
         :param start_time: an explicit Span start time as a unix timestamp per
             time.time().
         :param ignore_active_scope: an explicit flag that ignores the current
-            active `Span` and creates a root `Span`.
+            active `Scope` and creates a root `Span`.
         :param finish_on_close: whether span should automatically be finished
             when `Scope#close()` is called.
 
@@ -142,7 +140,7 @@ class Tracer(object):
         :param start_time: an explicit Span start time as a unix timestamp per
             time.time()
         :param ignore_active_scope: an explicit flag that ignores the current
-            active `Span` and creates a root `Span`.
+            active `Scope` and creates a root `Span`.
 
         :return: Returns an already-started Span instance.
         """

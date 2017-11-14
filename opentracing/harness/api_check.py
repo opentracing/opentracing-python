@@ -47,21 +47,21 @@ class APICompatibilityCheckMixin(object):
 
     def check_scope_manager(self):
         """If true, the test suite will validate the `ScopeManager` propagation
-        and storage to ensure the correct parenting and active `Scope` are
-        properly defined by the implementation. If false, it will only use
-        the API without any assert. The latter mode is only useful for no-op
-        tracer.
+        to ensure correct parenting. If false, it will only use the API without
+        asserting. The latter mode is only useful for no-op tracer.
         """
         return True
 
     def is_parent(self, parent, span):
         """Utility method that must be defined by Tracer implementers to define
         how the test suite can check when a `Span` is a parent of another one.
+        It depends by the underlying implementation that is not part of the
+        OpenTracing API.
         """
         return False
 
     def test_start_span(self):
-        # test for deprecated API
+        # test deprecated API for minor compatibility
         tracer = self.tracer()
         span = tracer.start_span(operation_name='Fry')
         span.finish()
@@ -320,7 +320,7 @@ class APICompatibilityCheckMixin(object):
         # when a Scope is closed, the previous one must be activated
         tracer = self.tracer()
         with tracer.start_active(operation_name='Fry') as parent:
-            with tracer.start_active(operation_name='Fry'):
+            with tracer.start_active(operation_name='Farnsworth'):
                 pass
 
             if self.check_scope_manager():
@@ -335,7 +335,7 @@ class APICompatibilityCheckMixin(object):
         parent = tracer.start_active(operation_name='Fry',
                                      finish_on_close=False)
         with mock.patch.object(parent.span(), 'finish') as finish:
-            with tracer.start_active(operation_name='Fry'):
+            with tracer.start_active(operation_name='Farnsworth'):
                 pass
             parent.close()
 
@@ -348,7 +348,7 @@ class APICompatibilityCheckMixin(object):
         # only the active `Scope` can be closed
         tracer = self.tracer()
         parent = tracer.start_active(operation_name='Fry')
-        child = tracer.start_active(operation_name='Fry')
+        child = tracer.start_active(operation_name='Farnsworth')
         parent.close()
 
         if self.check_scope_manager():

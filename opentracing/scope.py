@@ -22,9 +22,8 @@ from __future__ import absolute_import
 
 
 class Scope(object):
-    """
-    A `Scope` formalizes the activation and deactivation of a `Span`, usually
-    from a CPU standpoint. Many times a `Span` will be extant (in that
+    """A `Scope` formalizes the activation and deactivation of a `Span`,
+    usually from a CPU standpoint. Many times a `Span` will be extant (in that
     `Span#finish()` has not been called) despite being in a non-runnable state
     from a CPU/scheduler standpoint. For instance, a `Span` representing the
     client side of an RPC will be unfinished but blocked on IO while the RPC is
@@ -32,9 +31,9 @@ class Scope(object):
     and on the path.
     """
     def __init__(self, manager, span, finish_on_close=True):
-        """
-        Initialize a `Scope` for the given `Span` object
+        """Initialize a `Scope` for the given `Span` object
 
+        :param manager: the `ScopeManager` that created this `Scope`
         :param span: the `Span` used for this `Scope`
         :param finish_on_close: whether span should automatically be
             finished when `Scope#close()` is called
@@ -43,14 +42,11 @@ class Scope(object):
         self._span = span
 
     def span(self):
-        """
-        Return the `Span` that's been scoped by this `Scope`.
-        """
+        """Return the `Span` that's been scoped by this `Scope`."""
         return self._span
 
     def close(self):
-        """
-        Mark the end of the active period for the current thread and `Scope`,
+        """Mark the end of the active period for the current thread and `Scope`,
         updating the `ScopeManager#active()` in the process.
 
         NOTE: Calling `close()` more than once on a single `Scope` instance
@@ -59,14 +55,11 @@ class Scope(object):
         pass
 
     def __enter__(self):
-        """
-        Allow `Scope` to be used inside a Python Context Manager.
-        """
+        """Allow `Scope` to be used inside a Python Context Manager."""
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        """
-        Call `close()` when the execution is outside the Python
+        """Call `close()` when the execution is outside the Python
         Context Manager.
         """
         self.close()

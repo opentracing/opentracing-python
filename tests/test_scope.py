@@ -32,7 +32,6 @@ def test_scope_wrapper():
     # ensure `Scope` wraps the `Span` argument
     span = Span(tracer=Tracer(), context=SpanContext())
     scope = Scope(ScopeManager, span, finish_on_close=False)
-    assert scope._span == span
     assert scope.span() == span
 
 
@@ -45,10 +44,3 @@ def test_scope_context_manager():
         with scope:
             pass
         assert close.call_count == 1
-
-
-def test_scope_close():
-    # ensure `Scope` can be closed
-    span = Span(tracer=Tracer(), context=SpanContext())
-    scope = Scope(ScopeManager(), span)
-    scope.close()

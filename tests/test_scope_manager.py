@@ -26,8 +26,7 @@ from opentracing.span import Span, SpanContext
 
 
 def test_scope_manager():
-    # ensure the activation returns the noop `Scope`
-    # that is always active
+    # ensure the activation returns the noop `Scope` that is always active
     scope_manager = ScopeManager()
     span = Span(tracer=Tracer(), context=SpanContext())
     scope = scope_manager.activate(span)
