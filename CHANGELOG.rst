@@ -3,10 +3,13 @@
 History
 =======
 
-1.2.3 (unreleased)
+1.3.0 (2018-01-14)
 ------------------
 
 - Added sphinx-generated documentation.
+- Remove 'futures' from install_requires (#62)
+- Add a harness check for unicode keys and vals (#40)
+- Have the harness try all tag value types (#39)
 
 
 1.2.2 (2016-10-03)
