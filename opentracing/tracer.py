@@ -25,8 +25,8 @@ from collections import namedtuple
 from .span import Span
 from .span import SpanContext
 from .scope import Scope
-from .propagation import Format, UnsupportedFormatException
 from .scope_manager import ScopeManager
+from .propagation import Format, UnsupportedFormatException
 
 
 class Tracer(object):
@@ -50,30 +50,30 @@ class Tracer(object):
         """ScopeManager accessor"""
         return self._scope_manager
 
-    def start_active(self,
+    def start_active_span(self,
                      operation_name=None,
                      child_of=None,
                      references=None,
                      tags=None,
                      start_time=None,
-                     ignore_active_scope=False,
-                     finish_on_close=True):
+                     ignore_active_span=False,
+                     finish_on_close=False):
         """Returns a newly started and activated `Scope`.
         Returned `Scope` supports with-statement contexts. For example:
 
-            with tracer.start_active('...') as scope:
-                scope.span().set_tag('http.method', 'GET')
+            with tracer.start_active_span('...') as scope:
+                scope.span.set_tag('http.method', 'GET')
                 do_some_work()
-            # Span is finished automatically outside the `Scope` `with`.
+            # Span is *not* finished automatically outside the `Scope` `with`.
 
-        It's also possible to not finish the `Span` when the `Scope` context
+        It's also possible to finish the `Span` when the `Scope` context
         expires:
 
-            with tracer.start_active('...', finish_on_close=False) as scope:
-                scope.span().set_tag('http.method', 'GET')
+            with tracer.start_active_span('...', finish_on_close=True) as scope:
+                scope.span.set_tag('http.method', 'GET')
                 do_some_work()
-            # Span does not finish automatically when the Scope is closed as
-            # `finish_on_close` is `False`
+            # Span finishes automatically when the Scope is closed as
+            # `finish_on_close` is `True`
 
         :param operation_name: name of the operation represented by the new
             span from the perspective of the current service.
@@ -88,7 +88,7 @@ class Tracer(object):
             to avoid extra data copying.
         :param start_time: an explicit Span start time as a unix timestamp per
             time.time().
-        :param ignore_active_scope: an explicit flag that ignores the current
+        :param ignore_active_span: an explicit flag that ignores the current
             active `Scope` and creates a root `Span`.
         :param finish_on_close: whether span should automatically be finished
             when `Scope#close()` is called.
@@ -97,31 +97,31 @@ class Tracer(object):
         """
         return self._noop_scope
 
-    def start_manual(self,
-                     operation_name=None,
-                     child_of=None,
-                     references=None,
-                     tags=None,
-                     start_time=None,
-                     ignore_active_scope=False):
+    def start_span(self,
+                   operation_name=None,
+                   child_of=None,
+                   references=None,
+                   tags=None,
+                   start_time=None,
+                   ignore_active_span=False):
         """Starts and returns a new Span representing a unit of work.
 
 
         Starting a root Span (a Span with no causal references)::
 
-            tracer.start_manual('...')
+            tracer.start_span('...')
 
 
         Starting a child Span (see also start_child_span())::
 
-            tracer.start_manual(
+            tracer.start_span(
                 '...',
                 child_of=parent_span)
 
 
         Starting a child Span in a more verbose way::
 
-            tracer.start_manual(
+            tracer.start_span(
                 '...',
                 references=[opentracing.child_of(parent_span)])
 
@@ -139,20 +139,11 @@ class Tracer(object):
             to avoid extra data copying.
         :param start_time: an explicit Span start time as a unix timestamp per
             time.time()
-        :param ignore_active_scope: an explicit flag that ignores the current
+        :param ignore_active_span: an explicit flag that ignores the current
             active `Scope` and creates a root `Span`.
 
         :return: Returns an already-started Span instance.
         """
-        return self._noop_span
-
-    def start_span(self,
-                   operation_name=None,
-                   child_of=None,
-                   references=None,
-                   tags=None,
-                   start_time=None):
-        """Deprecated: use `start_manual()` or `start_active()` instead."""
         return self._noop_span
 
     def inject(self, span_context, format, carrier):
@@ -218,7 +209,7 @@ class ReferenceType(object):
 class Reference(namedtuple('Reference', ['type', 'referenced_context'])):
     """A Reference pairs a reference type with a referenced SpanContext.
 
-    References are used by Tracer.start_manual() to describe the relationships
+    References are used by Tracer.start_span() to describe the relationships
     between Spans.
 
     Tracer implementations must ignore references where referenced_context is
@@ -227,7 +218,7 @@ class Reference(namedtuple('Reference', ['type', 'referenced_context'])):
     None::
 
         parent_ref = tracer.extract(opentracing.HTTP_HEADERS, request.headers)
-        span = tracer.start_manual(
+        span = tracer.start_span(
             'operation', references=child_of(parent_ref)
         )
 
@@ -243,7 +234,7 @@ def child_of(referenced_context=None):
         If None is passed, this reference must be ignored by the tracer.
 
     :rtype: Reference
-    :return: A Reference suitable for Tracer.start_manual(..., references=...)
+    :return: A Reference suitable for Tracer.start_span(..., references=...)
     """
     return Reference(
         type=ReferenceType.CHILD_OF,
@@ -257,7 +248,7 @@ def follows_from(referenced_context=None):
         If None is passed, this reference must be ignored by the tracer.
 
     :rtype: Reference
-    :return: A Reference suitable for Tracer.start_manual(..., references=...)
+    :return: A Reference suitable for Tracer.start_span(..., references=...)
     """
     return Reference(
         type=ReferenceType.FOLLOWS_FROM,
@@ -269,7 +260,7 @@ def start_child_span(parent_span, operation_name, tags=None, start_time=None):
 
     Equivalent to calling
 
-        parent_span.tracer().start_manual(
+        parent_span.tracer().start_span(
             operation_name,
             references=opentracing.child_of(parent_span.context),
             tags=tags,
@@ -286,7 +277,7 @@ def start_child_span(parent_span, operation_name, tags=None, start_time=None):
 
     :return: Returns an already-started Span instance.
     """
-    return parent_span.tracer.start_manual(
+    return parent_span.tracer.start_span(
         operation_name=operation_name,
         child_of=parent_span,
         tags=tags,
