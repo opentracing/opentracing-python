@@ -73,7 +73,8 @@ class APICompatibilityCheckMixin(object):
         # ensure the `ScopeManager` provides the right parenting
         tracer = self.tracer()
         with tracer.start_active_span(operation_name='Fry') as parent:
-            with tracer.start_active_span(operation_name='Farnsworth') as child:
+            with tracer.start_active_span(
+                    operation_name='Farnsworth') as child:
                 if self.check_scope_manager():
                     assert self.is_parent(parent.span, child.span)
 
@@ -83,7 +84,7 @@ class APICompatibilityCheckMixin(object):
         tracer = self.tracer()
         with tracer.start_active_span(operation_name='Fry') as parent:
             with tracer.start_active_span(operation_name='Farnsworth',
-                                     ignore_active_span=True) as child:
+                                          ignore_active_span=True) as child:
                 if self.check_scope_manager():
                     assert not self.is_parent(parent.span, child.span)
 
@@ -101,7 +102,7 @@ class APICompatibilityCheckMixin(object):
         # a `Span` is not finished when the flag is set
         tracer = self.tracer()
         scope = tracer.start_active_span(operation_name='Fry',
-                                    finish_on_close=False)
+                                         finish_on_close=False)
         with mock.patch.object(scope.span, 'finish') as finish:
             scope.close()
 
@@ -118,7 +119,7 @@ class APICompatibilityCheckMixin(object):
         span = tracer.start_span(operation_name='Fry')
         span.finish()
         with tracer.start_span(operation_name='Fry',
-                                 tags={'birthday': 'August 14 1974'}) as span:
+                               tags={'birthday': 'August 14 1974'}) as span:
             span.log_event('birthplace',
                            payload={'hospital': 'Brooklyn Pre-Med Hospital',
                                     'city': 'Old New York'})
@@ -137,7 +138,7 @@ class APICompatibilityCheckMixin(object):
         tracer = self.tracer()
         with tracer.start_active_span(operation_name='Fry') as parent:
             with tracer.start_span(operation_name='Farnsworth',
-                                     ignore_active_span=True) as child:
+                                   ignore_active_span=True) as child:
                 if self.check_scope_manager():
                     assert not self.is_parent(parent.span, child)
 
@@ -322,7 +323,7 @@ class APICompatibilityCheckMixin(object):
         # finish_on_close must be correctly handled
         tracer = self.tracer()
         parent = tracer.start_active_span(operation_name='Fry',
-                                     finish_on_close=False)
+                                          finish_on_close=False)
         with mock.patch.object(parent.span, 'finish') as finish:
             with tracer.start_active_span(operation_name='Farnsworth'):
                 pass

@@ -51,13 +51,13 @@ class Tracer(object):
         return self._scope_manager
 
     def start_active_span(self,
-                     operation_name=None,
-                     child_of=None,
-                     references=None,
-                     tags=None,
-                     start_time=None,
-                     ignore_active_span=False,
-                     finish_on_close=False):
+                          operation_name=None,
+                          child_of=None,
+                          references=None,
+                          tags=None,
+                          start_time=None,
+                          ignore_active_span=False,
+                          finish_on_close=False):
         """Returns a newly started and activated `Scope`.
         Returned `Scope` supports with-statement contexts. For example:
 
@@ -69,7 +69,8 @@ class Tracer(object):
         It's also possible to finish the `Span` when the `Scope` context
         expires:
 
-            with tracer.start_active_span('...', finish_on_close=True) as scope:
+            with tracer.start_active_span('...',
+                                          finish_on_close=True) as scope:
                 scope.span.set_tag('http.method', 'GET')
                 do_some_work()
             # Span finishes automatically when the Scope is closed as
