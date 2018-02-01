@@ -39,8 +39,8 @@ class Tracer(object):
 
     _supported_formats = [Format.TEXT_MAP, Format.BINARY, Format.HTTP_HEADERS]
 
-    def __init__(self):
-        self._scope_manager = ScopeManager()
+    def __init__(self, scope_manager=ScopeManager()):
+        self._scope_manager = scope_manager
         self._noop_span_context = SpanContext()
         self._noop_span = Span(tracer=self, context=self._noop_span_context)
         self._noop_scope = Scope(self._scope_manager, self._noop_span, False)
