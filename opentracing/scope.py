@@ -30,7 +30,7 @@ class Scope(object):
     still outstanding. A `Scope` defines when a given `Span` is scheduled
     and on the path.
     """
-    def __init__(self, manager, span, finish_on_close=True):
+    def __init__(self, manager, span, finish_on_close):
         """Initialize a `Scope` for the given `Span` object
 
         :param manager: the `ScopeManager` that created this `Scope`
@@ -40,14 +40,27 @@ class Scope(object):
         """
         self._manager = manager
         self._span = span
+        self._finish_on_close = finish_on_close
 
+    @property
     def span(self):
         """Return the `Span` that's been scoped by this `Scope`."""
         return self._span
 
+    @property
+    def manager(self):
+        """Return the `ScopeManager` that created this `Scope`."""
+        return self._manager
+
+    @property
+    def finish_on_close(self):
+        """Return whether the span should automatically be finished
+        when `Scope#close()` is called."""
+        return self._finish_on_close
+
     def close(self):
         """Mark the end of the active period for the current thread and `Scope`,
-        updating the `ScopeManager#active()` in the process.
+        updating the `ScopeManager#active` in the process.
 
         NOTE: Calling `close()` more than once on a single `Scope` instance
         leads to undefined behavior.

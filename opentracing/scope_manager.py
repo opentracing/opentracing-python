@@ -27,16 +27,16 @@ from .scope import Scope
 class ScopeManager(object):
     """The `ScopeManager` interface abstracts both the activation of `Span`
     instances (via `ScopeManager#activate(Span)`) and access to an active
-    `Span` / `Scope` (via `ScopeManager#active()`).
+    `Span` / `Scope` (via `ScopeManager#active`).
     """
     def __init__(self):
         # TODO: `tracer` should not be None, but we don't have a reference;
         # should we move the NOOP SpanContext, Span, Scope to somewhere
         # else so that they're globally reachable?
         self._noop_span = Span(tracer=None, context=SpanContext())
-        self._noop_scope = Scope(self, self._noop_span)
+        self._noop_scope = Scope(self, self._noop_span, False)
 
-    def activate(self, span, finish_on_close=True):
+    def activate(self, span, finish_on_close):
         """Make a `Span` instance active.
 
         :param span: the `Span` that should become active
@@ -44,17 +44,17 @@ class ScopeManager(object):
         finished when `Scope#close()` is called
         :return: a `Scope` instance to control the end of the active period for
         the `Span`. It is a programming error to neglect to call
-        `Scope#close()` on the returned instance. By default, `Span` will
-        automatically be finished when `Scope#close()` is called.
+        `Scope#close()` on the returned instance.
         """
         return self._noop_scope
 
+    @property
     def active(self):
         """Return the currently active `Scope` which can be used to access the
-        currently active `Scope#span()`.
+        currently active `Scope#span`.
 
         If there is a non-null `Scope`, its wrapped `Span` becomes an implicit
-        parent of any newly-created `Span` at `Tracer#start_active()`
+        parent of any newly-created `Span` at `Tracer#start_active_span()`
         time.
 
         :return: the `Scope` that is active, or `None` if not available.
