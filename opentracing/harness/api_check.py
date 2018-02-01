@@ -95,18 +95,18 @@ class APICompatibilityCheckMixin(object):
         with mock.patch.object(scope.span, 'finish') as finish:
             scope.close()
 
-        if self.check_scope_manager():
-            assert finish.call_count == 1
+        assert finish.call_count == 0
 
     def test_start_active_span_not_finish_on_close(self):
         # a `Span` is not finished when the flag is set
         tracer = self.tracer()
         scope = tracer.start_active_span(operation_name='Fry',
-                                         finish_on_close=False)
+                                         finish_on_close=True)
         with mock.patch.object(scope.span, 'finish') as finish:
             scope.close()
 
-        assert finish.call_count == 0
+        if self.check_scope_manager():
+            assert finish.call_count == 1
 
     def test_scope_as_context_manager(self):
         tracer = self.tracer()

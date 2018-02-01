@@ -67,9 +67,6 @@ class VerifyAPICompatibilityCheck(unittest.TestCase):
             api_check.test_start_active_span_parent()
 
         with self.assertRaises(AssertionError):
-            api_check.test_start_active_span_finish_on_close()
-
-        with self.assertRaises(AssertionError):
             api_check.test_start_span_propagation()
 
         with self.assertRaises(AssertionError):
@@ -92,3 +89,6 @@ class VerifyAPICompatibilityCheck(unittest.TestCase):
 
         with self.assertRaises(AssertionError):
             api_check.test_tracer_scope_manager_activate()
+
+        with self.assertRaises(AssertionError):
+            api_check.test_start_active_span_not_finish_on_close()
