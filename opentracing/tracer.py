@@ -43,7 +43,7 @@ class Tracer(object):
         self._scope_manager = scope_manager
         self._noop_span_context = SpanContext()
         self._noop_span = Span(tracer=self, context=self._noop_span_context)
-        self._noop_scope = Scope(self._scope_manager, self._noop_span, False)
+        self._noop_scope = Scope(self._scope_manager, self._noop_span)
 
     @property
     def scope_manager(self):

@@ -34,7 +34,7 @@ class ScopeManager(object):
         # should we move the NOOP SpanContext, Span, Scope to somewhere
         # else so that they're globally reachable?
         self._noop_span = Span(tracer=None, context=SpanContext())
-        self._noop_scope = Scope(self, self._noop_span, False)
+        self._noop_scope = Scope(self, self._noop_span)
 
     def activate(self, span, finish_on_close):
         """Make a `Span` instance active.

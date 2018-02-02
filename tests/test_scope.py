@@ -31,7 +31,7 @@ from opentracing.span import Span, SpanContext
 def test_scope_wrapper():
     # ensure `Scope` wraps the `Span` argument
     span = Span(tracer=Tracer(), context=SpanContext())
-    scope = Scope(ScopeManager, span, False)
+    scope = Scope(ScopeManager, span)
     assert scope.span == span
 
 
@@ -39,7 +39,7 @@ def test_scope_context_manager():
     # ensure `Scope` can be used in a Context Manager that
     # calls the `close()` method
     span = Span(tracer=Tracer(), context=SpanContext())
-    scope = Scope(ScopeManager(), span, True)
+    scope = Scope(ScopeManager(), span)
     with mock.patch.object(scope, 'close') as close:
         with scope:
             pass
