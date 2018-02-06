@@ -63,7 +63,7 @@ class APICompatibilityCheckMixin(object):
     def test_start_active_span(self):
         # the first usage returns a `Scope` that wraps a root `Span`
         tracer = self.tracer()
-        scope = tracer.start_active_span(operation_name='Fry')
+        scope = tracer.start_active_span('Fry', False)
 
         assert scope.span is not None
         if self.check_scope_manager():
@@ -72,9 +72,8 @@ class APICompatibilityCheckMixin(object):
     def test_start_active_span_parent(self):
         # ensure the `ScopeManager` provides the right parenting
         tracer = self.tracer()
-        with tracer.start_active_span(operation_name='Fry') as parent:
-            with tracer.start_active_span(
-                    operation_name='Farnsworth') as child:
+        with tracer.start_active_span('Fry', False) as parent:
+            with tracer.start_active_span('Farnsworth', False) as child:
                 if self.check_scope_manager():
                     assert self.is_parent(parent.span, child.span)
 
@@ -82,8 +81,8 @@ class APICompatibilityCheckMixin(object):
         # ensure the `ScopeManager` ignores the active `Scope`
         # if the flag is set
         tracer = self.tracer()
-        with tracer.start_active_span(operation_name='Fry') as parent:
-            with tracer.start_active_span(operation_name='Farnsworth',
+        with tracer.start_active_span('Fry', False) as parent:
+            with tracer.start_active_span('Farnsworth', False,
                                           ignore_active_span=True) as child:
                 if self.check_scope_manager():
                     assert not self.is_parent(parent.span, child.span)
@@ -91,7 +90,7 @@ class APICompatibilityCheckMixin(object):
     def test_start_active_span_finish_on_close(self):
         # ensure a `Span` is finished when the `Scope` close
         tracer = self.tracer()
-        scope = tracer.start_active_span(operation_name='Fry')
+        scope = tracer.start_active_span('Fry', False)
         with mock.patch.object(scope.span, 'finish') as finish:
             scope.close()
 
@@ -100,8 +99,7 @@ class APICompatibilityCheckMixin(object):
     def test_start_active_span_not_finish_on_close(self):
         # a `Span` is not finished when the flag is set
         tracer = self.tracer()
-        scope = tracer.start_active_span(operation_name='Fry',
-                                         finish_on_close=True)
+        scope = tracer.start_active_span('Fry', True)
         with mock.patch.object(scope.span, 'finish') as finish:
             scope.close()
 
@@ -111,7 +109,7 @@ class APICompatibilityCheckMixin(object):
     def test_scope_as_context_manager(self):
         tracer = self.tracer()
 
-        with tracer.start_active_span(operation_name='antiquing') as scope:
+        with tracer.start_active_span('antiquing', False) as scope:
             assert scope.span is not None
 
     def test_start_span(self):
@@ -127,7 +125,7 @@ class APICompatibilityCheckMixin(object):
     def test_start_span_propagation(self):
         # `start_span` must inherit the current active `Scope` span
         tracer = self.tracer()
-        with tracer.start_active_span(operation_name='Fry') as parent:
+        with tracer.start_active_span('Fry', False) as parent:
             with tracer.start_span(operation_name='Farnsworth') as child:
                 if self.check_scope_manager():
                     assert self.is_parent(parent.span, child)
@@ -136,7 +134,7 @@ class APICompatibilityCheckMixin(object):
         # `start_span` doesn't inherit the current active `Scope` span
         # if the flag is set
         tracer = self.tracer()
-        with tracer.start_active_span(operation_name='Fry') as parent:
+        with tracer.start_active_span('Fry', False) as parent:
             with tracer.start_span(operation_name='Farnsworth',
                                    ignore_active_span=True) as child:
                 if self.check_scope_manager():
@@ -299,7 +297,7 @@ class APICompatibilityCheckMixin(object):
     def test_tracer_start_active_span_scope(self):
         # the Tracer ScopeManager should store the active Scope
         tracer = self.tracer()
-        scope = tracer.start_active_span(operation_name='Fry')
+        scope = tracer.start_active_span('Fry', False)
 
         if self.check_scope_manager():
             assert tracer.scope_manager.active == scope
@@ -309,8 +307,8 @@ class APICompatibilityCheckMixin(object):
     def test_tracer_start_active_span_nesting(self):
         # when a Scope is closed, the previous one must be activated
         tracer = self.tracer()
-        with tracer.start_active_span(operation_name='Fry') as parent:
-            with tracer.start_active_span(operation_name='Farnsworth'):
+        with tracer.start_active_span('Fry', False) as parent:
+            with tracer.start_active_span('Farnsworth', False):
                 pass
 
             if self.check_scope_manager():
@@ -322,10 +320,9 @@ class APICompatibilityCheckMixin(object):
     def test_tracer_start_active_span_nesting_finish_on_close(self):
         # finish_on_close must be correctly handled
         tracer = self.tracer()
-        parent = tracer.start_active_span(operation_name='Fry',
-                                          finish_on_close=False)
+        parent = tracer.start_active_span('Fry', False)
         with mock.patch.object(parent.span, 'finish') as finish:
-            with tracer.start_active_span(operation_name='Farnsworth'):
+            with tracer.start_active_span('Farnsworth', False):
                 pass
             parent.close()
 
@@ -337,8 +334,8 @@ class APICompatibilityCheckMixin(object):
     def test_tracer_start_active_span_wrong_close_order(self):
         # only the active `Scope` can be closed
         tracer = self.tracer()
-        parent = tracer.start_active_span(operation_name='Fry')
-        child = tracer.start_active_span(operation_name='Farnsworth')
+        parent = tracer.start_active_span('Fry', False)
+        child = tracer.start_active_span('Farnsworth', False)
         parent.close()
 
         if self.check_scope_manager():
