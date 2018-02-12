@@ -60,12 +60,13 @@ class Tracer(object):
                           start_time=None,
                           ignore_active_span=False):
         """Returns a newly started and activated `Scope`.
-        Returned `Scope` supports with-statement contexts. For example:
 
-            with tracer.start_active_span('...') as scope:
+        The returned `Scope` supports with-statement contexts. For example:
+
+            with tracer.start_active_span('...', False) as scope:
                 scope.span.set_tag('http.method', 'GET')
                 do_some_work()
-            # Span is *not* finished automatically outside the `Scope` `with`.
+            # Span is not finished outside the `Scope` `with`.
 
         It's also possible to finish the `Span` when the `Scope` context
         expires:
@@ -73,11 +74,13 @@ class Tracer(object):
             with tracer.start_active_span('...', True) as scope:
                 scope.span.set_tag('http.method', 'GET')
                 do_some_work()
-            # Span finishes automatically when the Scope is closed as
+            # Span finishes when the Scope is closed as
             # `finish_on_close` is `True`
 
         :param operation_name: name of the operation represented by the new
             span from the perspective of the current service.
+        :param finish_on_close: whether span should automatically be finished
+            when `Scope#close()` is called.
         :param child_of: (optional) a Span or SpanContext instance representing
             the parent in a REFERENCE_CHILD_OF Reference. If specified, the
             `references` parameter must be omitted.
@@ -89,10 +92,8 @@ class Tracer(object):
             to avoid extra data copying.
         :param start_time: an explicit Span start time as a unix timestamp per
             time.time().
-        :param ignore_active_span: an explicit flag that ignores the current
-            active `Scope` and creates a root `Span`.
-        :param finish_on_close: whether span should automatically be finished
-            when `Scope#close()` is called.
+        :param ignore_active_span: (optional) an explicit flag that ignores
+            the current active `Scope` and creates a root `Span`.
 
          :return: a `Scope`, already registered via the `ScopeManager`.
         """

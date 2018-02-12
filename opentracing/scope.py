@@ -31,7 +31,7 @@ class Scope(object):
     and on the path.
     """
     def __init__(self, manager, span):
-        """Initialize a `Scope` for the given `Span` object
+        """Initializes a `Scope` for the given `Span` object.
 
         :param manager: the `ScopeManager` that created this `Scope`
         :param span: the `Span` used for this `Scope`
@@ -41,17 +41,17 @@ class Scope(object):
 
     @property
     def span(self):
-        """Return the `Span` that's been scoped by this `Scope`."""
+        """Returns the `Span` wrapped by this `Scope`."""
         return self._span
 
     @property
     def manager(self):
-        """Return the `ScopeManager` that created this `Scope`."""
+        """Returns the `ScopeManager` that created this `Scope`."""
         return self._manager
 
     def close(self):
-        """Mark the end of the active period for the current thread and `Scope`,
-        updating the `ScopeManager#active` in the process.
+        """Marks the end of the active period for this `Scope`,
+        updating `ScopeManager#active` in the process.
 
         NOTE: Calling `close()` more than once on a single `Scope` instance
         leads to undefined behavior.
@@ -59,11 +59,11 @@ class Scope(object):
         pass
 
     def __enter__(self):
-        """Allow `Scope` to be used inside a Python Context Manager."""
+        """Allows `Scope` to be used inside a Python Context Manager."""
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        """Call `close()` when the execution is outside the Python
+        """Calls `close()` when the execution is outside the Python
         Context Manager.
         """
         self.close()
