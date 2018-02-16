@@ -1,6 +1,4 @@
-# Copyright (c) 2016 The OpenTracing Authors.
-#
-# Copyright (c) 2015 Uber Technologies, Inc.
+# Copyright (c) 2017 The OpenTracing Authors.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -19,23 +17,18 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
-from __future__ import absolute_import
-from .span import Span  # noqa
-from .span import SpanContext  # noqa
-from .scope import Scope  # noqa
-from .scope_manager import ScopeManager  # noqa
-from .tracer import child_of  # noqa
-from .tracer import follows_from  # noqa
-from .tracer import Reference  # noqa
-from .tracer import ReferenceType  # noqa
-from .tracer import Tracer  # noqa
-from .tracer import start_child_span  # noqa
-from .propagation import Format  # noqa
-from .propagation import InvalidCarrierException  # noqa
-from .propagation import SpanContextCorruptedException  # noqa
-from .propagation import UnsupportedFormatException  # noqa
 
-# Global variable that should be initialized to an instance of real tracer.
-# Note: it should be accessed via 'opentracing.tracer', not via
-# 'from opentracing import tracer', the latter seems to take a copy.
-tracer = Tracer()
+from __future__ import absolute_import
+
+from opentracing.scope_manager import ScopeManager
+from opentracing.tracer import Tracer
+from opentracing.span import Span, SpanContext
+
+
+def test_scope_manager():
+    # ensure the activation returns the noop `Scope` that is always active
+    scope_manager = ScopeManager()
+    span = Span(tracer=Tracer(), context=SpanContext())
+    scope = scope_manager.activate(span, False)
+    assert scope == scope_manager._noop_scope
+    assert scope == scope_manager.active

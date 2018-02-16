@@ -9,6 +9,12 @@ Classes
 .. autoclass:: opentracing.SpanContext
    :members:
 
+.. autoclass:: opentracing.Scope
+   :members:
+
+.. autoclass:: opentracing.ScopeManager
+   :members:
+
 .. autoclass:: opentracing.Tracer
    :members:
 

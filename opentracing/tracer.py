@@ -24,6 +24,8 @@ from __future__ import absolute_import
 from collections import namedtuple
 from .span import Span
 from .span import SpanContext
+from .scope import Scope
+from .scope_manager import ScopeManager
 from .propagation import Format, UnsupportedFormatException
 
 
@@ -37,16 +39,73 @@ class Tracer(object):
 
     _supported_formats = [Format.TEXT_MAP, Format.BINARY, Format.HTTP_HEADERS]
 
-    def __init__(self):
+    def __init__(self, scope_manager=None):
+        self._scope_manager = ScopeManager() if scope_manager is None \
+                else scope_manager
         self._noop_span_context = SpanContext()
         self._noop_span = Span(tracer=self, context=self._noop_span_context)
+        self._noop_scope = Scope(self._scope_manager, self._noop_span)
+
+    @property
+    def scope_manager(self):
+        """ScopeManager accessor"""
+        return self._scope_manager
+
+    def start_active_span(self,
+                          operation_name,
+                          finish_on_close,
+                          child_of=None,
+                          references=None,
+                          tags=None,
+                          start_time=None,
+                          ignore_active_span=False):
+        """Returns a newly started and activated `Scope`.
+
+        The returned `Scope` supports with-statement contexts. For example:
+
+            with tracer.start_active_span('...', False) as scope:
+                scope.span.set_tag('http.method', 'GET')
+                do_some_work()
+            # Span is not finished outside the `Scope` `with`.
+
+        It's also possible to finish the `Span` when the `Scope` context
+        expires:
+
+            with tracer.start_active_span('...', True) as scope:
+                scope.span.set_tag('http.method', 'GET')
+                do_some_work()
+            # Span finishes when the Scope is closed as
+            # `finish_on_close` is `True`
+
+        :param operation_name: name of the operation represented by the new
+            span from the perspective of the current service.
+        :param finish_on_close: whether span should automatically be finished
+            when `Scope#close()` is called.
+        :param child_of: (optional) a Span or SpanContext instance representing
+            the parent in a REFERENCE_CHILD_OF Reference. If specified, the
+            `references` parameter must be omitted.
+        :param references: (optional) a list of Reference objects that identify
+            one or more parent SpanContexts. (See the Reference documentation
+            for detail).
+        :param tags: an optional dictionary of Span Tags. The caller gives up
+            ownership of that dictionary, because the Tracer may use it as-is
+            to avoid extra data copying.
+        :param start_time: an explicit Span start time as a unix timestamp per
+            time.time().
+        :param ignore_active_span: (optional) an explicit flag that ignores
+            the current active `Scope` and creates a root `Span`.
+
+         :return: a `Scope`, already registered via the `ScopeManager`.
+        """
+        return self._noop_scope
 
     def start_span(self,
                    operation_name=None,
                    child_of=None,
                    references=None,
                    tags=None,
-                   start_time=None):
+                   start_time=None,
+                   ignore_active_span=False):
         """Starts and returns a new Span representing a unit of work.
 
 
@@ -82,6 +141,8 @@ class Tracer(object):
             to avoid extra data copying.
         :param start_time: an explicit Span start time as a unix timestamp per
             time.time()
+        :param ignore_active_span: an explicit flag that ignores the current
+            active `Scope` and creates a root `Span`.
 
         :return: Returns an already-started Span instance.
         """

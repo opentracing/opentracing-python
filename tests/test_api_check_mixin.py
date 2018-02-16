@@ -33,6 +33,10 @@ class VerifyAPICompatibilityCheck(unittest.TestCase):
         api_check = APICompatibilityCheckMixin()
         assert api_check.check_baggage_values() is True
 
+    def test_default_scope_manager_check_mode(self):
+        api_check = APICompatibilityCheckMixin()
+        assert api_check.check_scope_manager() is True
+
     def test_baggage_check_works(self):
         api_check = APICompatibilityCheckMixin()
         setattr(api_check, 'tracer', lambda: Tracer())
@@ -45,3 +49,46 @@ class VerifyAPICompatibilityCheck(unittest.TestCase):
         # second check that assert on empty baggage will fail too
         with self.assertRaises(AssertionError):
             api_check.test_context_baggage()
+
+    def test_scope_manager_check_works(self):
+        api_check = APICompatibilityCheckMixin()
+        setattr(api_check, 'tracer', lambda: Tracer())
+
+        # these tests are expected to succeed
+        api_check.test_start_active_span_ignore_active_span()
+        api_check.test_start_span_propagation_ignore_active_span()
+
+        # no-op tracer doesn't have a ScopeManager implementation
+        # so these tests are expected to work, but asserts to fail
+        with self.assertRaises(AssertionError):
+            api_check.test_start_active_span()
+
+        with self.assertRaises(AssertionError):
+            api_check.test_start_active_span_parent()
+
+        with self.assertRaises(AssertionError):
+            api_check.test_start_span_propagation()
+
+        with self.assertRaises(AssertionError):
+            api_check.test_tracer_start_active_span_scope()
+
+        with self.assertRaises(AssertionError):
+            api_check.test_tracer_start_active_span_nesting()
+
+        with self.assertRaises(AssertionError):
+            api_check.test_tracer_start_active_span_nesting_finish_on_close()
+
+        with self.assertRaises(AssertionError):
+            api_check.test_tracer_start_active_span_wrong_close_order()
+
+        with self.assertRaises(AssertionError):
+            api_check.test_tracer_start_span_scope()
+
+        with self.assertRaises(AssertionError):
+            api_check.test_tracer_scope_manager_active()
+
+        with self.assertRaises(AssertionError):
+            api_check.test_tracer_scope_manager_activate()
+
+        with self.assertRaises(AssertionError):
+            api_check.test_start_active_span_not_finish_on_close()
