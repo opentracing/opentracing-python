@@ -53,34 +53,33 @@ class Tracer(object):
 
     def start_active_span(self,
                           operation_name,
-                          finish_on_close,
                           child_of=None,
                           references=None,
                           tags=None,
                           start_time=None,
-                          ignore_active_span=False):
+                          ignore_active_span=False,
+                          finish_on_close=True):
         """Returns a newly started and activated `Scope`.
 
         The returned `Scope` supports with-statement contexts. For example:
 
-            with tracer.start_active_span('...', False) as scope:
+            with tracer.start_active_span('...') as scope:
                 scope.span.set_tag('http.method', 'GET')
                 do_some_work()
-            # Span is not finished outside the `Scope` `with`.
+            # Span is finished outside the `Scope` `with`.
 
-        It's also possible to finish the `Span` when the `Scope` context
+        It's also possible to not finish the `Span` when the `Scope` context
         expires:
 
-            with tracer.start_active_span('...', True) as scope:
+            with tracer.start_active_span('...',
+                                          finish_on_close=False) as scope:
                 scope.span.set_tag('http.method', 'GET')
                 do_some_work()
-            # Span finishes when the Scope is closed as
-            # `finish_on_close` is `True`
+            # Span does not finish when the Scope is closed as
+            # `finish_on_close` is `False`
 
         :param operation_name: name of the operation represented by the new
             span from the perspective of the current service.
-        :param finish_on_close: whether span should automatically be finished
-            when `Scope#close()` is called.
         :param child_of: (optional) a Span or SpanContext instance representing
             the parent in a REFERENCE_CHILD_OF Reference. If specified, the
             `references` parameter must be omitted.
@@ -94,6 +93,8 @@ class Tracer(object):
             time.time().
         :param ignore_active_span: (optional) an explicit flag that ignores
             the current active `Scope` and creates a root `Span`.
+        :param finish_on_close: whether span should automatically be finished
+            when `Scope#close()` is called.
 
          :return: a `Scope`, already registered via the `ScopeManager`.
         """
