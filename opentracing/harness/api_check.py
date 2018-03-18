@@ -60,6 +60,15 @@ class APICompatibilityCheckMixin(object):
         """
         return False
 
+    def test_active_span(self):
+        tracer = self.tracer()
+        span = tracer.start_span('Fry')
+
+        if self.check_scope_manager():
+            assert tracer.active_span is None
+            with tracer.scope_manager.activate(span, True):
+                assert tracer.active_span is span
+
     def test_start_active_span(self):
         # the first usage returns a `Scope` that wraps a root `Span`
         tracer = self.tracer()
