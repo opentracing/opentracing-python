@@ -187,3 +187,9 @@ Before new release, add a summary of changes since last version to CHANGELOG.rst
    :target: https://travis-ci.org/opentracing/opentracing-python
 .. |PyPI| image:: https://badge.fury.io/py/opentracing.svg
    :target: https://badge.fury.io/py/opentracing
+
+LICENSE
+^^^^^^^
+
+[MIT License](./LICENSE).
+
