@@ -166,6 +166,11 @@ Documentation
 
 The documentation is written to *docs/_build/html*.
 
+LICENSE
+^^^^^^^
+
+[MIT License](./LICENSE).
+
 Releases
 ^^^^^^^^
 
@@ -188,8 +193,4 @@ Before new release, add a summary of changes since last version to CHANGELOG.rst
 .. |PyPI| image:: https://badge.fury.io/py/opentracing.svg
    :target: https://badge.fury.io/py/opentracing
 
-LICENSE
-^^^^^^^
-
-[MIT License](./LICENSE).
 
