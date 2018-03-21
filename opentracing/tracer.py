@@ -224,3 +224,5 @@ def start_child_span(parent_span, operation_name, tags=None, start_time=None):
         tags=tags,
         start_time=start_time
     )
+
+__all__ = ['child_of', 'follows_from', 'Reference', 'ReferenceType', 'Tracer', 'start_child_span']
