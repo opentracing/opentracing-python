@@ -66,7 +66,8 @@ class Tracer(object):
             with tracer.start_active_span('...') as scope:
                 scope.span.set_tag('http.method', 'GET')
                 do_some_work()
-            # Span is finished outside the `Scope` `with`.
+            # Span.finish() is called as part of Scope deactivation through
+            # the with statement.
 
         It's also possible to not finish the `Span` when the `Scope` context
         expires:
@@ -75,8 +76,8 @@ class Tracer(object):
                                           finish_on_close=False) as scope:
                 scope.span.set_tag('http.method', 'GET')
                 do_some_work()
-            # Span does not finish when the Scope is closed as
-            # `finish_on_close` is `False`
+            # Span.finish() is not called as part of Scope deactivation as
+            # `finish_on_close` is `False`.
 
         :param operation_name: name of the operation represented by the new
             span from the perspective of the current service.
