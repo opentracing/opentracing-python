@@ -58,7 +58,8 @@ class VerifyAPICompatibilityCheck(unittest.TestCase):
         api_check.test_start_active_span_ignore_active_span()
         api_check.test_start_span_propagation_ignore_active_span()
 
-        # no-op tracer doesn't have a ScopeManager implementation
+        # no-op tracer has a no-op ScopeManager implementation,
+        # which means no *actual* propagation is done,
         # so these tests are expected to work, but asserts to fail
         with self.assertRaises(AssertionError):
             api_check.test_start_active_span()
