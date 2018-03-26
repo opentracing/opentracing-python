@@ -159,8 +159,8 @@ another task or thread, but not ``Scope``.
 The common case starts a ``Scope`` that's automatically registered for intra-process
 propagation via ``ScopeManager``.
 
-Note that ``start_active_span('...', True)`` finishes the span on ``Scope.close()``
-(``start_active_span('...', False)`` does not finish it, in contrast).
+Note that ``start_active_span('...')`` automatically finishes the span on ``Scope.close()``
+(``start_active_span('...', finish_on_close=False)`` does not finish it, in contrast).
 
 .. code-block:: python
 
