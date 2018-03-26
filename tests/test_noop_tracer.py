@@ -31,3 +31,8 @@ def test_tracer():
     child = tracer.start_span(operation_name='child',
                               references=child_of(span))
     assert span == child
+
+
+def test_tracer_active_span():
+    tracer = Tracer()
+    assert tracer.active_span is tracer.scope_manager.active.span

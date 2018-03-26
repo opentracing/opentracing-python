@@ -51,6 +51,17 @@ class Tracer(object):
         """ScopeManager accessor"""
         return self._scope_manager
 
+    @property
+    def active_span(self):
+        """Provides access to the the active Span. This is a shorthand for
+        Tracer.scope_manager.active.span, and None will be returned if
+        Scope.span is None.
+
+        :return: returns the active Span.
+        """
+        scope = self._scope_manager.active
+        return None if scope is None else scope.span
+
     def start_active_span(self,
                           operation_name,
                           finish_on_close,
