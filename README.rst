@@ -196,6 +196,23 @@ Each service/framework ought to provide a specific ``ScopeManager`` implementati
 that relies on their own request-local storage (thread-local storage, or coroutine-based storage
 for asynchronous frameworks, for example).
 
+Instrumentation Tests
+---------------------
+
+This project has a working design of interfaces for the OpenTracing API. There is a MockTracer to
+facilitate unit-testing of OpenTracing Python instrumentation.
+
+.. code-block:: python
+
+       from opentracing.mocktracer import MockTracer
+
+       tracer = MockTracer()
+       with tracer.start_active_span('someWork') as scope:
+           pass
+
+       spans = tracer.finished_spans()
+       someWorkSpan = spans[0]
+
 Development
 -----------
 
