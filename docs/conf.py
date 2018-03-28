@@ -2,7 +2,7 @@ import sphinx_rtd_theme
 
 
 project = 'opentracing-python'
-copyright = '(c) 2016-2017 The OpenTracing Authors'
+copyright = 'The OpenTracing Authors'
 author = 'The OpenTracing Authors'
 version = '1.2.3.dev0'
 release = '1.2'
