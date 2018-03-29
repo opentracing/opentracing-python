@@ -26,7 +26,7 @@ import opentracing
 class SpanContext(opentracing.SpanContext):
     """SpanContext satisfies the opentracing.SpanContext contract.
 
-    trace_id and span_id are uint64's, so their range is [0, 2^64).
+    trace_id and span_id are uint64's, so their range is [1, 2^64).
     """
 
     def __init__(

@@ -27,7 +27,6 @@ from opentracing import UnsupportedFormatException
 
 from .context import SpanContext
 from .span import MockSpan
-from .util import generate_id
 
 
 class MockTracer(Tracer):
@@ -41,10 +40,13 @@ class MockTracer(Tracer):
         """
 
         super(MockTracer, self).__init__()
-
         self._propagators = {}
         self._finished_spans = []
         self._spans_lock = Lock()
+
+        # Simple-as-possible (consecutive for repeatability) id generation.
+        self._next_id = 0
+        self._next_id_lock = Lock()
 
         self._register_required_propagators()
 
@@ -76,6 +78,11 @@ class MockTracer(Tracer):
         with self._spans_lock:
             self._finished_spans.append(span)
 
+    def _generate_id(self):
+        with self._next_id_lock:
+            self._next_id += 1
+            return self._next_id
+
     def start_span(self,
                    operation_name=None,
                    child_of=None,
@@ -97,13 +104,13 @@ class MockTracer(Tracer):
             parent_ctx = references[0].referenced_context
 
         # Assemble the child ctx
-        ctx = SpanContext(span_id=generate_id())
+        ctx = SpanContext(span_id=self._generate_id())
         if parent_ctx is not None:
             if parent_ctx._baggage is not None:
                 ctx._baggage = parent_ctx._baggage.copy()
             ctx.trace_id = parent_ctx.trace_id
         else:
-            ctx.trace_id = generate_id()
+            ctx.trace_id = self._generate_id()
 
         # Tie it all together
         return MockSpan(
