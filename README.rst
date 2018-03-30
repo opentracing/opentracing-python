@@ -99,10 +99,6 @@ Somewhere in your service that's about to make an outgoing call:
    from opentracing.propagation import Format
    from opentracing_instrumentation import request_context
 
-   from opentracing.ext import tags
-   from opentracing.propagation import Format
-   from opentracing_instrumentation import request_context
-
    # create and serialize a child span and use it as context manager
    with before_http_request(
        request=out_request,
@@ -209,6 +205,24 @@ Tests
    make bootstrap
    make test
 
+Instrumentation Tests
+---------------------
+
+This project has a working design of interfaces for the OpenTracing API. There is a MockTracer to
+facilitate unit-testing of OpenTracing Python instrumentation.
+
+.. code-block:: python
+
+       from opentracing.mocktracer import MockTracer
+
+       tracer = MockTracer()
+       with tracer.start_span('someWork') as span:
+           pass
+
+       spans = tracer.finished_spans()
+       someWorkSpan = spans[0]
+
+
 Documentation
 ^^^^^^^^^^^^^
 
@@ -220,6 +234,11 @@ Documentation
    make docs
 
 The documentation is written to *docs/_build/html*.
+
+LICENSE
+^^^^^^^
+
+[MIT License](./LICENSE).
 
 Releases
 ^^^^^^^^
@@ -242,3 +261,5 @@ Before new release, add a summary of changes since last version to CHANGELOG.rst
    :target: https://travis-ci.org/opentracing/opentracing-python
 .. |PyPI| image:: https://badge.fury.io/py/opentracing.svg
    :target: https://badge.fury.io/py/opentracing
+
+
