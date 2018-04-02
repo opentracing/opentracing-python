@@ -178,7 +178,6 @@ Documentation
    make bootstrap
    make docs
 
-The documentation is written to *docs/_build/html*.
 
 LICENSE
 ^^^^^^^
