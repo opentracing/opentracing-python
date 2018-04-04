@@ -12,6 +12,13 @@ Build and test.
 
 Depending on whether Python 2 or 3 is being used, the ``asyncio`` tests will be automatically disabled.
 
+Alternatively, due to the organization of the suite, it's possible to run directly the tests using `py.test`:
+
+.. code-block:: sh
+
+    py.test -s testbed/test_multiple_callbacks/test_threads.py
+
+
 Tested frameworks
 -----------------
 
@@ -56,3 +63,19 @@ List of patterns
 - `Multiple callbacks <test_multiple_callbacks>`_ - Multiple callbacks spawned at the same time.
 - `Nested callbacks <test_nested_callbacks>`_ - One callback at a time, defined ina pipeline fashion.
 - `Subtask Span propagation <test_subtask_span_propagation>`_ - ``Span`` propagation for subtasks/coroutines.
+
+Adding new patterns
+-------------------
+
+A new pattern is composed of a directory under *testbed* with the *test_* prefix, and containing the files for each platform, also with the *test_* prefix:
+
+.. code-block:: text
+
+testbed/
+ test_new_pattern/
+  test_threads.py
+  test_tornado.py
+  test_asyncio.py
+  test_gevent.py
+
+Supporting all the platforms is optional, and a warning will be displayed when doing `make testbed` in such case.

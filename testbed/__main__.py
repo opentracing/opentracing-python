@@ -1,8 +1,8 @@
 from importlib import import_module
+import logging
+import os
 import six
 import unittest
-
-import testbed
 
 
 enabled_platforms = [
@@ -13,9 +13,12 @@ enabled_platforms = [
 if six.PY3:
     enabled_platforms.append('asyncio')
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__package__)
+
 
 def import_test_module(test_name, platform):
-    full_path = 'testbed.%s.test_%s' % (test_name, platform)
+    full_path = '%s.%s.test_%s' % (__package__, test_name, platform)
     try:
         return import_module(full_path)
     except ImportError:
@@ -24,18 +27,24 @@ def import_test_module(test_name, platform):
     return None
 
 
-if __name__ == '__main__':
-    main_suite = unittest.TestSuite()
-    loader = unittest.TestLoader()
+def get_test_directories():
+    """Return all the directories starting with test_ under this package."""
+    return [directory for directory in os.listdir(os.path.dirname(__file__))
+            if directory.startswith('test_')]
 
-    for test_name in testbed.TEST_NAMES:
-        for platform in enabled_platforms:
 
-            test_module = import_test_module(test_name, platform)
-            if test_module is None:
-                continue
+main_suite = unittest.TestSuite()
+loader = unittest.TestLoader()
 
-            suite = loader.loadTestsFromModule(test_module)
-            main_suite.addTests(suite)
+for test_dir in get_test_directories():
+    for platform in enabled_platforms:
 
-    unittest.TextTestRunner(verbosity=3).run(main_suite)
+        test_module = import_test_module(test_dir, platform)
+        if test_module is None:
+            logger.warning('Could not load %s for %s' % (test_dir, platform))
+            continue
+
+        suite = loader.loadTestsFromModule(test_module)
+        main_suite.addTests(suite)
+
+unittest.TextTestRunner(verbosity=3).run(main_suite)
