@@ -12,6 +12,9 @@ class TestThreads(OpenTracingTestCase):
         self.tracer = MockTracer()
         self.executor = ThreadPoolExecutor(max_workers=3)
 
+    def tearDown(self):
+        self.executor.shutdown(False)
+
     def test_main(self):
         # Start a Span and let the callback-chain
         # finish it when the task is done
