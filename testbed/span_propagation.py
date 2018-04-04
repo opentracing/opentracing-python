@@ -9,6 +9,9 @@ if six.PY3:
     import asyncio
 
 
+#
+# asyncio section.
+#
 class AsyncioScopeManager(ScopeManager):
     def activate(self, span, finish_on_close):
         scope = AsyncioScope(self, span, finish_on_close)
@@ -45,7 +48,9 @@ class AsyncioScope(Scope):
         if self._finish_on_close:
             self.span.finish()
 
-
+#
+# gevent section.
+#
 class GeventScopeManager(ScopeManager):
     def __init__(self):
         self._locals = gevent.local.local()
@@ -76,7 +81,9 @@ class GeventScope(Scope):
         if self._finish_on_close:
             self.span.finish()
 
-
+#
+# tornado section.
+#
 class TornadoScopeManager(ScopeManager):
     def activate(self, span, finish_on_close):
         context = self._get_context()
