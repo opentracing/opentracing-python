@@ -79,3 +79,8 @@ testbed/
   test_gevent.py
 
 Supporting all the platforms is optional, and a warning will be displayed when doing `make testbed` in such case.
+
+Flake8 support
+--------------
+
+Currently `flake8` does not support the Python 3 `await`/`async` syntax, and does not offer a way to ignore such syntax.
