@@ -38,9 +38,9 @@ setup(
         ],
         'testbed': [
             'six>=1.10.0,<2.0',
-            'futures',
             'gevent==1.2',
             'tornado',
         ],
+        ':python_version == "2.7"': ['futures'],
     },
 )
