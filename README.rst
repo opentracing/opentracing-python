@@ -205,6 +205,11 @@ Tests
    make bootstrap
    make test
 
+Testbed suite
+^^^^^^^^^^^^^
+
+A testbed suite designed to test API changes and experimental features is included under the *testbed* directory. For more information, see the `Testbed README <testbed/README.md>`_.
+
 Instrumentation Tests
 ---------------------
 

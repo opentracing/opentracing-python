@@ -35,6 +35,12 @@ setup(
             'pytest-mock',
             'Sphinx',
             'sphinx_rtd_theme'
-        ]
+        ],
+        'testbed': [
+            'six>=1.10.0,<2.0',
+            'gevent==1.2',
+            'tornado',
+        ],
+        ':python_version == "2.7"': ['futures'],
     },
 )

@@ -6,7 +6,7 @@ pytest := PYTHONDONTWRITEBYTECODE=1 py.test --tb short -rxs \
 html_report := --cov-report=html
 test_args := --cov-report xml --cov-report term-missing
 
-.PHONY: clean-pyc clean-build docs clean
+.PHONY: clean-pyc clean-build docs clean testbed
 .DEFAULT_GOAL : help
 
 help:
@@ -17,6 +17,7 @@ help:
 	@echo "clean-test - remove test and coverage artifacts"
 	@echo "lint - check style with flake8"
 	@echo "test - run tests quickly with the default Python"
+	@echo "testbed - run testbed scenarios with the default Python"
 	@echo "coverage - check code coverage quickly with the default Python"
 	@echo "docs - generate Sphinx HTML documentation, including API docs"
 	@echo "release - package and upload a release"
@@ -29,6 +30,7 @@ check-virtual-env:
 bootstrap: check-virtual-env
 	pip install -r requirements.txt
 	pip install -r requirements-test.txt
+	pip install -r requirements-testbed.txt
 	python setup.py develop
 
 clean: clean-build clean-pyc clean-test
@@ -56,6 +58,9 @@ lint:
 
 test:
 	$(pytest) $(test_args)
+
+testbed:
+	python -m testbed
 
 jenkins:
 	pip install -r requirements.txt
