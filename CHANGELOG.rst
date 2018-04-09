@@ -3,7 +3,7 @@
 History
 =======
 
-2.0.0rc1 (2018-02-20)
+2.0.0rc2 (2018-04-09)
 ---------------------
 
 - Implement ScopeManager for in-process propagation.
