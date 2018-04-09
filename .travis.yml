@@ -7,5 +7,5 @@ install:
   - make bootstrap
 
 script:
-  - make test lint
+  - make test testbed lint
 
