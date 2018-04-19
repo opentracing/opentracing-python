@@ -221,3 +221,5 @@ class Span(object):
         if 'timestamp' in kwargs:
             timestamp = kwargs['timestamp']
         return self.log_kv(key_values, timestamp)
+
+__all__ = ['Span', 'SpanContext']
