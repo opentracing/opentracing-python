@@ -18,32 +18,17 @@ Alternatively, due to the organization of the suite, it's possible to run direct
 
 ## Tested frameworks
 
-Currently the examples cover `threading`, `tornado`, `gevent` and `asyncio` (which requires Python 3). The implementation of `ScopeManager` for each framework is a basic, simple one, and can be found in [span_propagation.py](span_propagation.py). See details below.
+Currently the examples cover `threading`, `tornado`, `gevent` and `asyncio` (which requires Python 3). Each example uses their respective `ScopeManager` instance from `opentracing.ext.scope_manager`, along with their related requirements and limitations.
 
-### threading
+### threading, asyncio and gevent
 
-`ThreadScopeManager` uses thread-local storage (through `threading.local()`), and does not provide automatic propagation from thread to thread, which needs to be done manually.
-
-### gevent
-
-`GeventScopeManager` uses greenlet-local storage (through `gevent.local.local()`), and does not provide automatic propagation from parent greenlets to their children, which needs to be done manually.
+No automatic `Span` propagation between parent and children tasks is provided, and thus the `Span` need to be manually passed down the chain.
 
 ### tornado
 
 `TornadoScopeManager` uses a variation of `tornado.stack_context.StackContext` to both store **and** automatically propagate the context from parent coroutines to their children. 
 
-Because of this, in order to make the `TornadoScopeManager` work, calls need to be started like this:
-
-```python
-with tracer_stack_context():
-    my_coroutine()
-```
-
-At the moment of writing this, yielding over multiple children is not supported, as the context is effectively shared, and switching from coroutine to coroutine messes up the current active `Span`.
-
-### asyncio
-
-`AsyncioScopeManager` uses the current `Task` (through `Task.current_task()`) to store the active `Span`, and does not provide automatic propagation from parent `Task` to their children, which needs to be done manually.
+Currently, yielding over multiple children is not supported, as the context is effectively shared, and switching from coroutine to coroutine messes up the current active `Span`.
 
 ## List of patterns
 

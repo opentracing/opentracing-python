@@ -4,7 +4,7 @@ import gevent
 
 from opentracing.ext import tags
 from opentracing.mocktracer import MockTracer
-from ..span_propagation import GeventScopeManager
+from opentracing.ext.scope_manager.gevent import GeventScopeManager
 from ..testcase import OpenTracingTestCase
 from ..utils import get_logger, get_one_by_operation_name
 from .request_handler import RequestHandler
