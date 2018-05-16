@@ -27,7 +27,7 @@ History
 1.2.1 (2016-09-22)
 ------------------
 
-- Make Span.log(self, **kwargs) smarter
+- Make Span.log(self, \**kwargs) smarter
 
 
 1.2.0 (2016-09-21)
@@ -115,7 +115,7 @@ History
 ------------------
 
 - Change inheritance to match api-go: TraceContextSource extends codecs,
-Tracer extends TraceContextSource
+  Tracer extends TraceContextSource
 - Create API harness
 
 

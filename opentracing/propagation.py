@@ -25,7 +25,7 @@ class UnsupportedFormatException(Exception):
     """UnsupportedFormatException should be used when the provided format
     value is unknown or disallowed by the Tracer.
 
-    See Tracer.inject() and Tracer.extract().
+    See :meth:`Tracer.inject()` and :meth:`Tracer.extract()`.
     """
     pass
 
@@ -34,7 +34,7 @@ class InvalidCarrierException(Exception):
     """InvalidCarrierException should be used when the provided carrier
     instance does not match what the `format` argument requires.
 
-    See Tracer.inject() and Tracer.extract().
+    See :meth:`Tracer.inject()` and :meth:`Tracer.extract()`.
     """
     pass
 
@@ -43,7 +43,7 @@ class SpanContextCorruptedException(Exception):
     """SpanContextCorruptedException should be used when the underlying span
     context state is seemingly present but not well-formed.
 
-    See Tracer.inject() and Tracer.extract().
+    See :meth:`Tracer.inject()` and :meth:`Tracer.extract()`.
     """
     pass
 
@@ -51,8 +51,8 @@ class SpanContextCorruptedException(Exception):
 class Format(object):
     """A namespace for builtin carrier formats.
 
-    These static constants are intended for use in the Tracer.inject() and
-    Tracer.extract() methods. E.g.::
+    These static constants are intended for use in the :meth:`Tracer.inject()`
+    and :meth:`Tracer.extract()` methods. E.g.::
 
         tracer.inject(span.context, Format.BINARY, binary_carrier)
 
@@ -62,9 +62,9 @@ class Format(object):
     """
     The BINARY format represents SpanContexts in an opaque bytearray carrier.
 
-    For both Tracer.inject() and Tracer.extract() the carrier should be a
-    bytearray instance. Tracer.inject() must append to the bytearray carrier
-    (rather than replace its contents).
+    For both :meth:`Tracer.inject()` and :meth:`Tracer.extract()` the carrier
+    should be a bytearray instance. :meth:`Tracer.inject()` must append to the
+    bytearray carrier (rather than replace its contents).
     """
 
     TEXT_MAP = 'text_map'

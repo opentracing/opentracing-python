@@ -57,7 +57,7 @@ class Tracer(object):
         Tracer.scope_manager.active.span, and None will be returned if
         Scope.span is None.
 
-        :return: returns the active Span.
+        :return: the active Span.
         """
         scope = self._scope_manager.active
         return None if scope is None else scope.span
@@ -72,7 +72,7 @@ class Tracer(object):
                           finish_on_close=True):
         """Returns a newly started and activated `Scope`.
 
-        The returned `Scope` supports with-statement contexts. For example:
+        The returned `Scope` supports with-statement contexts. For example::
 
             with tracer.start_active_span('...') as scope:
                 scope.span.set_tag('http.method', 'GET')
@@ -81,7 +81,7 @@ class Tracer(object):
             # the with statement.
 
         It's also possible to not finish the `Span` when the `Scope` context
-        expires:
+        expires::
 
             with tracer.start_active_span('...',
                                           finish_on_close=False) as scope:
@@ -108,7 +108,7 @@ class Tracer(object):
         :param finish_on_close: whether span should automatically be finished
             when `Scope#close()` is called.
 
-         :return: a `Scope`, already registered via the `ScopeManager`.
+        :return: a `Scope`, already registered via the `ScopeManager`.
         """
         return self._noop_scope
 
@@ -127,7 +127,7 @@ class Tracer(object):
             tracer.start_span('...')
 
 
-        Starting a child Span (see also start_child_span())::
+        Starting a child Span (see also `start_child_span()`)::
 
             tracer.start_span(
                 '...',
@@ -157,7 +157,7 @@ class Tracer(object):
         :param ignore_active_span: an explicit flag that ignores the current
             active `Scope` and creates a root `Span`.
 
-        :return: Returns an already-started Span instance.
+        :return: an already-started Span instance.
         """
         return self._noop_span
 
@@ -192,9 +192,9 @@ class Tracer(object):
         Implementations MUST raise opentracing.UnsupportedFormatException if
         `format` is unknown or disallowed.
 
-        Implementations may raise opentracing.InvalidCarrierException,
-        opentracing.SpanContextCorruptedException, or implementation-specific
-        errors if there are problems with `carrier`.
+        Implementations may raise :meth:`opentracing.InvalidCarrierException`,
+        :meth:`opentracing.SpanContextCorruptedException`, or
+        implementation-specific errors if there are problems with `carrier`.
 
         :param format: a python object instance that represents a given
             carrier format. `format` may be of any type, and `format` equality
@@ -224,13 +224,13 @@ class ReferenceType(object):
 class Reference(namedtuple('Reference', ['type', 'referenced_context'])):
     """A Reference pairs a reference type with a referenced SpanContext.
 
-    References are used by Tracer.start_span() to describe the relationships
-    between Spans.
+    References are used by :meth:`Tracer.start_span()` to describe the
+    relationships between Spans.
 
     Tracer implementations must ignore references where referenced_context is
     None.  This behavior allows for simpler code when an inbound RPC request
-    contains no tracing information and as a result tracer.extract() returns
-    None::
+    contains no tracing information and as a result :meth:`Tracer.extract()`
+    returns None::
 
         parent_ref = tracer.extract(opentracing.HTTP_HEADERS, request.headers)
         span = tracer.start_span(
@@ -273,7 +273,7 @@ def follows_from(referenced_context=None):
 def start_child_span(parent_span, operation_name, tags=None, start_time=None):
     """A shorthand method that starts a child_of span for a given parent span.
 
-    Equivalent to calling
+    Equivalent to calling::
 
         parent_span.tracer().start_span(
             operation_name,
@@ -290,7 +290,7 @@ def start_child_span(parent_span, operation_name, tags=None, start_time=None):
     :param start_time: an explicit Span start time as a unix timestamp per
         time.time().
 
-    :return: Returns an already-started Span instance.
+    :return: an already-started Span instance.
     """
     return parent_span.tracer.start_span(
         operation_name=operation_name,

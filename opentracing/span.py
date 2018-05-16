@@ -28,10 +28,10 @@ class SpanContext(object):
     Spans and across process boundaries.
 
     SpanContext is logically divided into two pieces: the user-level "Baggage"
-    (see set_baggage_item and get_baggage_item) that propagates across Span
-    boundaries and any Tracer-implementation-specific fields that are needed to
-    identify or otherwise contextualize the associated Span instance (e.g., a
-    <trace_id, span_id, sampled> tuple).
+    (see :meth:`Span.set_baggage_item` and :meth:`Span.get_baggage_item`) that
+    propagates across Span boundaries and any Tracer-implementation-specific
+    fields that are needed to identify or otherwise contextualize the
+    associated Span instance (e.g., a <trace_id, span_id, sampled> tuple).
     """
 
     EMPTY_BAGGAGE = {}  # TODO would be nice to make this immutable
@@ -44,10 +44,10 @@ class SpanContext(object):
 
         The caller must not modify the returned dictionary.
 
-        See also: Span.set_baggage_item() / Span.get_baggage_item()
+        See also: :meth:`Span.set_baggage_item()` / :meth:`Span.get_baggage_item()`
 
         :rtype: dict
-        :return: returns baggage associated with this SpanContext or {}.
+        :return: baggage associated with this SpanContext or {}.
         """
         return SpanContext.EMPTY_BAGGAGE
 
@@ -60,14 +60,13 @@ class Span(object):
     and these relationships transitively form a DAG. It is common for spans to
     have at most one parent, and thus most traces are merely tree structures.
 
-    Span implements a Context Manager API that allows the following usage:
-
-    .. code-block:: python
+    Span implements a Context Manager API that allows the following usage::
 
         with tracer.start_span(operation_name='go_fishing') as span:
             call_some_service()
 
-    In the Context Manager syntax it's not necessary to call span.finish()
+    In the Context Manager syntax it's not necessary to call
+    :meth:`Span.finish()`
     """
 
     def __init__(self, tracer, context):
@@ -81,7 +80,7 @@ class Span(object):
         The SpanContext contains state that propagates from Span to Span in a
         larger trace.
 
-        :return: returns the SpanContext associated with this Span.
+        :return: the SpanContext associated with this Span.
         """
         return self._context
 
@@ -89,7 +88,7 @@ class Span(object):
     def tracer(self):
         """Provides access to the Tracer that created this Span.
 
-        :return: returns the Tracer that created this Span.
+        :return: the Tracer that created this Span.
         """
         return self._tracer
 
@@ -97,7 +96,7 @@ class Span(object):
         """Changes the operation name.
 
         :param operation_name: the new operation name
-        :return: Returns the Span itself, for call chaining.
+        :return: the Span itself, for call chaining.
         """
         return self
 
@@ -126,8 +125,8 @@ class Span(object):
         :param key: key or name of the tag. Must be a string.
         :param value: value of the tag.
 
-        :return: Returns the Span itself, for call chaining.
         :rtype: Span
+        :return: the Span itself, for call chaining.
         """
         return self
 
@@ -149,8 +148,8 @@ class Span(object):
             None
         :type timestamp: float
 
-        :return: Returns the Span itself, for call chaining.
         :rtype: Span
+        :return: the Span itself, for call chaining.
         """
         return self
 
@@ -173,7 +172,7 @@ class Span(object):
         :param value: Baggage item value
         :type value: str
 
-        :rtype : Span
+        :rtype: Span
         :return: itself, for chaining the calls.
         """
         return self
@@ -184,7 +183,7 @@ class Span(object):
         :param key: key of the Baggage item
         :type key: str
 
-        :rtype : str
+        :rtype: str
         :return: value of the Baggage item with given key, or None.
         """
         return None
@@ -192,7 +191,7 @@ class Span(object):
     def __enter__(self):
         """Invoked when span is used as a context manager.
 
-        :return: returns the Span itself
+        :return: the Span itself
         """
         return self
 
