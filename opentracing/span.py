@@ -44,7 +44,8 @@ class SpanContext(object):
 
         The caller must not modify the returned dictionary.
 
-        See also: :meth:`Span.set_baggage_item()` / :meth:`Span.get_baggage_item()`
+        See also: :meth:`Span.set_baggage_item()` /
+        :meth:`Span.get_baggage_item()`
 
         :rtype: dict
         :return: baggage associated with this SpanContext or {}.

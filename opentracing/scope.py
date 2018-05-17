@@ -24,11 +24,11 @@ from __future__ import absolute_import
 class Scope(object):
     """A `Scope` formalizes the activation and deactivation of a `Span`,
     usually from a CPU standpoint. Many times a `Span` will be extant (in that
-    :meth:`Span.finish()` has not been called) despite being in a non-runnable state
-    from a CPU/scheduler standpoint. For instance, a ``Span`` representing the
-    client side of an RPC will be unfinished but blocked on IO while the RPC is
-    still outstanding. A ``Scope`` defines when a given ``Span`` is scheduled
-    and on the path.
+    :meth:`Span.finish()` has not been called) despite being in a non-runnable
+    state from a CPU/scheduler standpoint. For instance, a ``Span``
+    representing the client side of an RPC will be unfinished but blocked on IO
+    while the RPC is still outstanding. A ``Scope`` defines when a given
+    ``Span`` is scheduled and on the path.
     """
     def __init__(self, manager, span):
         """Initializes a ``Scope`` for the given ``Span`` object.
