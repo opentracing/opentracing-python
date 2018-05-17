@@ -20,32 +20,17 @@
 
 from __future__ import absolute_import
 
-from opentracing import Scope
+from unittest import TestCase
+
+import gevent
+
+from opentracing.ext.scope_manager.gevent import GeventScopeManager
+from opentracing.harness.scope_check import ScopeCompatibilityCheckMixin
 
 
-class ThreadLocalScope(Scope):
-    """ThreadLocalScope is an implementation of `opentracing.Scope`
-    using thread-local storage."""
+class GeventCompabilityCheck(TestCase, ScopeCompatibilityCheckMixin):
+    def scope_manager(self):
+        return GeventScopeManager()
 
-    def __init__(self, manager, span, finish_on_close):
-        """Initialize a `Scope` for the given `Span` object.
-
-        :param span: the `Span` wrapped by this `Scope`.
-        :param finish_on_close: whether span should automatically be
-            finished when `Scope#close()` is called.
-        """
-        super(ThreadLocalScope, self).__init__(manager, span)
-        self._finish_on_close = finish_on_close
-        self._to_restore = manager.active
-
-    def close(self):
-        """Mark the end of the active period for this {@link Scope},
-        updating ScopeManager#active in the process.
-        """
-        if self.manager.active is not self:
-            return
-
-        if self._finish_on_close:
-            self.span.finish()
-
-        setattr(self._manager._tls_scope, 'active', self._to_restore)
+    def run_test(self, test_fn):
+        gevent.spawn(test_fn).get()

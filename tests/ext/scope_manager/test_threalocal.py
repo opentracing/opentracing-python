@@ -19,44 +19,12 @@
 # THE SOFTWARE.
 
 from __future__ import absolute_import
-import mock
+from unittest import TestCase
 
-from opentracing.tracer import Tracer
 from opentracing.ext.scope_manager import ThreadLocalScopeManager
+from opentracing.harness.scope_check import ScopeCompatibilityCheckMixin
 
 
-def test_ext_scope_manager_missing_active():
-    scope_manager = ThreadLocalScopeManager()
-    assert scope_manager.active is None
-
-
-def test_ext_scope_manager_activate():
-    scope_manager = ThreadLocalScopeManager()
-    tracer = Tracer()
-    span = tracer.start_span('test')
-
-    with mock.patch.object(span, 'finish') as finish:
-        scope = scope_manager.activate(span, False)
-        assert scope is not None
-        assert scope_manager.active is scope
-
-        scope.close()
-        assert finish.call_count == 0
-
-    assert scope_manager.active is None
-
-
-def test_ext_scope_manager_finish_close():
-    scope_manager = ThreadLocalScopeManager()
-    tracer = Tracer()
-    span = tracer.start_span('test')
-
-    with mock.patch.object(span, 'finish') as finish:
-        scope = scope_manager.activate(span, True)
-        assert scope is not None
-        assert scope_manager.active is scope
-
-        scope.close()
-        assert finish.call_count == 1
-
-    assert scope_manager.active is None
+class ThreadLocalCompabilityCheck(TestCase, ScopeCompatibilityCheckMixin):
+    def scope_manager(self):
+        return ThreadLocalScopeManager()

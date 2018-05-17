@@ -74,22 +74,7 @@ class VerifyAPICompatibilityCheck(unittest.TestCase):
             api_check.test_tracer_start_active_span_scope()
 
         with self.assertRaises(AssertionError):
-            api_check.test_tracer_start_active_span_nesting()
-
-        with self.assertRaises(AssertionError):
-            api_check.test_tracer_start_active_span_nesting_finish_on_close()
-
-        with self.assertRaises(AssertionError):
-            api_check.test_tracer_start_active_span_wrong_close_order()
-
-        with self.assertRaises(AssertionError):
             api_check.test_tracer_start_span_scope()
-
-        with self.assertRaises(AssertionError):
-            api_check.test_tracer_scope_manager_active()
-
-        with self.assertRaises(AssertionError):
-            api_check.test_tracer_scope_manager_activate()
 
         with self.assertRaises(AssertionError):
             api_check.test_start_active_span_finish_on_close()
