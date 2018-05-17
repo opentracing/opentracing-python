@@ -65,7 +65,7 @@ class AsyncioScopeManager(ScopeManager):
             the `Span`.
         """
 
-        scope = AsyncioScope(self, span, finish_on_close)
+        scope = _AsyncioScope(self, span, finish_on_close)
         self._set_active(scope)
 
         return scope
@@ -92,9 +92,9 @@ class AsyncioScopeManager(ScopeManager):
         setattr(task, '__active', scope)
 
 
-class AsyncioScope(Scope):
+class _AsyncioScope(Scope):
     def __init__(self, manager, span, finish_on_close):
-        super(AsyncioScope, self).__init__(manager, span)
+        super(_AsyncioScope, self).__init__(manager, span)
         self._finish_on_close = finish_on_close
         self._to_restore = manager.active
 

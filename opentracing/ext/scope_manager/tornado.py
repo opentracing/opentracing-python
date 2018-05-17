@@ -94,7 +94,7 @@ class TornadoScopeManager(ScopeManager):
         if context is None:
             raise RuntimeError('No tracer_stack_context() found.')
 
-        scope = TornadoScope(self, span, finish_on_close)
+        scope = _TornadoScope(self, span, finish_on_close)
         context.active = scope
 
         return scope
@@ -113,12 +113,12 @@ class TornadoScopeManager(ScopeManager):
         return context.active if context else None
 
     def _get_context(self):
-        return TracerRequestContextManager.current_context()
+        return _TracerRequestContextManager.current_context()
 
 
-class TornadoScope(Scope):
+class _TornadoScope(Scope):
     def __init__(self, manager, span, finish_on_close):
-        super(TornadoScope, self).__init__(manager, span)
+        super(_TornadoScope, self).__init__(manager, span)
         self._finish_on_close = finish_on_close
         self._to_restore = manager.active
 
@@ -199,14 +199,14 @@ class ThreadSafeStackContext(tornado.stack_context.StackContext):
             self.contexts = LocalContexts()
 
 
-class TracerRequestContext(object):
+class _TracerRequestContext(object):
     __slots__ = ('active', )
 
     def __init__(self, active=None):
         self.active = active
 
 
-class TracerRequestContextManager(object):
+class _TracerRequestContextManager(object):
     _state = threading.local()
     _state.context = None
 
@@ -254,5 +254,7 @@ def tracer_stack_context():
         Return a custom StackContext that allows TornadoScopeManager to
         activate and propagate `Span` instances.
     """
-    context = TracerRequestContext()
-    return ThreadSafeStackContext(lambda: TracerRequestContextManager(context))
+    context = _TracerRequestContext()
+    return ThreadSafeStackContext(
+            lambda: _TracerRequestContextManager(context)
+    )

@@ -53,7 +53,7 @@ class GeventScopeManager(ScopeManager):
         self._locals = gevent.local.local()
 
     def activate(self, span, finish_on_close):
-        scope = GeventScope(self, span, finish_on_close)
+        scope = _GeventScope(self, span, finish_on_close)
         setattr(self._locals, 'active', scope)
 
         return scope
@@ -63,9 +63,9 @@ class GeventScopeManager(ScopeManager):
         return getattr(self._locals, 'active', None)
 
 
-class GeventScope(Scope):
+class _GeventScope(Scope):
     def __init__(self, manager, span, finish_on_close):
-        super(GeventScope, self).__init__(manager, span)
+        super(_GeventScope, self).__init__(manager, span)
         self._finish_on_close = finish_on_close
         self._to_restore = manager.active
 

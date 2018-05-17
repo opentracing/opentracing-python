@@ -43,7 +43,7 @@ class ThreadLocalScopeManager(ScopeManager):
             the `Span`. It is a programming error to neglect to call
             `Scope#close()` on the returned instance.
         """
-        scope = ThreadLocalScope(self, span, finish_on_close)
+        scope = _ThreadLocalScope(self, span, finish_on_close)
         setattr(self._tls_scope, 'active', scope)
         return scope
 
@@ -61,8 +61,8 @@ class ThreadLocalScopeManager(ScopeManager):
         return getattr(self._tls_scope, 'active', None)
 
 
-class ThreadLocalScope(Scope):
-    """ThreadLocalScope is an implementation of `opentracing.Scope`
+class _ThreadLocalScope(Scope):
+    """_ThreadLocalScope is an implementation of `opentracing.Scope`
     using thread-local storage."""
 
     def __init__(self, manager, span, finish_on_close):
@@ -72,7 +72,7 @@ class ThreadLocalScope(Scope):
         :param finish_on_close: whether span should automatically be
             finished when `Scope#close()` is called.
         """
-        super(ThreadLocalScope, self).__init__(manager, span)
+        super(_ThreadLocalScope, self).__init__(manager, span)
         self._finish_on_close = finish_on_close
         self._to_restore = manager.active
 
