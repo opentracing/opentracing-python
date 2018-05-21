@@ -57,7 +57,7 @@ class Tracer(object):
         Tracer.scope_manager.active.span, and None will be returned if
         Scope.span is None.
 
-        :return: the active Span.
+        :return: the active ``Span``.
         """
         scope = self._scope_manager.active
         return None if scope is None else scope.span
@@ -106,9 +106,9 @@ class Tracer(object):
         :param ignore_active_span: (optional) an explicit flag that ignores
             the current active `Scope` and creates a root `Span`.
         :param finish_on_close: whether span should automatically be finished
-            when `Scope#close()` is called.
+            when :meth:`Scope.close()` is called.
 
-        :return: a `Scope`, already registered via the `ScopeManager`.
+        :return: a ``Scope``, already registered via the ``ScopeManager``.
         """
         return self._noop_scope
 
