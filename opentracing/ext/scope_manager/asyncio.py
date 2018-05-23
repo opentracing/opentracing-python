@@ -26,13 +26,15 @@ from opentracing import Scope, ScopeManager
 
 
 class AsyncioScopeManager(ScopeManager):
-    """ScopeManager implementation for asyncio that stores
-    the `Scope` in the current Task (Task.current_task()).
+    """
+    :class:`~opentracing.ScopeManager` implementation for **asyncio**
+    that stores the :class:`~opentracing.Scope` in the current
+    :class:`Task` (:meth:`Task.current_task()`).
 
     It needs both an existing loop for the current thread
-    (asyncio.get_event_loop()) and to be accesed under a running coroutine.
-    Automatic `Span` propagation from parent coroutines to
-    their children is not provided, which needs to be
+    (:meth:`asyncio.get_event_loop()`) and to be accesed under a running
+    coroutine. Automatic :class:`~opentracing.Span` propagation from
+    parent coroutines to their children is not provided, which needs to be
     done manually:
 
     .. code-block:: python
@@ -49,20 +51,24 @@ class AsyncioScopeManager(ScopeManager):
                 ...
                 await child_coroutine(span)
                 ...
+
     """
 
     def activate(self, span, finish_on_close):
-        """Make a `Span` instance active.
+        """
+        Make a :class:`~opentracing.Span` instance active.
 
-        :param span: the `Span` that should become active.
-        :param finish_on_close: whether span should automatically be
-            finished when `Scope#close()` is called.
+        :param span: the :class:`~opentracing.Span` that should become active.
+        :param finish_on_close: whether *span* should automatically be
+            finished when :meth:`Scope.close()` is called.
 
-        RuntimeError will be raised if no Task is being
-        executed (Task.current_task() returning None).
+        RuntimeError will be raised if no :class:`Task` is being
+        executed (:meth:`Task.current_task()` returning ``None``).
 
-        :return: a `Scope` instance to control the end of the active period for
-            the `Span`.
+        :return: a :class:`~opentracing.Scope` instance to control the end
+            of the active period for the :class:`~opentracing.Span`.
+            It is a programming error to neglect to call :meth:`Scope.close()`
+            on the returned instance.
         """
 
         scope = _AsyncioScope(self, span, finish_on_close)
@@ -72,13 +78,18 @@ class AsyncioScopeManager(ScopeManager):
 
     @property
     def active(self):
-        """Return the currently active `Scope` which can be used to access the
-        currently active `Scope#span`.
-
-        If no Task is being executed, this propery will return None.
-
-        :return: the `Scope` that is active, or `None` if not available.
         """
+        Return the currently active :class:`~opentracing.Scope` which
+        can be used to access the currently active
+        :attr:`Scope.span`.
+
+        If no :class:`Task` is being executed, this property will
+        return ``None``.
+
+        :return: the :class:`~opentracing.Scope` that is active,
+            or ``None`` if not available.
+        """
+
         loop = asyncio.get_event_loop()
         task = asyncio.Task.current_task(loop=loop)
         return getattr(task, '__active', None)

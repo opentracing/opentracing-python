@@ -45,3 +45,19 @@ Exceptions
 
 .. autoclass:: opentracing.UnsupportedFormatException
    :members:
+
+Scope managers
+--------------
+.. autoclass:: opentracing.ext.scope_manager.ThreadLocalScopeManager
+   :members:
+
+.. autoclass:: opentracing.ext.scope_manager.gevent.GeventScopeManager
+   :members:
+
+.. autoclass:: opentracing.ext.scope_manager.tornado.TornadoScopeManager
+   :members:
+
+.. autofunction:: opentracing.ext.scope_manager.tornado.tracer_stack_context
+
+.. autoclass:: opentracing.ext.scope_manager.asyncio.AsyncioScopeManager
+   :members:

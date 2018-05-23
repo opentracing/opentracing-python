@@ -26,22 +26,25 @@ from opentracing import Scope, ScopeManager
 
 
 class ThreadLocalScopeManager(ScopeManager):
-    """ScopeManager implementation that stores the current active `Scope`
-    using thread-local storage.
+    """
+    :class:`~opentracing.ScopeManager` implementation that stores the
+    current active :class:`~opentracing.Scope` using thread-local storage.
     """
     def __init__(self):
         self._tls_scope = threading.local()
 
     def activate(self, span, finish_on_close):
-        """Make a `Span` instance active.
+        """
+        Make a :class:`~opentracing.Span` instance active.
 
-        :param span: the `Span` that should become active.
-        :param finish_on_close: whether span should automatically be
-            finished when `Scope#close()` is called.
+        :param span: the :class:`~opentracing.Span` that should become active.
+        :param finish_on_close: whether *span* should automatically be
+            finished when :meth:`Scope.close()` is called.
 
-        :return: a `Scope` instance to control the end of the active period for
-            the `Span`. It is a programming error to neglect to call
-            `Scope#close()` on the returned instance.
+        :return: a :class:`~opentracing.Scope` instance to control the end
+            of the active period for the :class:`~opentracing.Span`.
+            It is a programming error to neglect to call :meth:`Scope.close()`
+            on the returned instance.
         """
         scope = _ThreadLocalScope(self, span, finish_on_close)
         setattr(self._tls_scope, 'active', scope)
@@ -49,37 +52,24 @@ class ThreadLocalScopeManager(ScopeManager):
 
     @property
     def active(self):
-        """Return the currently active `Scope` which can be used to access the
-        currently active `Scope#span`.
+        """
+        Return the currently active :class:`~opentracing.Scope` which
+        can be used to access the currently active
+        :attr:`Scope.span`.
 
-        If there is a non-null `Scope`, its wrapped `Span` becomes an implicit
-        parent of any newly-created `Span` at `Tracer#start_span()`/
-        `Tracer#start_active_span()` time.
-
-        :return: the `Scope` that is active, or `None` if not available.
+        :return: the :class:`~opentracing.Scope` that is active,
+            or ``None`` if not available.
         """
         return getattr(self._tls_scope, 'active', None)
 
 
 class _ThreadLocalScope(Scope):
-    """_ThreadLocalScope is an implementation of `opentracing.Scope`
-    using thread-local storage."""
-
     def __init__(self, manager, span, finish_on_close):
-        """Initialize a `Scope` for the given `Span` object.
-
-        :param span: the `Span` wrapped by this `Scope`.
-        :param finish_on_close: whether span should automatically be
-            finished when `Scope#close()` is called.
-        """
         super(_ThreadLocalScope, self).__init__(manager, span)
         self._finish_on_close = finish_on_close
         self._to_restore = manager.active
 
     def close(self):
-        """Mark the end of the active period for this {@link Scope},
-        updating ScopeManager#active in the process.
-        """
         if self.manager.active is not self:
             return
 

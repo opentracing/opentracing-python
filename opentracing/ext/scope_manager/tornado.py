@@ -21,7 +21,7 @@
 from __future__ import absolute_import
 
 import threading
-import tornado
+import tornado.stack_context
 
 from opentracing import Scope, ScopeManager
 
@@ -30,12 +30,14 @@ from opentracing import Scope, ScopeManager
 # github.com/uber-common/opentracing-python-instrumentation/
 
 class TornadoScopeManager(ScopeManager):
-    """ScopeManager implementation for Tornado that stores
-    the `Scope` using a custom StackContext.
+    """
+    :class:`~opentracing.ScopeManager` implementation for **Tornado**
+    that stores the :class:`~opentracing.Scope` using a custom
+    :class:`StackContext`.
 
-    It needs to be used under tracer_stack_context(), which
-    also automatically propagates the active `Span` from parent
-    coroutines to their children::
+    It needs to be used under :func:`tracer_stack_context()`, which
+    also automatically propagates the active :class:`~opentracing.Span`
+    from parent coroutines to their children:
 
     .. code-block:: python
 
@@ -56,38 +58,45 @@ class TornadoScopeManager(ScopeManager):
         with tracer_stack_context():
             loop.add_callback(parent_coroutine)
 
-    NOTE: The current version does not support `Span` activation
-    in children coroutines when the parent yields over *multiple* of them,
-    as the context is effectively shared by all, and the active
-    `Span` state is messed up::
 
-    .. code-block:: python
-        @tornado.gen.coroutine
-        def coroutine(input):
-            # No span should be activated here.
-            # The parent Span will remain active, though.
-            with tracer.start_span('child', child_of=tracer.active_span):
-                ...
+    .. note::
+        The current version does not support :class:`~opentracing.Span`
+        activation in children coroutines when the parent yields over
+        **multiple** of them, as the context is effectively shared by all,
+        and the active :class:`~opentracing.Span` state is messed up:
 
-        @tornado.gen.coroutine
-        def handle_request_wrapper():
-            res1 = corotuine('A')
-            res2 = corotuine('B')
+        .. code-block:: python
 
-            yield [res1, res2]
+            @tornado.gen.coroutine
+            def coroutine(input):
+                # No span should be activated here.
+                # The parent Span will remain active, though.
+                with tracer.start_span('child', child_of=tracer.active_span):
+                    ...
+
+            @tornado.gen.coroutine
+            def handle_request_wrapper():
+                res1 = corotuine('A')
+                res2 = corotuine('B')
+
+                yield [res1, res2]
     """
 
     def activate(self, span, finish_on_close):
-        """Make a `Span` instance active.
+        """
+        Make a :class:`~opentracing.Span` instance active.
 
-        :param span: the `Span` that should become active.
-        :param finish_on_close: whether span should automatically be
-            finished when `Scope#close()` is called.
+        :param span: the :class:`~opentracing.Span` that should become active.
+        :param finish_on_close: whether *span* should automatically be
+            finished when :meth:`Scope.close()` is called.
 
-        RuntimeError will be raised if no tracer_stack_context() was detected.
+        RuntimeError will be raised if no :func:`tracer_stack_context()`
+        was detected.
 
-        :return: a `Scope` instance to control the end of the active period for
-            the `Span`.
+        :return: a :class:`~opentracing.Scope` instance to control the end
+            of the active period for the :class:`~opentracing.Span`.
+            It is a programming error to neglect to call :meth:`Scope.close()`
+            on the returned instance.
         """
 
         context = self._get_context()
@@ -101,14 +110,18 @@ class TornadoScopeManager(ScopeManager):
 
     @property
     def active(self):
-        """Return the currently active `Scope` which can be used to access the
-        currently active `Scope#span`.
-
-        If no tracer_stack_context() is detected, this propery will return
-        None.
-
-        :return: the `Scope` that is active, or `None` if not available.
         """
+        Return the currently active :class:`~opentracing.Scope` which
+        can be used to access the currently active
+        :attr:`Scope.span`.
+
+        If no :func:`tracer_stack_context()` is detected, this property will
+        return ``None``.
+
+        :return: the :class:`~opentracing.Scope` that is active,
+            or ``None`` if not available.
+        """
+
         context = self._get_context()
         return context.active if context else None
 
@@ -230,10 +243,11 @@ class _TracerRequestContextManager(object):
 
 def tracer_stack_context():
     """
-    Create a custom Tornado's StackContext that allows TornadoScopeManager
-    to store the active `Span` in the thread-local request context.
+    Create a custom Tornado's :class:`StackContext` that allows
+    :class:`TornadoScopeManager` to store the active
+    :class:`~opentracing.Span` in the thread-local request context.
 
-    Suppose you have a method `handle_request(request)` in the http server.
+    Suppose you have a method ``handle_request(request)`` in the http server.
     Instead of calling it directly, use a wrapper:
 
     .. code-block:: python
@@ -251,8 +265,9 @@ def tracer_stack_context():
                     return actual_handler(*args, **kwargs)
 
     :return:
-        Return a custom StackContext that allows TornadoScopeManager to
-        activate and propagate `Span` instances.
+        Return a custom :class:`StackContext` that allows
+        :class:`TornadoScopeManager` to activate and propagate
+        :class:`~opentracing.Span` instances.
     """
     context = _TracerRequestContext()
     return ThreadSafeStackContext(

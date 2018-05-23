@@ -26,10 +26,12 @@ from opentracing import Scope, ScopeManager
 
 
 class GeventScopeManager(ScopeManager):
-    """ScopeManager implementation for gevent that stores
-    the `Scope` in greenlet-local storage (gevent.local.local).
+    """
+    :class:`~opentracing.ScopeManager` implementation for **gevent**
+    that stores the :class:`~opentracing.Scope` in greenlet-local storage
+    (:attr:`gevent.local.local`).
 
-    Automatic `Span` propagation from parent greenlets to
+    Automatic :class:`~opentracing.Span` propagation from parent greenlets to
     their children is not provided, which needs to be
     done manually:
 
@@ -53,6 +55,19 @@ class GeventScopeManager(ScopeManager):
         self._locals = gevent.local.local()
 
     def activate(self, span, finish_on_close):
+        """
+        Make a :class:`~opentracing.Span` instance active.
+
+        :param span: the :class:`~opentracing.Span` that should become active.
+        :param finish_on_close: whether *span* should automatically be
+            finished when :meth:`Scope.close()` is called.
+
+        :return: a :class:`~opentracing.Scope` instance to control the end
+            of the active period for the :class:`~opentracing.Span`.
+            It is a programming error to neglect to call :meth:`Scope.close()`
+            on the returned instance.
+        """
+
         scope = _GeventScope(self, span, finish_on_close)
         setattr(self._locals, 'active', scope)
 
@@ -60,6 +75,15 @@ class GeventScopeManager(ScopeManager):
 
     @property
     def active(self):
+        """
+        Return the currently active :class:`~opentracing.Scope` which
+        can be used to access the currently active
+        :attr:`Scope.span`.
+
+        :return: the :class:`~opentracing.Scope` that is active,
+            or ``None`` if not available.
+        """
+
         return getattr(self._locals, 'active', None)
 
 
