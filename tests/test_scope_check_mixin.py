@@ -47,6 +47,9 @@ class VerifyScopeCompatibilityCheck(unittest.TestCase):
             scope_check.test_activate()
 
         with self.assertRaises(AssertionError):
+            scope_check.test_activate_external()
+
+        with self.assertRaises(AssertionError):
             scope_check.test_activate_finish_on_close()
 
         with self.assertRaises(AssertionError):

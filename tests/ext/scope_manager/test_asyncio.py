@@ -20,6 +20,7 @@
 
 from __future__ import absolute_import
 
+from concurrent.futures import ThreadPoolExecutor
 from unittest import TestCase
 
 import asyncio
@@ -39,7 +40,12 @@ class AsyncioCompabilityCheck(TestCase, ScopeCompatibilityCheckMixin):
             test_fn()
         asyncio.get_event_loop().run_until_complete(async_test_fn())
 
-    def test_no_running_task(self):
-        scope_manager = self.scope_manager()
-        with self.assertRaises(RuntimeError):
-            scope_manager.activate(None, True)
+    def test_no_event_loop(self):
+        # no event loop exists by default in
+        # new threads, so make sure we don't fail there.
+        def test_fn():
+            manager = self.scope_manager()
+            assert manager.active is None
+
+        executor = ThreadPoolExecutor(max_workers=1)
+        executor.submit(test_fn).result()

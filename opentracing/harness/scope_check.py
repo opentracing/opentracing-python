@@ -72,6 +72,20 @@ class ScopeCompatibilityCheckMixin(object):
 
         self.run_test(fn)
 
+    def test_activate_external(self):
+        # test that activate() does not fail outside the run_test()
+        # implementation (greenlet or corotuine).
+        scope_manager = self.scope_manager()
+        span = mock.MagicMock(spec=Span)
+
+        scope = scope_manager.activate(span, False)
+        assert scope is not None
+        assert scope_manager.active is scope
+
+        scope.close()
+        assert span.finish.call_count == 0
+        assert scope_manager.active is None
+
     def test_activate_finish_on_close(self):
         def fn():
             scope_manager = self.scope_manager()

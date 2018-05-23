@@ -22,18 +22,18 @@ from __future__ import absolute_import
 
 import asyncio
 
-from opentracing import Scope, ScopeManager
+from opentracing import Scope
+from opentracing.ext.scope_manager import ThreadLocalScopeManager
 
 
-class AsyncioScopeManager(ScopeManager):
+class AsyncioScopeManager(ThreadLocalScopeManager):
     """
     :class:`~opentracing.ScopeManager` implementation for **asyncio**
     that stores the :class:`~opentracing.Scope` in the current
-    :class:`Task` (:meth:`Task.current_task()`).
+    :class:`Task` (:meth:`Task.current_task()`), falling back to
+    thread-local storage if none was being executed.
 
-    It needs both an existing loop for the current thread
-    (:meth:`asyncio.get_event_loop()`) and to be accesed under a running
-    coroutine. Automatic :class:`~opentracing.Span` propagation from
+    Automatic :class:`~opentracing.Span` propagation from
     parent coroutines to their children is not provided, which needs to be
     done manually:
 
@@ -62,8 +62,8 @@ class AsyncioScopeManager(ScopeManager):
         :param finish_on_close: whether *span* should automatically be
             finished when :meth:`Scope.close()` is called.
 
-        RuntimeError will be raised if no :class:`Task` is being
-        executed (:meth:`Task.current_task()` returning ``None``).
+        If no :class:`Task` is being executed, thread-local
+        storage will be used to store the :class:`~opentracing.Scope`.
 
         :return: a :class:`~opentracing.Scope` instance to control the end
             of the active period for the :class:`~opentracing.Span`.
@@ -71,8 +71,13 @@ class AsyncioScopeManager(ScopeManager):
             on the returned instance.
         """
 
+        task = self._get_task()
+        if not task:
+            return super(AsyncioScopeManager, self).activate(span,
+                                                             finish_on_close)
+
         scope = _AsyncioScope(self, span, finish_on_close)
-        self._set_active(scope)
+        setattr(task, '__active', scope)
 
         return scope
 
@@ -83,24 +88,25 @@ class AsyncioScopeManager(ScopeManager):
         can be used to access the currently active
         :attr:`Scope.span`.
 
-        If no :class:`Task` is being executed, this property will
-        return ``None``.
-
         :return: the :class:`~opentracing.Scope` that is active,
             or ``None`` if not available.
         """
 
-        loop = asyncio.get_event_loop()
-        task = asyncio.Task.current_task(loop=loop)
+        task = self._get_task()
+        if not task:
+            return super(AsyncioScopeManager, self).active
+
         return getattr(task, '__active', None)
 
-    def _set_active(self, scope):
-        loop = asyncio.get_event_loop()
-        task = asyncio.Task.current_task(loop=loop)
-        if not task:
-            raise RuntimeError('No executing Task detected.')
+    def _get_task(self):
+        try:
+            # Prevent failure when run from a thread
+            # without an event loop.
+            loop = asyncio.get_event_loop()
+        except RuntimeError:
+            return None
 
-        setattr(task, '__active', scope)
+        return asyncio.Task.current_task(loop=loop)
 
 
 class _AsyncioScope(Scope):
@@ -113,7 +119,8 @@ class _AsyncioScope(Scope):
         if self.manager.active is not self:
             return
 
-        self._manager._set_active(self._to_restore)
+        task = self._manager._get_task()
+        setattr(task, '__active', self._to_restore)
 
         if self._finish_on_close:
             self.span.finish()

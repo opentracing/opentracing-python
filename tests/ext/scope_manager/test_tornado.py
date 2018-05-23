@@ -36,8 +36,3 @@ class TornadoCompabilityCheck(TestCase, ScopeCompatibilityCheckMixin):
     def run_test(self, test_fn):
         with tracer_stack_context():
             ioloop.IOLoop.current().run_sync(test_fn)
-
-    def test_no_stack_trace(self):
-        scope_manager = self.scope_manager()
-        with self.assertRaises(RuntimeError):
-            scope_manager.activate(None, True)
