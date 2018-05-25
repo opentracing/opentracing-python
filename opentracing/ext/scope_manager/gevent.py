@@ -20,7 +20,7 @@
 
 from __future__ import absolute_import
 
-import gevent.local
+import gevent
 
 from opentracing import Scope, ScopeManager
 
@@ -28,8 +28,8 @@ from opentracing import Scope, ScopeManager
 class GeventScopeManager(ScopeManager):
     """
     :class:`~opentracing.ScopeManager` implementation for **gevent**
-    that stores the :class:`~opentracing.Scope` in greenlet-local storage
-    (:attr:`gevent.local.local`).
+    that stores the :class:`~opentracing.Scope` in the current greenlet
+    (:func:`gevent.getcurrent()`).
 
     Automatic :class:`~opentracing.Span` propagation from parent greenlets to
     their children is not provided, which needs to be
@@ -51,8 +51,6 @@ class GeventScopeManager(ScopeManager):
                 ...
 
     """
-    def __init__(self):
-        self._locals = gevent.local.local()
 
     def activate(self, span, finish_on_close):
         """
@@ -69,7 +67,7 @@ class GeventScopeManager(ScopeManager):
         """
 
         scope = _GeventScope(self, span, finish_on_close)
-        setattr(self._locals, 'active', scope)
+        self._set_greenlet_scope(scope)
 
         return scope
 
@@ -84,7 +82,19 @@ class GeventScopeManager(ScopeManager):
             or ``None`` if not available.
         """
 
-        return getattr(self._locals, 'active', None)
+        return self._get_greenlet_scope()
+
+    def _get_greenlet_scope(self, greenlet=None):
+        if greenlet is None:
+            greenlet = gevent.getcurrent()
+
+        return getattr(greenlet, '__active', None)
+
+    def _set_greenlet_scope(self, scope, greenlet=None):
+        if greenlet is None:
+            greenlet = gevent.getcurrent()
+
+        setattr(greenlet, '__active', scope)
 
 
 class _GeventScope(Scope):
@@ -97,7 +107,7 @@ class _GeventScope(Scope):
         if self.manager.active is not self:
             return
 
-        setattr(self.manager._locals, 'active', self._to_restore)
+        self.manager._set_greenlet_scope(self._to_restore)
 
         if self._finish_on_close:
             self.span.finish()

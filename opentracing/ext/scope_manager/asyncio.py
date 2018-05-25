@@ -77,7 +77,7 @@ class AsyncioScopeManager(ThreadLocalScopeManager):
                                                              finish_on_close)
 
         scope = _AsyncioScope(self, span, finish_on_close)
-        setattr(task, '__active', scope)
+        self._set_task_scope(scope, task)
 
         return scope
 
@@ -96,7 +96,7 @@ class AsyncioScopeManager(ThreadLocalScopeManager):
         if not task:
             return super(AsyncioScopeManager, self).active
 
-        return getattr(task, '__active', None)
+        return self._get_task_scope(task)
 
     def _get_task(self):
         try:
@@ -107,6 +107,18 @@ class AsyncioScopeManager(ThreadLocalScopeManager):
             return None
 
         return asyncio.Task.current_task(loop=loop)
+
+    def _set_task_scope(self, scope, task=None):
+        if task is None:
+            task = self._get_task()
+
+        setattr(task, '__active', scope)
+
+    def _get_task_scope(self, task=None):
+        if task is None:
+            task = self._get_task()
+
+        return getattr(task, '__active', None)
 
 
 class _AsyncioScope(Scope):
@@ -119,8 +131,7 @@ class _AsyncioScope(Scope):
         if self.manager.active is not self:
             return
 
-        task = self._manager._get_task()
-        setattr(task, '__active', self._to_restore)
+        self.manager._set_task_scope(self._to_restore)
 
         if self._finish_on_close:
             self.span.finish()
