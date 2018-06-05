@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from opentracing.mocktracer import MockTracer
+from opentracing.mock import MockTracer
 
 
 def test_span_log_kv():

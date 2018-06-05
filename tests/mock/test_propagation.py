@@ -21,7 +21,7 @@
 import pytest
 from opentracing import Format, SpanContextCorruptedException, \
         UnsupportedFormatException
-from opentracing.mocktracer import MockTracer
+from opentracing.mock import MockTracer
 
 
 def test_propagation():
