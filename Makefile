@@ -60,7 +60,7 @@ test:
 	$(pytest) $(test_args)
 
 testbed:
-	python -m testbed
+	PYTHONDONTWRITEBYTECODE=1 python -m testbed
 
 jenkins:
 	pip install -r requirements.txt
