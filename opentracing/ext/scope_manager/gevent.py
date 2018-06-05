@@ -23,6 +23,7 @@ from __future__ import absolute_import
 import gevent
 
 from opentracing import Scope, ScopeManager
+from .constants import ACTIVE_ATTR
 
 
 class GeventScopeManager(ScopeManager):
@@ -88,13 +89,13 @@ class GeventScopeManager(ScopeManager):
         if greenlet is None:
             greenlet = gevent.getcurrent()
 
-        return getattr(greenlet, '__active', None)
+        return getattr(greenlet, ACTIVE_ATTR, None)
 
     def _set_greenlet_scope(self, scope, greenlet=None):
         if greenlet is None:
             greenlet = gevent.getcurrent()
 
-        setattr(greenlet, '__active', scope)
+        setattr(greenlet, ACTIVE_ATTR, scope)
 
 
 class _GeventScope(Scope):

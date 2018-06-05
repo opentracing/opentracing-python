@@ -24,6 +24,7 @@ import asyncio
 
 from opentracing import Scope
 from opentracing.ext.scope_manager import ThreadLocalScopeManager
+from .constants import ACTIVE_ATTR
 
 
 class AsyncioScopeManager(ThreadLocalScopeManager):
@@ -112,13 +113,13 @@ class AsyncioScopeManager(ThreadLocalScopeManager):
         if task is None:
             task = self._get_task()
 
-        setattr(task, '__active', scope)
+        setattr(task, ACTIVE_ATTR, scope)
 
     def _get_task_scope(self, task=None):
         if task is None:
             task = self._get_task()
 
-        return getattr(task, '__active', None)
+        return getattr(task, ACTIVE_ATTR, None)
 
 
 class _AsyncioScope(Scope):
