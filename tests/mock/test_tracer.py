@@ -17,20 +17,30 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
-from __future__ import absolute_import
-import unittest
 
-from opentracing.harness.api_check import APICompatibilityCheckMixin
-from opentracing.mocktracer import MockTracer
+from opentracing.mock import MockTracer
 
 
-class APICheckMockTracer(unittest.TestCase, APICompatibilityCheckMixin):
-    def tracer(self):
-        return MockTracer()
+def test_tracer_finished_spans():
+    tracer = MockTracer()
 
-    def is_parent(self, parent, span):
-        # use `Span` ids to check parenting
-        if parent is None:
-            return span.parent_id is None
+    span_x = tracer.start_span('x')
+    span_x.finish()
 
-        return parent.context.span_id == span.parent_id
+    span_y = tracer.start_span('y')
+    span_y.finish()
+
+    finished_spans = tracer.finished_spans()
+    assert len(finished_spans) == 2
+    assert finished_spans[0] == span_x
+    assert finished_spans[1] == span_y
+
+    # A copy per invocation.
+    assert tracer.finished_spans() is not finished_spans
+
+
+def test_tracer_reset():
+    tracer = MockTracer()
+    tracer.start_span('x').finish()
+    tracer.reset()
+    assert len(tracer.finished_spans()) == 0
