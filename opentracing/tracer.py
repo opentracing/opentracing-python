@@ -53,12 +53,12 @@ class Tracer(object):
 
     @property
     def active_span(self):
-        """Provides access to the the active span. This is a shorthand for
+        """Provides access to the the active :class:`Span`. This is a shorthand for
         :attr:`Tracer.scope_manager.active.span`, and ``None`` will be
         returned if :attr:`Scope.span` is ``None``.
 
         :rtype: Span
-        :return: the active span.
+        :return: the active :class:`Span`.
         """
         scope = self._scope_manager.active
         return None if scope is None else scope.span
@@ -71,9 +71,10 @@ class Tracer(object):
                           start_time=None,
                           ignore_active_span=False,
                           finish_on_close=True):
-        """Returns a newly started and activated scope.
+        """Returns a newly started and activated :class:`Scope`.
 
-        The returned scope supports with-statement contexts. For example::
+        The returned :class:`Scope` supports with-statement contexts. For
+        example::
 
             with tracer.start_active_span('...') as scope:
                 scope.span.set_tag('http.method', 'GET')
@@ -81,8 +82,8 @@ class Tracer(object):
             # Span.finish() is called as part of scope deactivation through
             # the with statement.
 
-        It's also possible to not finish the span when the scope context
-        expires::
+        It's also possible to not finish the :class:`Span` when the
+        :class:`Scope` context expires::
 
             with tracer.start_active_span('...',
                                           finish_on_close=False) as scope:
@@ -92,37 +93,39 @@ class Tracer(object):
             # `finish_on_close` is `False`.
 
         :param operation_name: name of the operation represented by the new
-            span from the perspective of the current service.
+            :class:`Span` from the perspective of the current service.
         :type operation_name: str
 
-        :param child_of: (optional) a span or span context instance
-            representing the parent in a REFERENCE_CHILD_OF reference.  If
-            specified, the `references` parameter must be omitted.
+        :param child_of: (optional) a :class:`Span` or :class:`SpanContext`
+            instance representing the parent in a REFERENCE_CHILD_OF reference.
+            If specified, the `references` parameter must be omitted.
         :type child_of: Span or SpanContext
 
         :param references: (optional) references that identify one or more
-            parent span contexts. (See the Reference documentation for detail).
+            parent :class:`SpanContext`\ s. (See the Reference documentation
+            for detail).
         :type references: :obj:`list` of :class:`Reference`
 
-        :param tags: an optional dictionary of span tags. The caller gives up
-            ownership of that dictionary, because the tracer may use it as-is
-            to avoid extra data copying.
+        :param tags: an optional dictionary of :class:`Span` tags. The caller
+            gives up ownership of that dictionary, because the :class:`Tracer`
+            may use it as-is to avoid extra data copying.
         :type tags: dict
 
-        :param start_time: an explicit span start time as a unix timestamp per
-            :meth:`time.time()`.
+        :param start_time: an explicit :class:`Span` start time as a unix
+            timestamp per :meth:`time.time()`.
         :type start_time: float
 
         :param ignore_active_span: (optional) an explicit flag that ignores
-            the current active scope and creates a root span.
+            the current active :class:`Scope` and creates a root :class:`Span`.
         :type ignore_active_span: bool
 
-        :param finish_on_close: whether span should automatically be finished
-            when :meth:`Scope.close()` is called.
+        :param finish_on_close: whether :class:`Span` should automatically be
+            finished when :meth:`Scope.close()` is called.
         :type finish_on_close: bool
 
         :rtype: Scope
-        :return: a scope, already registered via the scope manager.
+        :return: a :class:`Scope`, already registered via the
+            :class:`ScopeManager`.
         """
         return self._noop_scope
 
@@ -133,22 +136,23 @@ class Tracer(object):
                    tags=None,
                    start_time=None,
                    ignore_active_span=False):
-        """Starts and returns a new span representing a unit of work.
+        """Starts and returns a new :class:`Span` representing a unit of work.
 
 
-        Starting a root span (a span with no causal references)::
+        Starting a root :class:`Span` (a :class:`Span` with no causal
+        references)::
 
             tracer.start_span('...')
 
 
-        Starting a child span (see also :meth:`start_child_span()`)::
+        Starting a child :class:`Span` (see also :meth:`start_child_span()`)::
 
             tracer.start_span(
                 '...',
                 child_of=parent_span)
 
 
-        Starting a child span in a more verbose way::
+        Starting a child :class:`Span` in a more verbose way::
 
             tracer.start_span(
                 '...',
@@ -156,21 +160,22 @@ class Tracer(object):
 
 
         :param operation_name: name of the operation represented by the new
-            span from the perspective of the current service.
+            :class:`Span` from the perspective of the current service.
         :type operation_name: str
 
-        :param child_of: (optional) a span or span context representing the
-            parent in a REFERENCE_CHILD_OF reference.  If specified, the
-            `references` parameter must be omitted.
+        :param child_of: (optional) a :class:`Span` or :class:`SpanContext`
+            representing the parent in a REFERENCE_CHILD_OF reference.  If
+            specified, the `references` parameter must be omitted.
         :type child_of: Span or SpanContext
 
         :param references: (optional) references that identify one or more
-            parent span contexts. (See the Reference documentation for detail).
+            parent :class:`SpanContext`\ s. (See the Reference documentation
+            for detail).
         :type references: :obj:`list` of :class:`Reference`
 
-        :param tags: an optional dictionary of span tags. The caller gives up
-            ownership of that dictionary, because the tracer may use it as-is
-            to avoid extra data copying.
+        :param tags: an optional dictionary of :class:`Span` tags. The caller
+            gives up ownership of that dictionary, because the :class:`Tracer`
+            may use it as-is to avoid extra data copying.
         :type tags: dict
 
         :param start_time: an explicit Span start time as a unix timestamp per
@@ -178,11 +183,11 @@ class Tracer(object):
         :type start_time: float
 
         :param ignore_active_span: an explicit flag that ignores the current
-            active scope and creates a root span.
+            active :class:`Scope` and creates a root :class:`Span`.
         :type ignore_active_span: bool
 
         :rtype: Span
-        :return: an already-started span instance.
+        :return: an already-started :class:`Span` instance.
         """
         return self._noop_span
 
@@ -195,7 +200,7 @@ class Tracer(object):
         Implementations *must* raise :exc:`UnsupportedFormatException` if
         `format` is unknown or disallowed.
 
-        :param span_context: the span context instance to inject
+        :param span_context: the :class:`SpanContext` instance to inject
         :type span_context: SpanContext
 
         :param format: a python object instance that represents a given
@@ -209,8 +214,9 @@ class Tracer(object):
         raise UnsupportedFormatException(format)
 
     def extract(self, format, carrier):
-        """Returns a span context instance extracted from a `carrier` of the
-        given `format`, or ``None`` if no such span context could be found.
+        """Returns a :class:`SpanContext` instance extracted from a `carrier` of the
+        given `format`, or ``None`` if no such :class:`SpanContext` could be
+        found.
 
         The type of `carrier` is determined by `format`. See the
         :class:`Format` class/namespace for the built-in OpenTracing formats.
@@ -230,8 +236,8 @@ class Tracer(object):
         :param carrier: the format-specific carrier object to extract from
 
         :rtype: SpanContext
-        :return: a span context extracted from `carrier` or ``None`` if no such
-            span context could be found.
+        :return: a :class:`SpanContext` extracted from `carrier` or ``None`` if
+            no such :class:`SpanContext` could be found.
         """
         if format in Tracer._supported_formats:
             return self._noop_span_context
@@ -251,14 +257,14 @@ class ReferenceType(object):
 # We use namedtuple since references are meant to be immutable.
 # We subclass it to expose a standard docstring.
 class Reference(namedtuple('Reference', ['type', 'referenced_context'])):
-    """A Reference pairs a reference type with a referenced span context.
+    """A Reference pairs a reference type with a referenced :class:`SpanContext`.
 
     References are used by :meth:`Tracer.start_span()` to describe the
-    relationships between spans.
+    relationships between :class:`Span`\ s.
 
-    Tracer implementations must ignore references where referenced_context is
-    ``None``.  This behavior allows for simpler code when an inbound RPC
-    request contains no tracing information and as a result
+    :class:`Tracer` implementations must ignore references where
+    referenced_context is ``None``.  This behavior allows for simpler code when
+    an inbound RPC request contains no tracing information and as a result
     :meth:`Tracer.extract()` returns ``None``::
 
         parent_ref = tracer.extract(opentracing.HTTP_HEADERS, request.headers)
@@ -275,8 +281,9 @@ class Reference(namedtuple('Reference', ['type', 'referenced_context'])):
 def child_of(referenced_context=None):
     """child_of is a helper that creates CHILD_OF References.
 
-    :param referenced_context: the (causal parent) span context to reference.
-        If ``None`` is passed, this reference must be ignored by the tracer.
+    :param referenced_context: the (causal parent) :class:`SpanContext` to
+        reference. If ``None`` is passed, this reference must be ignored by
+        the :class:`Tracer`.
     :type referenced_context: SpanContext
 
     :rtype: Reference
@@ -291,8 +298,9 @@ def child_of(referenced_context=None):
 def follows_from(referenced_context=None):
     """follows_from is a helper that creates FOLLOWS_FROM References.
 
-    :param referenced_context: the (causal parent) span context to reference
-        If ``None`` is passed, this reference must be ignored by the tracer.
+    :param referenced_context: the (causal parent) :class:`SpanContext` to
+        reference. If ``None`` is passed, this reference must be ignored by the
+        :class:`Tracer`.
     :type referenced_context: SpanContext
 
     :rtype: Reference
@@ -305,7 +313,8 @@ def follows_from(referenced_context=None):
 
 
 def start_child_span(parent_span, operation_name, tags=None, start_time=None):
-    """A shorthand method that starts a `child_of` span for a given parent span.
+    """A shorthand method that starts a `child_of` :class:`Span` for a given
+    parent :class:`Span`.
 
     Equivalent to calling::
 
@@ -315,24 +324,25 @@ def start_child_span(parent_span, operation_name, tags=None, start_time=None):
             tags=tags,
             start_time=start_time)
 
-    :param parent_span: the span which will act as the parent in the returned
-        span's child_of reference.
+    :param parent_span: the :class:`Span` which will act as the parent in the
+        returned :class:`Span`\ s child_of reference.
     :type parent_span: Span
 
-    :param operation_name: the operation name for the child span instance
+    :param operation_name: the operation name for the child :class:`Span`
+        instance
     :type operation_name: str
 
-    :param tags: optional dict of span tags. The caller gives up ownership of
-        that dict, because the tracer may use it as-is to avoid extra data
-        copying.
+    :param tags: optional dict of :class:`Span` tags. The caller gives up
+        ownership of that dict, because the :class:`Tracer` may use it as-is to
+        avoid extra data copying.
     :type tags: dict
 
-    :param start_time: an explicit span start time as a unix timestamp per
-        :meth:`time.time()`.
+    :param start_time: an explicit :class:`Span` start time as a unix timestamp
+        per :meth:`time.time()`.
     :type start_time: float
 
     :rtype: Span
-    :return: an already-started span instance.
+    :return: an already-started :class:`Span` instance.
     """
     return parent_span.tracer.start_span(
         operation_name=operation_name,

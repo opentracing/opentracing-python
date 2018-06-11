@@ -22,18 +22,18 @@ from __future__ import absolute_import
 
 
 class Scope(object):
-    """A scope formalizes the activation and deactivation of a span, usually
-    from a CPU standpoint. Many times a span will be extant (in that
-    :meth:`Span.finish()` has not been called) despite being in a non-runnable
-    state from a CPU/scheduler standpoint. For instance, a span representing
-    the client side of an RPC will be unfinished but blocked on IO while the
-    RPC is still outstanding. A scope defines when a given span is scheduled
-    and on the path.
+    """A scope formalizes the activation and deactivation of a :class:`Span`,
+    usually from a CPU standpoint. Many times a :class:`Span` will be extant
+    (in that :meth:`Span.finish()` has not been called) despite being in a
+    non-runnable state from a CPU/scheduler standpoint. For instance, a
+    :class:`Span` representing the client side of an RPC will be unfinished but
+    blocked on IO while the RPC is still outstanding. A scope defines when a
+    given :class:`Span` is scheduled and on the path.
 
-    :param manager: the scope manager that created this scope.
+    :param manager: the :class:`ScopeManager` that created this :class:`Scope`.
     :type manager: ScopeManager
 
-    :param span: the span used for this scope.
+    :param span: the :class:`Span` used for this :class:`Scope`.
     :type span: Span
     """
     def __init__(self, manager, span):
@@ -43,7 +43,7 @@ class Scope(object):
 
     @property
     def span(self):
-        """Returns the span wrapped by this scope.
+        """Returns the :class:`Span` wrapped by this :class:`Scope`.
 
         :rtype: Span
         """
@@ -51,18 +51,18 @@ class Scope(object):
 
     @property
     def manager(self):
-        """Returns the scope manager that created this scope.
+        """Returns the :class:`ScopeManager` that created this :class:`Scope`.
 
         :rtype: ScopeManager
         """
         return self._manager
 
     def close(self):
-        """Marks the end of the active period for this scope, updating
+        """Marks the end of the active period for this :class:`Scope`, updating
         :attr:`ScopeManager.active` in the process.
 
-        NOTE: Calling this method more than once on a single scope leads to
-        undefined behavior.
+        NOTE: Calling this method more than once on a single :class:`Scope`
+        leads to undefined behavior.
         """
         pass
 
