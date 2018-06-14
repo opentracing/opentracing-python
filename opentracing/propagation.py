@@ -23,9 +23,9 @@ from __future__ import absolute_import
 
 class UnsupportedFormatException(Exception):
     """UnsupportedFormatException should be used when the provided format
-    value is unknown or disallowed by the Tracer.
+    value is unknown or disallowed by the :class:`Tracer`.
 
-    See Tracer.inject() and Tracer.extract().
+    See :meth:`Tracer.inject()` and :meth:`Tracer.extract()`.
     """
     pass
 
@@ -34,16 +34,16 @@ class InvalidCarrierException(Exception):
     """InvalidCarrierException should be used when the provided carrier
     instance does not match what the `format` argument requires.
 
-    See Tracer.inject() and Tracer.extract().
+    See :meth:`Tracer.inject()` and :meth:`Tracer.extract()`.
     """
     pass
 
 
 class SpanContextCorruptedException(Exception):
-    """SpanContextCorruptedException should be used when the underlying span
-    context state is seemingly present but not well-formed.
+    """SpanContextCorruptedException should be used when the underlying
+    :class:`SpanContext` state is seemingly present but not well-formed.
 
-    See Tracer.inject() and Tracer.extract().
+    See :meth:`Tracer.inject()` and :meth:`Tracer.extract()`.
     """
     pass
 
@@ -51,8 +51,8 @@ class SpanContextCorruptedException(Exception):
 class Format(object):
     """A namespace for builtin carrier formats.
 
-    These static constants are intended for use in the Tracer.inject() and
-    Tracer.extract() methods. E.g.::
+    These static constants are intended for use in the :meth:`Tracer.inject()`
+    and :meth:`Tracer.extract()` methods. E.g.::
 
         tracer.inject(span.context, Format.BINARY, binary_carrier)
 
@@ -62,29 +62,29 @@ class Format(object):
     """
     The BINARY format represents SpanContexts in an opaque bytearray carrier.
 
-    For both Tracer.inject() and Tracer.extract() the carrier should be a
-    bytearray instance. Tracer.inject() must append to the bytearray carrier
-    (rather than replace its contents).
+    For both :meth:`Tracer.inject()` and :meth:`Tracer.extract()` the carrier
+    should be a bytearray instance. :meth:`Tracer.inject()` must append to the
+    bytearray carrier (rather than replace its contents).
     """
 
     TEXT_MAP = 'text_map'
     """
-    The TEXT_MAP format represents SpanContexts in a python dict mapping from
-    strings to strings.
+    The TEXT_MAP format represents :class:`SpanContext`\ s in a python ``dict``
+    mapping from strings to strings.
 
     Both the keys and the values have unrestricted character sets (unlike the
     HTTP_HEADERS format).
 
-    NOTE: The TEXT_MAP carrier dict may contain unrelated data (e.g.,
-    arbitrary gRPC metadata). As such, the Tracer implementation should use a
-    prefix or other convention to distinguish Tracer-specific key:value
-    pairs.
+    NOTE: The TEXT_MAP carrier ``dict`` may contain unrelated data (e.g.,
+    arbitrary gRPC metadata). As such, the :class:`Tracer` implementation
+    should use a prefix or other convention to distinguish tracer-specific
+    key:value pairs.
     """
 
     HTTP_HEADERS = 'http_headers'
     """
-    The HTTP_HEADERS format represents SpanContexts in a python dict mapping
-    from character-restricted strings to strings.
+    The HTTP_HEADERS format represents :class:`SpanContext`\ s in a python
+    ``dict`` mapping from character-restricted strings to strings.
 
     Keys and values in the HTTP_HEADERS carrier must be suitable for use as
     HTTP headers (without modification or further escaping). That is, the
@@ -92,8 +92,8 @@ class Format(object):
     be preserved by various intermediaries, and the values should be
     URL-escaped.
 
-    NOTE: The HTTP_HEADERS carrier dict may contain unrelated data (e.g.,
-    arbitrary gRPC metadata). As such, the Tracer implementation should use a
-    prefix or other convention to distinguish Tracer-specific key:value
-    pairs.
+    NOTE: The HTTP_HEADERS carrier ``dict`` may contain unrelated data (e.g.,
+    arbitrary gRPC metadata). As such, the :class:`Tracer` implementation
+    should use a prefix or other convention to distinguish tracer-specific
+    key:value pairs.
     """

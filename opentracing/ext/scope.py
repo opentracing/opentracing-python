@@ -31,16 +31,16 @@ class ThreadLocalScope(Scope):
         """Initialize a `Scope` for the given `Span` object.
 
         :param span: the `Span` wrapped by this `Scope`.
-        :param finish_on_close: whether span should automatically be
-            finished when `Scope#close()` is called.
+        :param finish_on_close: whether :class:`Span` should automatically be
+            finished when :meth:`Scope.close()` is called.
         """
         super(ThreadLocalScope, self).__init__(manager, span)
         self._finish_on_close = finish_on_close
         self._to_restore = manager.active
 
     def close(self):
-        """Mark the end of the active period for this {@link Scope},
-        updating ScopeManager#active in the process.
+        """Mark the end of the active period for this :class:`Scope`,
+        updating :attr:`ScopeManager.active` in the process.
         """
         if self.manager.active is not self:
             return

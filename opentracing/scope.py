@@ -22,38 +22,46 @@ from __future__ import absolute_import
 
 
 class Scope(object):
-    """A `Scope` formalizes the activation and deactivation of a `Span`,
-    usually from a CPU standpoint. Many times a `Span` will be extant (in that
-    `Span#finish()` has not been called) despite being in a non-runnable state
-    from a CPU/scheduler standpoint. For instance, a `Span` representing the
-    client side of an RPC will be unfinished but blocked on IO while the RPC is
-    still outstanding. A `Scope` defines when a given `Span` is scheduled
-    and on the path.
+    """A scope formalizes the activation and deactivation of a :class:`Span`,
+    usually from a CPU standpoint. Many times a :class:`Span` will be extant
+    (in that :meth:`Span.finish()` has not been called) despite being in a
+    non-runnable state from a CPU/scheduler standpoint. For instance, a
+    :class:`Span` representing the client side of an RPC will be unfinished but
+    blocked on IO while the RPC is still outstanding. A scope defines when a
+    given :class:`Span` is scheduled and on the path.
+
+    :param manager: the :class:`ScopeManager` that created this :class:`Scope`.
+    :type manager: ScopeManager
+
+    :param span: the :class:`Span` used for this :class:`Scope`.
+    :type span: Span
     """
     def __init__(self, manager, span):
-        """Initializes a `Scope` for the given `Span` object.
-
-        :param manager: the `ScopeManager` that created this `Scope`
-        :param span: the `Span` used for this `Scope`
-        """
+        """Initializes a scope for *span*."""
         self._manager = manager
         self._span = span
 
     @property
     def span(self):
-        """Returns the `Span` wrapped by this `Scope`."""
+        """Returns the :class:`Span` wrapped by this :class:`Scope`.
+
+        :rtype: Span
+        """
         return self._span
 
     @property
     def manager(self):
-        """Returns the `ScopeManager` that created this `Scope`."""
+        """Returns the :class:`ScopeManager` that created this :class:`Scope`.
+
+        :rtype: ScopeManager
+        """
         return self._manager
 
     def close(self):
-        """Marks the end of the active period for this `Scope`,
-        updating `ScopeManager#active` in the process.
+        """Marks the end of the active period for this :class:`Scope`, updating
+        :attr:`ScopeManager.active` in the process.
 
-        NOTE: Calling `close()` more than once on a single `Scope` instance
+        NOTE: Calling this method more than once on a single :class:`Scope`
         leads to undefined behavior.
         """
         pass
@@ -63,7 +71,7 @@ class Scope(object):
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        """Calls `close()` when the execution is outside the Python
+        """Calls :meth:`close()` when the execution is outside the Python
         Context Manager.
         """
         self.close()
