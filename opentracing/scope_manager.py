@@ -25,9 +25,8 @@ from .scope import Scope
 
 
 class ScopeManager(object):
-    """The `ScopeManager` interface abstracts both the activation of `Span`
-    instances (via `ScopeManager#activate(span, finish_on_close)`) and
-    access to an active `Span` / `Scope` (via `ScopeManager#active`).
+    """The :class:`ScopeManager` interface abstracts both the activation of
+    a :class:`Span` and access to an active :class:`Span`/:class:`Scope`.
     """
     def __init__(self):
         # TODO: `tracer` should not be None, but we don't have a reference;
@@ -37,27 +36,30 @@ class ScopeManager(object):
         self._noop_scope = Scope(self, self._noop_span)
 
     def activate(self, span, finish_on_close):
-        """Makes a `Span` instance active.
+        """Makes a :class:`Span` active.
 
-        :param span: the `Span` that should become active.
-        :param finish_on_close: whether span should be automatically
-            finished when `Scope#close()` is called.
+        :param span: the :class:`Span` that should become active.
+        :param finish_on_close: whether :class:`Span` should be automatically
+            finished when :meth:`Scope.close()` is called.
 
-        :return: a `Scope` instance to control the end of the active period for
-            the `Span`. It is a programming error to neglect to call
-            `Scope#close()` on the returned instance.
+        :rtype: Scope
+        :return: a :class:`Scope` to control the end of the active period for
+            *span*. It is a programming error to neglect to call
+            :meth:`Scope.close()` on the returned instance.
         """
         return self._noop_scope
 
     @property
     def active(self):
-        """Returns the currently active `Scope` which can be used to access the
-        currently active `Scope#span`.
+        """Returns the currently active :class:`Scope` which can be used to access the
+        currently active :attr:`Scope.span`.
 
-        If there is a non-null `Scope`, its wrapped `Span` becomes an implicit
-        parent of any newly-created `Span` at `Tracer#start_active_span()`
-        time.
+        If there is a non-null :class:`Scope`, its wrapped :class:`Span`
+        becomes an implicit parent of any newly-created :class:`Span` at
+        :meth:`Tracer.start_active_span()` time.
 
-        :return: the `Scope` that is active, or `None` if not available.
+        :rtype: Scope
+        :return: the :class:`Scope` that is active, or ``None`` if not
+            available.
         """
         return self._noop_scope
