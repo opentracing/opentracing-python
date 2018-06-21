@@ -94,8 +94,8 @@ class MockTracer(Tracer):
 
         Note that this does **not** have any effect on **Spans** created by
         MockTracer that have not finished yet; those
-        will still be enqueued in :meth:`~MockTracer.finished_spans()` when they
-        :func:`finish()`.
+        will still be enqueued in :meth:`~MockTracer.finished_spans()`
+        when they :func:`finish()`.
         """
         with self._spans_lock:
             self._finished_spans = []

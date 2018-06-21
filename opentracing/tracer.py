@@ -48,7 +48,10 @@ class Tracer(object):
 
     @property
     def scope_manager(self):
-        """ScopeManager accessor"""
+        """Provides access to the current :class:`~opentracing.ScopeManager`.
+
+        :rtype: :class:`~opentracing.ScopeManager`
+        """
         return self._scope_manager
 
     @property
@@ -57,7 +60,7 @@ class Tracer(object):
         :attr:`Tracer.scope_manager.active.span`, and ``None`` will be
         returned if :attr:`Scope.span` is ``None``.
 
-        :rtype: Span
+        :rtype: :class:`~opentracing.Span`
         :return: the active :class:`Span`.
         """
         scope = self._scope_manager.active

@@ -67,7 +67,7 @@ class Scope(object):
         pass
 
     def __enter__(self):
-        """Allows `Scope` to be used inside a Python Context Manager."""
+        """Allows :class:`Scope` to be used inside a Python Context Manager."""
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
