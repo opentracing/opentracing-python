@@ -45,3 +45,8 @@ Exceptions
 
 .. autoclass:: opentracing.UnsupportedFormatException
    :members:
+
+MockTracer
+--------------
+.. autoclass:: opentracing.mocktracer.MockTracer
+   :members:
