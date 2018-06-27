@@ -31,14 +31,23 @@ from .span import MockSpan
 
 
 class MockTracer(Tracer):
+    """MockTracer makes it easy to test the semantics of OpenTracing
+    instrumentation.
+
+    By using a MockTracer as a :class:`~opentracing.Tracer` implementation
+    for tests, a developer can assert that :class:`~opentracing.Span`
+    properties and relationships with other
+    **Spans** are defined as expected by instrumentation code.
+
+    By default, MockTracer registers propagators for :attr:`Format.TEXT_MAP`,
+    :attr:`Format.HTTP_HEADERS` and :attr:`Format.BINARY`. The user should
+    call :func:`register_propagator()` for each additional inject/extract
+    format.
+    """
 
     def __init__(self, scope_manager=None):
-        """Initialize a MockTracer instance.
+        """Initialize a MockTracer instance."""
 
-        By default, MockTracer registers propagators for Format.TEXT_MAP,
-        Format.HTTP_HEADERS and Format.BINARY. The user should call
-        register_propagator() for each additional inject/extract format.
-        """
         scope_manager = ThreadLocalScopeManager() \
             if scope_manager is None else scope_manager
         super(MockTracer, self).__init__(scope_manager)
@@ -56,8 +65,9 @@ class MockTracer(Tracer):
     def register_propagator(self, format, propagator):
         """Register a propagator with this MockTracer.
 
-        :param string format: a Format identifier like Format.TEXT_MAP
-        :param Propagator propagator: a Propagator instance to handle
+        :param string format: a :class:`~opentracing.Format`
+            identifier like :attr:`~opentracing.Format.TEXT_MAP`
+        :param **Propagator** propagator: a **Propagator** instance to handle
             inject/extract calls involving `format`
         """
         self._propagators[format] = propagator
@@ -70,10 +80,23 @@ class MockTracer(Tracer):
         self.register_propagator(Format.BINARY, BinaryPropagator())
 
     def finished_spans(self):
+        """Return a copy of all finished **Spans** started by this MockTracer
+        (since construction or the last call to :meth:`~MockTracer.reset()`)
+
+        :rtype: list
+        :return: a copy of the finished **Spans**.
+        """
         with self._spans_lock:
             return list(self._finished_spans)
 
     def reset(self):
+        """Clear the finished **Spans** queue.
+
+        Note that this does **not** have any effect on **Spans** created by
+        MockTracer that have not finished yet; those
+        will still be enqueued in :meth:`~MockTracer.finished_spans()`
+        when they :func:`finish()`.
+        """
         with self._spans_lock:
             self._finished_spans = []
 
