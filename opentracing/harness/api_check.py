@@ -66,8 +66,11 @@ class APICompatibilityCheckMixin(object):
 
         if self.check_scope_manager():
             assert tracer.active_span is None
+            assert tracer.scope_manager.active is None
+
             with tracer.scope_manager.activate(span, True):
                 assert tracer.active_span is span
+                assert tracer.scope_manager.active.span is span
 
     def test_start_active_span(self):
         # the first usage returns a `Scope` that wraps a root `Span`
@@ -124,12 +127,6 @@ class APICompatibilityCheckMixin(object):
 
         if self.check_scope_manager():
             assert finish.call_count == 1
-
-    def test_scope_as_context_manager(self):
-        tracer = self.tracer()
-
-        with tracer.start_active_span('antiquing') as scope:
-            assert scope.span is not None
 
     def test_start_span(self):
         tracer = self.tracer()
@@ -323,43 +320,6 @@ class APICompatibilityCheckMixin(object):
 
         scope.close()
 
-    def test_tracer_start_active_span_nesting(self):
-        # when a Scope is closed, the previous one must be activated
-        tracer = self.tracer()
-        with tracer.start_active_span('Fry') as parent:
-            with tracer.start_active_span('Farnsworth'):
-                pass
-
-            if self.check_scope_manager():
-                assert tracer.scope_manager.active == parent
-
-        if self.check_scope_manager():
-            assert tracer.scope_manager.active is None
-
-    def test_tracer_start_active_span_nesting_finish_on_close(self):
-        # finish_on_close must be correctly handled
-        tracer = self.tracer()
-        parent = tracer.start_active_span('Fry', finish_on_close=False)
-        with mock.patch.object(parent.span, 'finish') as finish:
-            with tracer.start_active_span('Farnsworth'):
-                pass
-            parent.close()
-
-        assert finish.call_count == 0
-
-        if self.check_scope_manager():
-            assert tracer.scope_manager.active is None
-
-    def test_tracer_start_active_span_wrong_close_order(self):
-        # only the active `Scope` can be closed
-        tracer = self.tracer()
-        parent = tracer.start_active_span('Fry')
-        child = tracer.start_active_span('Farnsworth')
-        parent.close()
-
-        if self.check_scope_manager():
-            assert tracer.scope_manager.active == child
-
     def test_tracer_start_span_scope(self):
         # the Tracer ScopeManager should not store the new Span
         tracer = self.tracer()
@@ -369,19 +329,3 @@ class APICompatibilityCheckMixin(object):
             assert tracer.scope_manager.active is None
 
         span.finish()
-
-    def test_tracer_scope_manager_active(self):
-        # a `ScopeManager` has no scopes in its initial state
-        tracer = self.tracer()
-
-        if self.check_scope_manager():
-            assert tracer.scope_manager.active is None
-
-    def test_tracer_scope_manager_activate(self):
-        # a `ScopeManager` should activate any `Span`
-        tracer = self.tracer()
-        span = tracer.start_span(operation_name='Fry')
-        tracer.scope_manager.activate(span, False)
-
-        if self.check_scope_manager():
-            assert tracer.scope_manager.active.span == span

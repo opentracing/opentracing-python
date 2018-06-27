@@ -4,7 +4,7 @@ from __future__ import print_function
 import asyncio
 
 from opentracing.mocktracer import MockTracer
-from ..span_propagation import AsyncioScopeManager
+from opentracing.ext.scope_manager.asyncio import AsyncioScopeManager
 from ..testcase import OpenTracingTestCase
 from ..utils import stop_loop_when
 

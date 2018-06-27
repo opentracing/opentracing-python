@@ -5,7 +5,8 @@ import functools
 from tornado import gen, ioloop
 
 from opentracing.mocktracer import MockTracer
-from ..span_propagation import TornadoScopeManager, tracer_stack_context
+from opentracing.ext.scope_manager.tornado import TornadoScopeManager, \
+        tracer_stack_context
 from ..testcase import OpenTracingTestCase
 
 

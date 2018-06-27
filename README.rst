@@ -192,6 +192,23 @@ Each service/framework ought to provide a specific ``ScopeManager`` implementati
 that relies on their own request-local storage (thread-local storage, or coroutine-based storage
 for asynchronous frameworks, for example).
 
+Scope managers
+^^^^^^^^^^^^^^
+
+This project includes a set of ``ScopeManager`` implementations under the ``opentracing.ext.scope_manager`` submodule, which can be imported on demand:
+
+.. code-block:: python
+
+   from opentracing.ext.scope_manager import ThreadLocalScopeManager
+
+There exist implementations for ``thread-local`` (the default), ``gevent``, ``Tornado`` and ``asyncio``:
+
+.. code-block:: python
+
+   from opentracing.ext.scope_manager.gevent import GeventScopeManager # requires gevent
+   from opentracing.ext.scope_manager.tornado import TornadoScopeManager # requires Tornado
+   from opentracing.ext.scope_manager.asyncio import AsyncioScopeManager # requires Python 3.4 or newer.
+
 Development
 -----------
 

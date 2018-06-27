@@ -19,41 +19,12 @@
 # THE SOFTWARE.
 
 from __future__ import absolute_import
-import mock
+from unittest import TestCase
 
-from opentracing.span import Span
 from opentracing.ext.scope_manager import ThreadLocalScopeManager
+from opentracing.harness.scope_check import ScopeCompatibilityCheckMixin
 
 
-def test_ext_scope_implicit_stack():
-    scope_manager = ThreadLocalScopeManager()
-
-    background_span = mock.MagicMock(spec=Span)
-    foreground_span = mock.MagicMock(spec=Span)
-
-    with scope_manager.activate(background_span, True) as background_scope:
-        assert background_scope is not None
-
-        # Activate a new Scope on top of the background one.
-        with scope_manager.activate(foreground_span, True) as foreground_scope:
-            assert foreground_scope is not None
-            assert scope_manager.active is foreground_scope
-
-        # And now the background_scope should be reinstated.
-        assert scope_manager.active is background_scope
-
-    assert background_span.finish.call_count == 1
-    assert foreground_span.finish.call_count == 1
-
-    assert scope_manager.active is None
-
-
-def test_when_different_span_is_active():
-    scope_manager = ThreadLocalScopeManager()
-
-    span = mock.MagicMock(spec=Span)
-    active = scope_manager.activate(span, False)
-    scope_manager.activate(mock.MagicMock(spec=Span), False)
-    active.close()
-
-    assert span.finish.call_count == 0
+class ThreadLocalCompabilityCheck(TestCase, ScopeCompatibilityCheckMixin):
+    def scope_manager(self):
+        return ThreadLocalScopeManager()

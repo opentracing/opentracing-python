@@ -5,8 +5,8 @@ import random
 import gevent
 
 from opentracing.mocktracer import MockTracer
+from opentracing.ext.scope_manager.gevent import GeventScopeManager
 from ..testcase import OpenTracingTestCase
-from ..span_propagation import GeventScopeManager
 from ..utils import get_logger
 
 

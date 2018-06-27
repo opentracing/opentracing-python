@@ -34,9 +34,8 @@ setup(
             'pytest-cov',
             'pytest-mock',
             'Sphinx',
-            'sphinx_rtd_theme'
-        ],
-        'testbed': [
+            'sphinx_rtd_theme',
+
             'six>=1.10.0,<2.0',
             'gevent==1.2',
             'tornado',
