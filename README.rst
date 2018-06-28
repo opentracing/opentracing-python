@@ -260,7 +260,7 @@ The documentation is written to *docs/_build/html*.
 LICENSE
 ^^^^^^^
 
-[MIT License](./LICENSE).
+[Apache 2.0 License](./LICENSE).
 
 Releases
 ^^^^^^^^
