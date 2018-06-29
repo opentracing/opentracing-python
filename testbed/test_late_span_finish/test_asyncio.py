@@ -3,7 +3,7 @@ from __future__ import print_function
 import asyncio
 
 from opentracing.mocktracer import MockTracer
-from opentracing.ext.scope_managers.asyncio import AsyncioScopeManager
+from opentracing.scope_managers.asyncio import AsyncioScopeManager
 from ..testcase import OpenTracingTestCase
 from ..utils import get_logger, stop_loop_when
 

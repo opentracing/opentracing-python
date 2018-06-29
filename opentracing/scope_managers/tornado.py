@@ -24,7 +24,7 @@ import threading
 import tornado.stack_context
 
 from opentracing import Scope
-from opentracing.ext.scope_managers import ThreadLocalScopeManager
+from opentracing.scope_managers import ThreadLocalScopeManager
 
 
 # Implementation based on
@@ -257,7 +257,7 @@ def tracer_stack_context():
 
     .. code-block:: python
 
-        from opentracing.ext.scope_manager.tornado import tracer_stack_context
+        from opentracing.scope_managers.tornado import tracer_stack_context
 
         @tornado.gen.coroutine
         def handle_request_wrapper(request, actual_handler, *args, **kwargs)

@@ -20,17 +20,32 @@
 
 from __future__ import absolute_import
 
+from concurrent.futures import ThreadPoolExecutor
 from unittest import TestCase
 
-import gevent
+import asyncio
 
-from opentracing.ext.scope_managers.gevent import GeventScopeManager
+from opentracing.scope_managers.asyncio import AsyncioScopeManager
 from opentracing.harness.scope_check import ScopeCompatibilityCheckMixin
 
 
-class GeventCompabilityCheck(TestCase, ScopeCompatibilityCheckMixin):
+class AsyncioCompabilityCheck(TestCase, ScopeCompatibilityCheckMixin):
+
     def scope_manager(self):
-        return GeventScopeManager()
+        return AsyncioScopeManager()
 
     def run_test(self, test_fn):
-        gevent.spawn(test_fn).get()
+        @asyncio.coroutine
+        def async_test_fn():
+            test_fn()
+        asyncio.get_event_loop().run_until_complete(async_test_fn())
+
+    def test_no_event_loop(self):
+        # no event loop exists by default in
+        # new threads, so make sure we don't fail there.
+        def test_fn():
+            manager = self.scope_manager()
+            assert manager.active is None
+
+        executor = ThreadPoolExecutor(max_workers=1)
+        executor.submit(test_fn).result()

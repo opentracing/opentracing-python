@@ -22,17 +22,15 @@ from __future__ import absolute_import
 
 from unittest import TestCase
 
-from tornado import ioloop
+import gevent
 
-from opentracing.ext.scope_managers.tornado import TornadoScopeManager
-from opentracing.ext.scope_managers.tornado import tracer_stack_context
+from opentracing.scope_managers.gevent import GeventScopeManager
 from opentracing.harness.scope_check import ScopeCompatibilityCheckMixin
 
 
-class TornadoCompabilityCheck(TestCase, ScopeCompatibilityCheckMixin):
+class GeventCompabilityCheck(TestCase, ScopeCompatibilityCheckMixin):
     def scope_manager(self):
-        return TornadoScopeManager()
+        return GeventScopeManager()
 
     def run_test(self, test_fn):
-        with tracer_stack_context():
-            ioloop.IOLoop.current().run_sync(test_fn)
+        gevent.spawn(test_fn).get()

@@ -6,7 +6,7 @@ from tornado import gen, ioloop
 
 from opentracing.ext import tags
 from opentracing.mocktracer import MockTracer
-from opentracing.ext.scope_managers.tornado import TornadoScopeManager, \
+from opentracing.scope_managers.tornado import TornadoScopeManager, \
         tracer_stack_context
 from ..testcase import OpenTracingTestCase
 from ..utils import get_logger, get_one_by_operation_name, stop_loop_when
