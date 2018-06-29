@@ -4,7 +4,7 @@ from __future__ import print_function
 from tornado import gen, ioloop
 
 from opentracing.mocktracer import MockTracer
-from opentracing.ext.scope_manager.tornado import TornadoScopeManager, \
+from opentracing.ext.scope_managers.tornado import TornadoScopeManager, \
         tracer_stack_context
 from ..testcase import OpenTracingTestCase
 from ..utils import stop_loop_when

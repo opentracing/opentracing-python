@@ -5,7 +5,7 @@ import random
 import asyncio
 
 from opentracing.mocktracer import MockTracer
-from opentracing.ext.scope_manager.asyncio import AsyncioScopeManager
+from opentracing.ext.scope_managers.asyncio import AsyncioScopeManager
 from ..testcase import OpenTracingTestCase
 from ..utils import RefCount, get_logger, stop_loop_when
 

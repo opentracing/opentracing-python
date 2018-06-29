@@ -21,7 +21,7 @@
 from __future__ import absolute_import
 from unittest import TestCase
 
-from opentracing.ext.scope_manager import ThreadLocalScopeManager
+from opentracing.ext.scope_managers import ThreadLocalScopeManager
 from opentracing.harness.scope_check import ScopeCompatibilityCheckMixin
 
 

@@ -18,7 +18,7 @@ Alternatively, due to the organization of the suite, it's possible to run direct
 
 ## Tested frameworks
 
-Currently the examples cover `threading`, `tornado`, `gevent` and `asyncio` (which requires Python 3). Each example uses their respective `ScopeManager` instance from `opentracing.ext.scope_manager`, along with their related requirements and limitations.
+Currently the examples cover `threading`, `tornado`, `gevent` and `asyncio` (which requires Python 3). Each example uses their respective `ScopeManager` instance from `opentracing.ext.scope_managers`, along with their related requirements and limitations.
 
 ### threading, asyncio and gevent
 

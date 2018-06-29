@@ -23,7 +23,7 @@ from __future__ import absolute_import
 import asyncio
 
 from opentracing import Scope
-from opentracing.ext.scope_manager import ThreadLocalScopeManager
+from opentracing.ext.scope_managers import ThreadLocalScopeManager
 from .constants import ACTIVE_ATTR
 
 

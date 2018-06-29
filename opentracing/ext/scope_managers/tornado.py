@@ -24,7 +24,7 @@ import threading
 import tornado.stack_context
 
 from opentracing import Scope
-from opentracing.ext.scope_manager import ThreadLocalScopeManager
+from opentracing.ext.scope_managers import ThreadLocalScopeManager
 
 
 # Implementation based on

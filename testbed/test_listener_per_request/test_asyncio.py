@@ -4,7 +4,7 @@ import asyncio
 
 from opentracing.ext import tags
 from opentracing.mocktracer import MockTracer
-from opentracing.ext.scope_manager.asyncio import AsyncioScopeManager
+from opentracing.ext.scope_managers.asyncio import AsyncioScopeManager
 from ..testcase import OpenTracingTestCase
 from ..utils import get_one_by_tag
 
