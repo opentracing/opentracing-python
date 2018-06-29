@@ -20,7 +20,7 @@ class TestGevent(OpenTracingTestCase):
 
     def test_main(self):
         def main_task():
-            with self.tracer.start_active_span('parent'):
+            with self.tracer.start_active_scope('parent'):
                 tasks = self.submit_callbacks()
                 gevent.joinall(tasks)
 
@@ -39,7 +39,7 @@ class TestGevent(OpenTracingTestCase):
         logger.info('Starting task')
 
         with self.tracer.scope_manager.activate(parent_span, False):
-            with self.tracer.start_active_span('task'):
+            with self.tracer.start_active_scope('task'):
                 gevent.sleep(interval)
 
     def submit_callbacks(self):

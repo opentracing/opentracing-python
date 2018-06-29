@@ -24,12 +24,12 @@ class TestAsyncio(OpenTracingTestCase):
         self.assertIsChildOf(spans[0], spans[1])
 
     async def parent_task(self, message):  # noqa
-        with self.tracer.start_active_span('parent') as scope:
+        with self.tracer.start_active_scope('parent') as scope:
             res = await self.child_task(message, scope.span)
 
         return res
 
     async def child_task(self, message, span):
         with self.tracer.scope_manager.activate(span, False):
-            with self.tracer.start_active_span('child'):
+            with self.tracer.start_active_scope('child'):
                 return '%s::response' % message

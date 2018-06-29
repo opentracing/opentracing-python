@@ -46,7 +46,7 @@ class TestTornado(OpenTracingTestCase):
         def task(name):
             logger.info('Running %s' % name)
             with self.tracer.scope_manager.activate(parent_span, False):
-                with self.tracer.start_active_span(name):
+                with self.tracer.start_active_scope(name):
                     gen.sleep(0.1)
 
         self.loop.add_callback(task, 'task1')

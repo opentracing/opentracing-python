@@ -23,7 +23,7 @@ class TestTornado(OpenTracingTestCase):
     def test_main(self):
         @gen.coroutine
         def main_task():
-            with self.tracer.start_active_span('parent'):
+            with self.tracer.start_active_scope('parent'):
                 tasks = self.submit_callbacks()
                 yield tasks
 

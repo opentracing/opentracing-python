@@ -8,7 +8,7 @@ This example shows a `Span` for a top-level operation, with independent, unknown
     def submit_subtasks(self, parent_span):
         def task(name, interval):
             with self.tracer.scope_manager.activate(parent_span, False):
-                with self.tracer.start_active_span(name):
+                with self.tracer.start_active_scope(name):
                     time.sleep(interval)
 
         self.executor.submit(task, 'task1', 0.1)

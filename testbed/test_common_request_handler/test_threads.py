@@ -73,7 +73,7 @@ class TestThreads(OpenTracingTestCase):
     def test_parent_not_picked(self):
         """Active parent should not be picked up by child."""
 
-        with self.tracer.start_active_span('parent'):
+        with self.tracer.start_active_scope('parent'):
             response = self.client.send_sync('no_parent')
             self.assertEquals('no_parent::response', response)
 
@@ -93,7 +93,7 @@ class TestThreads(OpenTracingTestCase):
         """Solution is bad because parent is per client
         (we don't have better choice)"""
 
-        with self.tracer.start_active_span('parent') as scope:
+        with self.tracer.start_active_scope('parent') as scope:
             client = Client(RequestHandler(self.tracer, scope.span.context),
                             self.executor)
             response = client.send_sync('correct_parent')

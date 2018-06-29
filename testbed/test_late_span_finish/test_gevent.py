@@ -39,7 +39,7 @@ class TestGevent(OpenTracingTestCase):
     def submit_subtasks(self, parent_span):
         def task(name):
             with self.tracer.scope_manager.activate(parent_span, False):
-                with self.tracer.start_active_span(name):
+                with self.tracer.start_active_scope(name):
                     gevent.sleep(0.1)
 
         gevent.spawn(task, 'task1')

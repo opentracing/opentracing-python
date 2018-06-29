@@ -23,7 +23,7 @@ class TestAsyncio(OpenTracingTestCase):
         # Need to run within a Task, as the scope manager depends
         # on Task.current_task()
         async def main_task():
-            with self.tracer.start_active_span('parent'):
+            with self.tracer.start_active_scope('parent'):
                 tasks = self.submit_callbacks()
                 await asyncio.gather(*tasks)
 
@@ -45,7 +45,7 @@ class TestAsyncio(OpenTracingTestCase):
         logger.info('Starting task')
 
         with self.tracer.scope_manager.activate(parent_span, False):
-            with self.tracer.start_active_span('task'):
+            with self.tracer.start_active_scope('task'):
                 await asyncio.sleep(interval)
 
     def submit_callbacks(self):

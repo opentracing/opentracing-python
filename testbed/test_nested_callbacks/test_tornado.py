@@ -19,7 +19,7 @@ class TestTornado(OpenTracingTestCase):
         # Start a Span and let the callback-chain
         # finish it when the task is done
         with tracer_stack_context():
-            with self.tracer.start_active_span('one', finish_on_close=False):
+            with self.tracer.start_active_scope('one', finish_on_close=False):
                 self.submit()
 
         stop_loop_when(self.loop,

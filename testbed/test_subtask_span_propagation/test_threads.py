@@ -21,7 +21,7 @@ class TestThreads(OpenTracingTestCase):
         self.assertIsChildOf(spans[0], spans[1])
 
     def parent_task(self, message):
-        with self.tracer.start_active_span('parent') as scope:
+        with self.tracer.start_active_scope('parent') as scope:
             f = self.executor.submit(self.child_task, message, scope.span)
             res = f.result()
 
@@ -29,5 +29,5 @@ class TestThreads(OpenTracingTestCase):
 
     def child_task(self, message, span):
         with self.tracer.scope_manager.activate(span, False):
-            with self.tracer.start_active_span('child'):
+            with self.tracer.start_active_scope('child'):
                 return '%s::response' % message

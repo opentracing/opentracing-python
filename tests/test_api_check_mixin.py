@@ -50,26 +50,26 @@ class VerifyAPICompatibilityCheck(unittest.TestCase):
         setattr(api_check, 'tracer', lambda: Tracer())
 
         # these tests are expected to succeed
-        api_check.test_start_active_span_ignore_active_span()
+        api_check.test_start_active_scope_ignore_active_span()
         api_check.test_start_span_propagation_ignore_active_span()
 
         # no-op tracer has a no-op ScopeManager implementation,
         # which means no *actual* propagation is done,
         # so these tests are expected to work, but asserts to fail
         with self.assertRaises(AssertionError):
-            api_check.test_start_active_span()
+            api_check.test_start_active_scope()
 
         with self.assertRaises(AssertionError):
-            api_check.test_start_active_span_parent()
+            api_check.test_start_active_scope_parent()
 
         with self.assertRaises(AssertionError):
             api_check.test_start_span_propagation()
 
         with self.assertRaises(AssertionError):
-            api_check.test_tracer_start_active_span_scope()
+            api_check.test_tracer_start_active_scope_scope()
 
         with self.assertRaises(AssertionError):
             api_check.test_tracer_start_span_scope()
 
         with self.assertRaises(AssertionError):
-            api_check.test_start_active_span_finish_on_close()
+            api_check.test_start_active_scope_finish_on_close()

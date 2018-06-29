@@ -47,12 +47,12 @@ class TornadoScopeManager(ThreadLocalScopeManager):
         def child_coroutine():
             # No need to pass 'parent' and activate it here,
             # as it is automatically propagated.
-            with tracer.start_active_span('child') as scope:
+            with tracer.start_active_scope('child') as scope:
                 ...
 
         @tornado.gen.coroutine
         def parent_coroutine():
-            with tracer.start_active_span('parent') as scope:
+            with tracer.start_active_scope('parent') as scope:
                 ...
                 yield child_coroutine()
                 ...

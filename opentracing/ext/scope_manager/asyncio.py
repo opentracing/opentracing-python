@@ -44,11 +44,11 @@ class AsyncioScopeManager(ThreadLocalScopeManager):
             # activate the parent Span, but do not finish it upon
             # deactivation. That will be done by the parent coroutine.
             with tracer.scope_manager.activate(span, finish_on_close=False):
-                with tracer.start_active_span('child') as scope:
+                with tracer.start_active_scope('child') as scope:
                     ...
 
         async def parent_coroutine():
-            with tracer.start_active_span('parent') as scope:
+            with tracer.start_active_scope('parent') as scope:
                 ...
                 await child_coroutine(span)
                 ...
