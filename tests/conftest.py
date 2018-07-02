@@ -22,7 +22,7 @@ from __future__ import absolute_import
 import six
 
 PYTHON3_FILES = [
-    'ext/scope_manager/test_asyncio.py',
+    'scope_managers/test_asyncio.py',
 ]
 
 if six.PY2:

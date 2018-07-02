@@ -53,16 +53,16 @@ MockTracer
 
 Scope managers
 --------------
-.. autoclass:: opentracing.ext.scope_manager.ThreadLocalScopeManager
+.. autoclass:: opentracing.scope_managers.ThreadLocalScopeManager
    :members:
 
-.. autoclass:: opentracing.ext.scope_manager.gevent.GeventScopeManager
+.. autoclass:: opentracing.scope_managers.gevent.GeventScopeManager
    :members:
 
-.. autoclass:: opentracing.ext.scope_manager.tornado.TornadoScopeManager
+.. autoclass:: opentracing.scope_managers.tornado.TornadoScopeManager
    :members:
 
-.. autofunction:: opentracing.ext.scope_manager.tornado.tracer_stack_context
+.. autofunction:: opentracing.scope_managers.tornado.tracer_stack_context
 
-.. autoclass:: opentracing.ext.scope_manager.asyncio.AsyncioScopeManager
+.. autoclass:: opentracing.scope_managers.asyncio.AsyncioScopeManager
    :members:
