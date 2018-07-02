@@ -19,12 +19,20 @@
 # THE SOFTWARE.
 
 from __future__ import absolute_import
+
 from unittest import TestCase
 
-from opentracing.ext.scope_manager import ThreadLocalScopeManager
+from tornado import ioloop
+
+from opentracing.scope_managers.tornado import TornadoScopeManager
+from opentracing.scope_managers.tornado import tracer_stack_context
 from opentracing.harness.scope_check import ScopeCompatibilityCheckMixin
 
 
-class ThreadLocalCompabilityCheck(TestCase, ScopeCompatibilityCheckMixin):
+class TornadoCompabilityCheck(TestCase, ScopeCompatibilityCheckMixin):
     def scope_manager(self):
-        return ThreadLocalScopeManager()
+        return TornadoScopeManager()
+
+    def run_test(self, test_fn):
+        with tracer_stack_context():
+            ioloop.IOLoop.current().run_sync(test_fn)

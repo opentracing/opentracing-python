@@ -20,19 +20,32 @@
 
 from __future__ import absolute_import
 
+from concurrent.futures import ThreadPoolExecutor
 from unittest import TestCase
 
-from tornado import ioloop
+import asyncio
 
-from opentracing.ext.scope_manager.tornado import TornadoScopeManager
-from opentracing.ext.scope_manager.tornado import tracer_stack_context
+from opentracing.scope_managers.asyncio import AsyncioScopeManager
 from opentracing.harness.scope_check import ScopeCompatibilityCheckMixin
 
 
-class TornadoCompabilityCheck(TestCase, ScopeCompatibilityCheckMixin):
+class AsyncioCompabilityCheck(TestCase, ScopeCompatibilityCheckMixin):
+
     def scope_manager(self):
-        return TornadoScopeManager()
+        return AsyncioScopeManager()
 
     def run_test(self, test_fn):
-        with tracer_stack_context():
-            ioloop.IOLoop.current().run_sync(test_fn)
+        @asyncio.coroutine
+        def async_test_fn():
+            test_fn()
+        asyncio.get_event_loop().run_until_complete(async_test_fn())
+
+    def test_no_event_loop(self):
+        # no event loop exists by default in
+        # new threads, so make sure we don't fail there.
+        def test_fn():
+            manager = self.scope_manager()
+            assert manager.active is None
+
+        executor = ThreadPoolExecutor(max_workers=1)
+        executor.submit(test_fn).result()

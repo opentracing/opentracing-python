@@ -3,7 +3,7 @@ from __future__ import print_function
 import gevent
 
 from opentracing.mocktracer import MockTracer
-from opentracing.ext.scope_manager.gevent import GeventScopeManager
+from opentracing.scope_managers.gevent import GeventScopeManager
 from ..testcase import OpenTracingTestCase
 
 

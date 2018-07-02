@@ -4,7 +4,7 @@ import gevent
 
 from opentracing.ext import tags
 from opentracing.mocktracer import MockTracer
-from opentracing.ext.scope_manager.gevent import GeventScopeManager
+from opentracing.scope_managers.gevent import GeventScopeManager
 from ..testcase import OpenTracingTestCase
 from ..utils import get_one_by_tag
 

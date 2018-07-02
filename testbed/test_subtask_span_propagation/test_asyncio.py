@@ -5,7 +5,7 @@ import functools
 import asyncio
 
 from opentracing.mocktracer import MockTracer
-from opentracing.ext.scope_manager.asyncio import AsyncioScopeManager
+from opentracing.scope_managers.asyncio import AsyncioScopeManager
 from ..testcase import OpenTracingTestCase
 
 

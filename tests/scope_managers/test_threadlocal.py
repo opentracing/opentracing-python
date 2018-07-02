@@ -19,18 +19,12 @@
 # THE SOFTWARE.
 
 from __future__ import absolute_import
-
 from unittest import TestCase
 
-import gevent
-
-from opentracing.ext.scope_manager.gevent import GeventScopeManager
+from opentracing.scope_managers import ThreadLocalScopeManager
 from opentracing.harness.scope_check import ScopeCompatibilityCheckMixin
 
 
-class GeventCompabilityCheck(TestCase, ScopeCompatibilityCheckMixin):
+class ThreadLocalCompabilityCheck(TestCase, ScopeCompatibilityCheckMixin):
     def scope_manager(self):
-        return GeventScopeManager()
-
-    def run_test(self, test_fn):
-        gevent.spawn(test_fn).get()
+        return ThreadLocalScopeManager()
