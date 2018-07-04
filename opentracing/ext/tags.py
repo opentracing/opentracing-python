@@ -35,10 +35,10 @@ SPAN_KIND_RPC_CLIENT = 'client'
 # Marks a span representing the server-side of an RPC or other remote call
 SPAN_KIND_RPC_SERVER = 'server'
 
-# Marks a span representing the consumer-side of an messaging call
+# Marks a span representing the consumer-side of a messaging call
 SPAN_KIND_CONSUMER = 'consumer'
 
-# Marks a span representing the producer-side of an messaging call
+# Marks a span representing the producer-side of a messaging call
 SPAN_KIND_PRODUCER = 'producer'
 
 # ---------------------------------------------------------------------------
