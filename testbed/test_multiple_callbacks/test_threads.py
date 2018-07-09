@@ -21,7 +21,7 @@ class TestThreads(OpenTracingTestCase):
 
     def test_main(self):
         try:
-            scope = self.tracer.start_active_span('parent',
+            scope = self.tracer.start_active_scope('parent',
                                                   finish_on_close=False)
             scope.span._ref_count = RefCount(1)
             self.submit_callbacks(scope.span)
@@ -45,7 +45,7 @@ class TestThreads(OpenTracingTestCase):
 
         try:
             scope = self.tracer.scope_manager.activate(parent_span, False)
-            with self.tracer.start_active_span('task'):
+            with self.tracer.start_active_scope('task'):
                 time.sleep(interval)
         finally:
             scope.close()

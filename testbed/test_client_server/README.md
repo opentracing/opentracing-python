@@ -6,7 +6,7 @@ This example shows a `Span` created by a `Client`, which will send a `Message`/`
 
 ```python
 def send(self):
-    with self.tracer.start_active_span('send') as scope:
+    with self.tracer.start_active_scope('send') as scope:
         scope.span.set_tag(tags.SPAN_KIND, tags.SPAN_KIND_RPC_CLIENT)
 
         message = {}

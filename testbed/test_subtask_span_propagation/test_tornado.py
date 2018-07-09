@@ -28,7 +28,7 @@ class TestTornado(OpenTracingTestCase):
 
     @gen.coroutine
     def parent_task(self, message):
-        with self.tracer.start_active_span('parent'):
+        with self.tracer.start_active_scope('parent'):
             res = yield self.child_task(message)
 
         raise gen.Return(res)
@@ -37,5 +37,5 @@ class TestTornado(OpenTracingTestCase):
     def child_task(self, message):
         # No need to pass/activate the parent Span, as
         # it stays in the context.
-        with self.tracer.start_active_span('child'):
+        with self.tracer.start_active_scope('child'):
             raise gen.Return('%s::response' % message)

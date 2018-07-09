@@ -155,8 +155,8 @@ another task or thread, but not ``Scope``.
 The common case starts a ``Scope`` that's automatically registered for intra-process
 propagation via ``ScopeManager``.
 
-Note that ``start_active_span('...')`` automatically finishes the span on ``Scope.close()``
-(``start_active_span('...', finish_on_close=False)`` does not finish it, in contrast).
+Note that ``start_active_scope('...')`` automatically finishes the span on ``Scope.close()``
+(``start_active_scope('...', finish_on_close=False)`` does not finish it, in contrast).
 
 .. code-block:: python
 
@@ -167,7 +167,7 @@ Note that ``start_active_span('...')`` automatically finishes the span on ``Scop
 
        # Automatic activation of the Span.
        # finish_on_close is a required parameter.
-       with tracer.start_active_span('someWork', finish_on_close=True) as scope:
+       with tracer.start_active_scope('someWork', finish_on_close=True) as scope:
            # Do things.
 
        # Handling done through a try construct:
@@ -181,12 +181,12 @@ Note that ``start_active_span('...')`` automatically finishes the span on ``Scop
            scope.finish()
 
 **If there is a Scope, it will act as the parent to any newly started Span** unless
-the programmer passes ``ignore_active_span=True`` at ``start_span()``/``start_active_span()``
+the programmer passes ``ignore_active_span=True`` at ``start_span()``/``start_active_scope()``
 time or specified parent context explicitly:
 
 .. code-block:: python
 
-       scope = tracer.start_active_span('someWork', ignore_active_span=True)
+       scope = tracer.start_active_scope('someWork', ignore_active_span=True)
 
 Each service/framework ought to provide a specific ``ScopeManager`` implementation
 that relies on their own request-local storage (thread-local storage, or coroutine-based storage

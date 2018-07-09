@@ -18,7 +18,7 @@ class TestAsyncio(OpenTracingTestCase):
         # Start a Span and let the callback-chain
         # finish it when the task is done
         async def task():
-            with self.tracer.start_active_span('one', finish_on_close=False):
+            with self.tracer.start_active_scope('one', finish_on_close=False):
                 self.submit()
 
         self.loop.create_task(task())

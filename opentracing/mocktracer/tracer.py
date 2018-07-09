@@ -109,14 +109,14 @@ class MockTracer(Tracer):
             self._next_id += 1
             return self._next_id
 
-    def start_active_span(self,
-                          operation_name,
-                          child_of=None,
-                          references=None,
-                          tags=None,
-                          start_time=None,
-                          ignore_active_span=False,
-                          finish_on_close=True):
+    def start_active_scope(self,
+                           operation_name,
+                           child_of=None,
+                           references=None,
+                           tags=None,
+                           start_time=None,
+                           ignore_active_span=False,
+                           finish_on_close=True):
 
         # create a new Span
         span = self.start_span(

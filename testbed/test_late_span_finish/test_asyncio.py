@@ -43,7 +43,7 @@ class TestAsyncio(OpenTracingTestCase):
         async def task(name):
             logger.info('Running %s' % name)
             with self.tracer.scope_manager.activate(parent_span, False):
-                with self.tracer.start_active_span(name):
+                with self.tracer.start_active_scope(name):
                     asyncio.sleep(0.1)
 
         self.loop.create_task(task('task1'))

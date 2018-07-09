@@ -18,7 +18,7 @@ class TestThreads(OpenTracingTestCase):
     def test_main(self):
         # Start a Span and let the callback-chain
         # finish it when the task is done
-        with self.tracer.start_active_span('one', finish_on_close=False):
+        with self.tracer.start_active_scope('one', finish_on_close=False):
             self.submit()
 
         # Cannot shutdown the executor and wait for the callbacks

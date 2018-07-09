@@ -31,7 +31,7 @@ class Server(Thread):
         logger.info('Processing message in server')
 
         ctx = self.tracer.extract(opentracing.Format.TEXT_MAP, message)
-        with self.tracer.start_active_span('receive',
+        with self.tracer.start_active_scope('receive',
                                            child_of=ctx) as scope:
             scope.span.set_tag(tags.SPAN_KIND, tags.SPAN_KIND_RPC_SERVER)
 
@@ -42,7 +42,7 @@ class Client(object):
         self.queue = queue
 
     def send(self):
-        with self.tracer.start_active_span('send') as scope:
+        with self.tracer.start_active_scope('send') as scope:
             scope.span.set_tag(tags.SPAN_KIND, tags.SPAN_KIND_RPC_CLIENT)
 
             message = {}

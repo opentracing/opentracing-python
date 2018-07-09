@@ -59,20 +59,20 @@ class Tracer(object):
         scope = self._scope_manager.active
         return None if scope is None else scope.span
 
-    def start_active_span(self,
-                          operation_name,
-                          child_of=None,
-                          references=None,
-                          tags=None,
-                          start_time=None,
-                          ignore_active_span=False,
-                          finish_on_close=True):
+    def start_active_scope(self,
+                           operation_name,
+                           child_of=None,
+                           references=None,
+                           tags=None,
+                           start_time=None,
+                           ignore_active_span=False,
+                           finish_on_close=True):
         """Returns a newly started and activated :class:`Scope`.
 
         The returned :class:`Scope` supports with-statement contexts. For
         example::
 
-            with tracer.start_active_span('...') as scope:
+            with tracer.start_active_scope('...') as scope:
                 scope.span.set_tag('http.method', 'GET')
                 do_some_work()
             # Span.finish() is called as part of scope deactivation through
@@ -81,7 +81,7 @@ class Tracer(object):
         It's also possible to not finish the :class:`Span` when the
         :class:`Scope` context expires::
 
-            with tracer.start_active_span('...',
+            with tracer.start_active_scope('...',
                                           finish_on_close=False) as scope:
                 scope.span.set_tag('http.method', 'GET')
                 do_some_work()

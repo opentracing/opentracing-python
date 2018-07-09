@@ -16,7 +16,7 @@ Implementation details:
 
         try:
             scope = self.tracer.scope_manager.activate(parent_span, False)
-            with self.tracer.start_active_span('task'):
+            with self.tracer.start_active_scope('task'):
                 time.sleep(interval)
         finally:
             scope.close()
@@ -30,11 +30,11 @@ Implementation details:
         logger.info('Starting task')
 
         with self.tracer.scope_manager.activate(parent_span, False):
-            with self.tracer.start_active_span('task'):
+            with self.tracer.start_active_scope('task'):
                 await asyncio.sleep(interval)
 
     # Invoke and yield over the corotuines.
-    with self.tracer.start_active_span('parent'):
+    with self.tracer.start_active_scope('parent'):
 	tasks = self.submit_callbacks()
 	await asyncio.gather(*tasks)
 ```

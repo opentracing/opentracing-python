@@ -42,11 +42,11 @@ class GeventScopeManager(ScopeManager):
             # activate the parent Span, but do not finish it upon
             # deactivation. That will be done by the parent greenlet.
             with tracer.scope_manager.activate(span, finish_on_close=False):
-                with tracer.start_active_span('child') as scope:
+                with tracer.start_active_scope('child') as scope:
                     ...
 
         def parent_greenlet():
-            with tracer.start_active_span('parent') as scope:
+            with tracer.start_active_scope('parent') as scope:
                 ...
                 gevent.spawn(child_greenlet, span).join()
                 ...

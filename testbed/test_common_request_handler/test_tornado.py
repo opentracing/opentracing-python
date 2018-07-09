@@ -85,7 +85,7 @@ class TestTornado(OpenTracingTestCase):
         as we pass ignore_active_span=True to the RequestHandler"""
 
         with tracer_stack_context():
-            with self.tracer.start_active_span('parent'):
+            with self.tracer.start_active_scope('parent'):
                 response = self.client.send_sync('no_parent')
                 self.assertEquals('no_parent::response', response)
 
@@ -106,7 +106,7 @@ class TestTornado(OpenTracingTestCase):
         the context will be properly detected."""
 
         with tracer_stack_context():
-            with self.tracer.start_active_span('parent'):
+            with self.tracer.start_active_scope('parent'):
                 req_handler = RequestHandler(self.tracer,
                                              ignore_active_span=False)
                 client = Client(req_handler, self.loop)
