@@ -1,7 +1,7 @@
 OpenTracing API for Python
 ==========================
 
-|GitterChat| |BuildStatus| |PyPI|
+|GitterChat| |BuildStatus| |PyPI| |ReadTheDocs|
 
 This library is a Python platform API for OpenTracing.
 
@@ -283,5 +283,6 @@ Before new release, add a summary of changes since last version to CHANGELOG.rst
    :target: https://travis-ci.org/opentracing/opentracing-python
 .. |PyPI| image:: https://badge.fury.io/py/opentracing.svg
    :target: https://badge.fury.io/py/opentracing
-
-
+.. |ReadTheDocs| image:: http://readthedocs.org/projects/opentracing-python/badge/?version=latest
+   :target: https://opentracing-python.readthedocs.io/en/latest/?badge=latest
+   :alt: Documentation Status
