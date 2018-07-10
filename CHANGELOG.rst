@@ -3,10 +3,13 @@
 History
 =======
 
-2.0.0rc2 (2018-04-09)
----------------------
+2.0.0 (2018-07-10)
+------------------
 
 - Implement ScopeManager for in-process propagation.
+- Added a set of default ScopeManager implementations.
+- Added testbed/ for testing API changes.
+- Added MockTracer for instrumentation testing.
 
 
 1.3.0 (2018-01-14)
