@@ -16,6 +16,8 @@
 from __future__ import absolute_import
 from .span import Span  # noqa
 from .span import SpanContext  # noqa
+from .scope import Scope  # noqa
+from .scope_manager import ScopeManager  # noqa
 from .tracer import child_of  # noqa
 from .tracer import follows_from  # noqa
 from .tracer import Reference  # noqa

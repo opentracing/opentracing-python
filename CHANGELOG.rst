@@ -3,6 +3,12 @@
 History
 =======
 
+2.0.0rc2 (2018-04-09)
+---------------------
+
+- Implement ScopeManager for in-process propagation.
+
+
 1.3.0 (2018-01-14)
 ------------------
 
@@ -21,7 +27,7 @@ History
 1.2.1 (2016-09-22)
 ------------------
 
-- Make Span.log(self, **kwargs) smarter
+- Make Span.log(self, \**kwargs) smarter
 
 
 1.2.0 (2016-09-21)
@@ -109,7 +115,7 @@ History
 ------------------
 
 - Change inheritance to match api-go: TraceContextSource extends codecs,
-Tracer extends TraceContextSource
+  Tracer extends TraceContextSource
 - Create API harness
 
 

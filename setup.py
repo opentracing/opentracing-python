@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='opentracing',
-    version='1.3.0',
+    version='2.0.0rc2',
     author='The OpenTracing Authors',
     author_email='opentracing@googlegroups.com',
     description='OpenTracing API for Python. See documentation at http://opentracing.io',
@@ -34,7 +34,12 @@ setup(
             'pytest-cov',
             'pytest-mock',
             'Sphinx',
-            'sphinx_rtd_theme'
-        ]
+            'sphinx_rtd_theme',
+
+            'six>=1.10.0,<2.0',
+            'gevent==1.2',
+            'tornado',
+        ],
+        ':python_version == "2.7"': ['futures'],
     },
 )

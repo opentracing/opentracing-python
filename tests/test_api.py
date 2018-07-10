@@ -28,3 +28,6 @@ class APICheckNoopTracer(unittest.TestCase, APICompatibilityCheckMixin):
 
     def check_baggage_values(self):
         return False
+
+    def check_scope_manager(self):
+        return False

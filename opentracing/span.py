@@ -17,14 +17,15 @@ from __future__ import absolute_import
 
 
 class SpanContext(object):
-    """SpanContext represents Span state that must propagate to descendant
-    Spans and across process boundaries.
+    """SpanContext represents :class:`Span` state that must propagate to
+    descendant :class:`Span`\ s and across process boundaries.
 
     SpanContext is logically divided into two pieces: the user-level "Baggage"
-    (see set_baggage_item and get_baggage_item) that propagates across Span
-    boundaries and any Tracer-implementation-specific fields that are needed to
-    identify or otherwise contextualize the associated Span instance (e.g., a
-    <trace_id, span_id, sampled> tuple).
+    (see :meth:`Span.set_baggage_item` and :meth:`Span.get_baggage_item`) that
+    propagates across :class:`Span` boundaries and any
+    tracer-implementation-specific fields that are needed to identify or
+    otherwise contextualize the associated :class:`Span` (e.g., a ``(trace_id,
+    span_id, sampled)`` tuple).
     """
 
     EMPTY_BAGGAGE = {}  # TODO would be nice to make this immutable
@@ -32,15 +33,17 @@ class SpanContext(object):
     @property
     def baggage(self):
         """
-        Return baggage associated with this SpanContext.
-        If no baggage has been added to the span, returns an empty dict.
+        Return baggage associated with this :class:`SpanContext`.
+        If no baggage has been added to the :class:`Span`, returns an empty
+        dict.
 
         The caller must not modify the returned dictionary.
 
-        See also: Span.set_baggage_item() / Span.get_baggage_item()
+        See also: :meth:`Span.set_baggage_item()` /
+        :meth:`Span.get_baggage_item()`
 
         :rtype: dict
-        :return: returns baggage associated with this SpanContext or {}.
+        :return: baggage associated with this :class:`SpanContext` or ``{}``.
         """
         return SpanContext.EMPTY_BAGGAGE
 
@@ -53,14 +56,13 @@ class Span(object):
     and these relationships transitively form a DAG. It is common for spans to
     have at most one parent, and thus most traces are merely tree structures.
 
-    Span implements a Context Manager API that allows the following usage:
-
-    .. code-block:: python
+    Span implements a context manager API that allows the following usage::
 
         with tracer.start_span(operation_name='go_fishing') as span:
             call_some_service()
 
-    In the Context Manager syntax it's not necessary to call span.finish()
+    In the context manager syntax it's not necessary to call
+    :meth:`Span.finish()`
     """
 
     def __init__(self, tracer, context):
@@ -69,20 +71,24 @@ class Span(object):
 
     @property
     def context(self):
-        """Provides access to the SpanContext associated with this Span.
+        """Provides access to the :class:`SpanContext` associated with this
+        :class:`Span`.
 
-        The SpanContext contains state that propagates from Span to Span in a
-        larger trace.
+        The :class:`SpanContext` contains state that propagates from
+        :class:`Span` to :class:`Span` in a larger trace.
 
-        :return: returns the SpanContext associated with this Span.
+        :rtype: SpanContext
+        :return: the :class:`SpanContext` associated with this :class:`Span`.
         """
         return self._context
 
     @property
     def tracer(self):
-        """Provides access to the Tracer that created this Span.
+        """Provides access to the :class:`Tracer` that created this
+        :class:`Span`.
 
-        :return: returns the Tracer that created this Span.
+        :rtype: Tracer
+        :return: the :class:`Tracer` that created this :class:`Span`.
         """
         return self._tracer
 
@@ -90,42 +96,51 @@ class Span(object):
         """Changes the operation name.
 
         :param operation_name: the new operation name
-        :return: Returns the Span itself, for call chaining.
+        :type operation_name: str
+
+        :rtype: Span
+        :return: the :class:`Span` itself, for call chaining.
         """
         return self
 
     def finish(self, finish_time=None):
-        """Indicates that the work represented by this span has completed or
+        """Indicates that the work represented by this :class:`Span` has completed or
         terminated.
 
-        With the exception of the `Span.context` property, the semantics of all
-        other Span methods are undefined after `finish()` has been invoked.
+        With the exception of the :attr:`Span.context` property, the semantics
+        of all other :class:`Span` methods are undefined after
+        :meth:`Span.finish()` has been invoked.
 
-        :param finish_time: an explicit Span finish timestamp as a unix
-            timestamp per time.time()
+        :param finish_time: an explicit :class:`Span` finish timestamp as a
+            unix timestamp per :meth:`time.time()`
+        :type finish_time: float
         """
         pass
 
     def set_tag(self, key, value):
-        """Attaches a key/value pair to the span.
+        """Attaches a key/value pair to the :class:`Span`.
 
         The value must be a string, a bool, or a numeric type.
 
         If the user calls set_tag multiple times for the same key,
-        the behavior of the tracer is undefined, i.e. it is implementation
-        specific whether the tracer will retain the first value, or the last
-        value, or pick one randomly, or even keep all of them.
+        the behavior of the :class:`Tracer` is undefined, i.e. it is
+        implementation specific whether the :class:`Tracer` will retain the
+        first value, or the last value, or pick one randomly, or even keep all
+        of them.
 
         :param key: key or name of the tag. Must be a string.
-        :param value: value of the tag.
+        :type key: str
 
-        :return: Returns the Span itself, for call chaining.
+        :param value: value of the tag.
+        :type value: string or bool or int or float
+
         :rtype: Span
+        :return: the :class:`Span` itself, for call chaining.
         """
         return self
 
     def log_kv(self, key_values, timestamp=None):
-        """Adds a log record to the Span.
+        """Adds a log record to the :class:`Span`.
 
         For example::
 
@@ -138,24 +153,24 @@ class Span(object):
         :param key_values: A dict of string keys and values of any type
         :type key_values: dict
 
-        :param timestamp: A unix timestamp per time.time(); current time if
-            None
+        :param timestamp: A unix timestamp per :meth:`time.time()`; current
+            time if ``None``
         :type timestamp: float
 
-        :return: Returns the Span itself, for call chaining.
         :rtype: Span
+        :return: the :class:`Span` itself, for call chaining.
         """
         return self
 
     def set_baggage_item(self, key, value):
-        """Stores a Baggage item in the span as a key/value pair.
+        """Stores a Baggage item in the :class:`Span` as a key/value pair.
 
         Enables powerful distributed context propagation functionality where
         arbitrary application data can be carried along the full path of
         request execution throughout the system.
 
         Note 1: Baggage is only propagated to the future (recursive) children
-        of this Span.
+        of this :class:`Span`.
 
         Note 2: Baggage is sent in-band with every subsequent local and remote
         calls, so this feature must be used with care.
@@ -166,34 +181,35 @@ class Span(object):
         :param value: Baggage item value
         :type value: str
 
-        :rtype : Span
+        :rtype: Span
         :return: itself, for chaining the calls.
         """
         return self
 
     def get_baggage_item(self, key):
-        """Retrieves value of the Baggage item with the given key.
+        """Retrieves value of the baggage item with the given key.
 
-        :param key: key of the Baggage item
+        :param key: key of the baggage item
         :type key: str
 
-        :rtype : str
-        :return: value of the Baggage item with given key, or None.
+        :rtype: str
+        :return: value of the baggage item with given key, or ``None``.
         """
         return None
 
     def __enter__(self):
-        """Invoked when span is used as a context manager.
+        """Invoked when :class:`Span` is used as a context manager.
 
-        :return: returns the Span itself
+        :rtype: Span
+        :return: the :class:`Span` itself
         """
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        """Ends context manager and calls finish() on the span.
+        """Ends context manager and calls finish() on the :class:`Span`.
 
         If exception has occurred during execution, it is automatically added
-        as a tag to the span.
+        as a tag to the :class:`Span`.
         """
         if exc_type:
             self.log_kv({
