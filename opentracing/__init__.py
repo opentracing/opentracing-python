@@ -28,8 +28,10 @@ from .propagation import Format  # noqa
 from .propagation import InvalidCarrierException  # noqa
 from .propagation import SpanContextCorruptedException  # noqa
 from .propagation import UnsupportedFormatException  # noqa
+from .globaltracer import init_global_tracer  # noqa
+from .globaltracer import get_global_tracer  # noqa
 
 # Global variable that should be initialized to an instance of real tracer.
 # Note: it should be accessed via 'opentracing.tracer', not via
 # 'from opentracing import tracer', the latter seems to take a copy.
-tracer = Tracer()
+tracer = get_global_tracer()
