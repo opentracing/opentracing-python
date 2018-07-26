@@ -28,10 +28,33 @@ from .propagation import Format  # noqa
 from .propagation import InvalidCarrierException  # noqa
 from .propagation import SpanContextCorruptedException  # noqa
 from .propagation import UnsupportedFormatException  # noqa
-from .globaltracer import init_global_tracer  # noqa
-from .globaltracer import get_global_tracer  # noqa
 
 # Global variable that should be initialized to an instance of real tracer.
 # Note: it should be accessed via 'opentracing.tracer', not via
 # 'from opentracing import tracer', the latter seems to take a copy.
-tracer = get_global_tracer()
+# DEPRECATED, use global_tracer() and set_global_tracer() instead.
+tracer = Tracer()
+
+
+def global_tracer():
+    """Returns the global tracer.
+    The default value is an instance of :class:`opentracing.Tracer`
+
+    :rtype: :class:`Tracer`
+    :return: The global tracer instance.
+    """
+    return tracer
+
+
+def set_global_tracer(value):
+    """Sets the global tracer.
+    It is an error to pass ``None``.
+
+    :param value: the :class:`Tracer` used as global instance.
+    :type value: :class:`Tracer`
+    """
+    if value is None:
+        raise ValueError('The global Tracer tracer cannot be None')
+
+    global tracer
+    tracer = value

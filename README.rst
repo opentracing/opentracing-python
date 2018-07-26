@@ -55,7 +55,7 @@ Somewhere in your server's request handler code:
 .. code-block:: python
 
    def handle_request(request):
-       span = before_request(request, opentracing.tracer)
+       span = before_request(request, opentracing.global_tracer())
        # store span in some request-local storage using Tracer.scope_manager,
        # using the returned `Scope` as Context Manager to ensure
        # `Span` will be cleared and (in this case) `Span.finish()` be called.
@@ -111,7 +111,7 @@ Somewhere in your service that's about to make an outgoing call:
    def before_http_request(request, current_span_extractor):
        op = request.operation
        parent_span = current_span_extractor()
-       outbound_span = opentracing.tracer.start_span(
+       outbound_span = opentracing.global_tracer().start_span(
            operation_name=op,
            child_of=parent_span
        )
@@ -127,7 +127,7 @@ Somewhere in your service that's about to make an outgoing call:
            outbound_span.set_tag(tags.PEER_PORT, port)
 
        http_header_carrier = {}
-       opentracing.tracer.inject(
+       opentracing.global_tracer().inject(
            span_context=outbound_span,
            format=Format.HTTP_HEADERS,
            carrier=http_header_carrier)

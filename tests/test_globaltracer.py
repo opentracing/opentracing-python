@@ -14,21 +14,25 @@
 
 from __future__ import absolute_import
 import pytest
+import mock
 import opentracing
-from opentracing.mocktracer import MockTracer
-from opentracing.globaltracer import GlobalTracer
 
 
-def test_singleton_reference():
-    assert isinstance(opentracing.tracer, GlobalTracer)
-    assert opentracing.tracer is opentracing.get_global_tracer()
+def test_opentracing_tracer():
+    assert opentracing.tracer is opentracing.global_tracer()
+    assert isinstance(opentracing.global_tracer(), opentracing.Tracer)
 
 
-def test_multiple_registrations():
-    assert opentracing.init_global_tracer(MockTracer()) is True
-    assert opentracing.init_global_tracer(MockTracer()) is False
+@mock.patch('opentracing.tracer')
+def test_set_global_tracer(mock_obj):
+    tracer = mock.Mock()
+    opentracing.set_global_tracer(tracer)
+    assert opentracing.global_tracer() is tracer
+
+    opentracing.set_global_tracer(mock_obj)
+    assert opentracing.global_tracer() is mock_obj
 
 
 def test_register_none():
     with pytest.raises(ValueError):
-        opentracing.init_global_tracer(None)
+        opentracing.set_global_tracer(None)
