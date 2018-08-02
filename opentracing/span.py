@@ -30,6 +30,31 @@ class SpanContext(object):
 
     EMPTY_BAGGAGE = {}  # TODO would be nice to make this immutable
 
+    def to_trace_id(self):
+        """
+        Return the ID of the trace.
+
+        Globally unique. Every :class:`Span` in a trace shares this ID.
+        The empty string is a valid return value, while ``None`` is not.
+
+        :rtype: str
+        :return: the trace ID for this context.
+        """
+        return ''
+
+    def to_span_id(self):
+        """
+        Return the ID of the associated :class:`Span`.
+
+        Unique within a trace. Each :class:`Span` within
+        a trace contains a different ID.
+        The empty string is a valid return value, while ``None`` is not.
+
+        :rtype: str
+        :return: the :class:`Span` ID for this context.
+        """
+        return ''
+
     @property
     def baggage(self):
         """
