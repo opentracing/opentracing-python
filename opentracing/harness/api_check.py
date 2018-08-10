@@ -42,9 +42,11 @@ class APICompatibilityCheckMixin(object):
 
     def check_trace_identifiers(self):
         """If true, the test will validate trace ID and :class:`Span` ID by
-        retrieving them from the trace context. If false, it will only attempt
-        to retrieve them to check the API compliance, but not actually validate
-        the values. The latter mode is only useful for no-op tracer.
+        retrieving them from the trace context (parent and child :class:`Span`s
+        must have the same trace ID and different :class:`Span` ID). If false,
+        it will only attempt to retrieve them to check the API compliance,
+        but not actually validate the values. The latter mode is only useful
+        for no-op tracer.
         """
         return True
 
