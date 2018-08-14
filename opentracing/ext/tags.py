@@ -42,6 +42,17 @@ SPAN_KIND_CONSUMER = 'consumer'
 SPAN_KIND_PRODUCER = 'producer'
 
 # ---------------------------------------------------------------------------
+# SERVICE indicates the service name for a span, which overrides any default
+# "service name" property defined in a tracer's config. The meaning of
+# service should correspond to the value set in peer.service, except it is
+# applied to the current span. This tag is meant to only be used when a
+# tracer is reporting spans on behalf of another service. This tag does not
+# need to be used when reporting spans for the service the tracer is running
+# in.
+# ---------------------------------------------------------------------------
+SERVICE = 'service'
+
+# ---------------------------------------------------------------------------
 # ERROR indicates whether a Span ended in an error state.
 # ---------------------------------------------------------------------------
 ERROR = 'error'
