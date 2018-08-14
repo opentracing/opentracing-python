@@ -33,14 +33,16 @@ def test_span():
     with mock.patch.object(parent, 'finish') as finish:
         with mock.patch.object(parent, 'log_event') as log_event:
             with mock.patch.object(parent, 'log_kv') as log_kv:
-                try:
-                    with parent:
-                        raise ValueError()
-                except ValueError:
-                    pass
-                assert finish.call_count == 1
-                assert log_event.call_count == 0
-                assert log_kv.call_count == 1
+                with mock.patch.object(parent, 'set_tag') as set_tag:
+                    try:
+                        with parent:
+                            raise ValueError()
+                    except ValueError:
+                        pass
+                    assert finish.call_count == 1
+                    assert log_event.call_count == 0
+                    assert log_kv.call_count == 2
+                    assert set_tag.call_count == 1
 
     with mock.patch.object(parent, 'finish') as finish:
         with mock.patch.object(parent, 'log_event') as log_kv:

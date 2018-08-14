@@ -73,5 +73,10 @@ class Scope(object):
     def __exit__(self, exc_type, exc_val, exc_tb):
         """Calls :meth:`close()` when the execution is outside the Python
         Context Manager.
+
+        If exception has occurred during execution, it is automatically logged
+        and added as a tag to the :class:`Span`.
+        :attr:`~operation.ext.tags.ERROR` will also be set to `True`.
         """
+        self.span._on_error(exc_type, exc_val, exc_tb)
         self.close()
