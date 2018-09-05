@@ -14,7 +14,7 @@
 # limitations under the License.
 
 from __future__ import absolute_import
-from . import logfields
+from . import logs
 
 
 class SpanContext(object):
@@ -223,15 +223,15 @@ class Span(object):
     def log_event(self, event, payload=None):
         """DEPRECATED"""
         if payload is None:
-            return self.log_kv({logfields.EVENT: event})
+            return self.log_kv({logs.EVENT: event})
         else:
-            return self.log_kv({logfields.EVENT: event, 'payload': payload})
+            return self.log_kv({logs.EVENT: event, 'payload': payload})
 
     def log(self, **kwargs):
         """DEPRECATED"""
         key_values = {}
-        if logfields.EVENT in kwargs:
-            key_values[logfields.EVENT] = kwargs[logfields.EVENT]
+        if logs.EVENT in kwargs:
+            key_values[logs.EVENT] = kwargs[logs.EVENT]
         if 'payload' in kwargs:
             key_values['payload'] = kwargs['payload']
         timestamp = None
