@@ -78,8 +78,8 @@ class TornadoScopeManager(ThreadLocalScopeManager):
 
             @tornado.gen.coroutine
             def handle_request_wrapper():
-                res1 = corotuine('A')
-                res2 = corotuine('B')
+                res1 = coroutine('A')
+                res2 = coroutine('B')
 
                 yield [res1, res2]
     """
