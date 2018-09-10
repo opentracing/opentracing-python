@@ -201,12 +201,13 @@ This project includes a set of ``ScopeManager`` implementations under the ``open
 
    from opentracing.scope_managers import ThreadLocalScopeManager
 
-There exist implementations for ``thread-local`` (the default), ``gevent``, ``Tornado`` and ``asyncio``:
+There exist implementations for ``thread-local`` (the default), ``gevent``, ``Tornado``, ``Flask``, and ``asyncio``:
 
 .. code-block:: python
 
    from opentracing.scope_managers.gevent import GeventScopeManager # requires gevent
    from opentracing.scope_managers.tornado import TornadoScopeManager # requires Tornado
+   from opentracing.scope_managers.flask import FlaskScopeManager # requires Flask
    from opentracing.scope_managers.asyncio import AsyncioScopeManager # requires Python 3.4 or newer.
 
 Development

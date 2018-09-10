@@ -9,6 +9,7 @@ enabled_platforms = [
     'threads',
     'tornado',
     'gevent',
+    'flask',
 ]
 if six.PY3:
     enabled_platforms.append('asyncio')
