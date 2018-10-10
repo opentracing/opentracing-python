@@ -222,15 +222,10 @@ class Span(object):
         if not exc_type:
             return
 
-        self.log_kv({
-            'python.exception.type': exc_type,
-            'python.exception.val': exc_val,
-            'python.exception.tb': exc_tb,
-            })
         self.set_tag(tags.ERROR, True)
         self.log_kv({
-            'event': tags.ERROR,
-            'error.object': exc_type,
+            logs.EVENT: tags.ERROR,
+            logs.ERROR_OBJECT: exc_type,
         })
 
     def log_event(self, event, payload=None):
