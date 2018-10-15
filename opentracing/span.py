@@ -34,8 +34,12 @@ class SpanContext(object):
         """
         Return the ID of the trace.
 
-        Globally unique. Every :class:`Span` in a trace shares this ID.
-        The empty string is a valid return value, while ``None`` is not.
+        Should be globally unique. Every :class:`Span` in a trace shares
+        this ID.
+
+        An empty string will be returned if the tracer does not support
+        this functionality (this is the case for no-op tracers, for example).
+        ``None`` is an invalid return value.
 
         :rtype: str
         :return: the trace ID for this context.
@@ -46,9 +50,12 @@ class SpanContext(object):
         """
         Return the ID of the associated :class:`Span`.
 
-        Unique within a trace. Each :class:`Span` within
+        Should be unique within a trace. Each :class:`Span` within
         a trace contains a different ID.
-        The empty string is a valid return value, while ``None`` is not.
+
+        An empty string will be returned if the tracer does not support
+        this functionality (this is the case for no-op tracers, for example).
+        ``None`` is an invalid return value.
 
         :rtype: str
         :return: the :class:`Span` ID for this context.
