@@ -219,13 +219,13 @@ class Span(object):
         self.finish()
 
     def _on_error(self, exc_type, exc_val, exc_tb):
-        if not exc_type:
+        if not exc_val:
             return
 
         self.set_tag(tags.ERROR, True)
         self.log_kv({
             logs.EVENT: tags.ERROR,
-            logs.ERROR_OBJECT: exc_type,
+            logs.ERROR_OBJECT: exc_val,
         })
 
     def log_event(self, event, payload=None):
