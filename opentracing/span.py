@@ -226,6 +226,7 @@ class Span(object):
         self.log_kv({
             logs.EVENT: tags.ERROR,
             logs.ERROR_OBJECT: exc_val,
+            'stack': exc_tb,
         })
 
     def log_event(self, event, payload=None):
