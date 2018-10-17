@@ -15,6 +15,7 @@
 from __future__ import absolute_import
 import mock
 import time
+import types
 from opentracing import child_of
 from opentracing import Format
 from opentracing import Tracer
@@ -81,11 +82,11 @@ def test_span_error_report():
             log_kv_args = log_kv.call_args[0][0]
             assert log_kv_args.get(logs.EVENT, None) is tags.ERROR
             assert log_kv_args.get(logs.MESSAGE, None) is error_message
-            assert log_kv_args.get(logs.ERROR_KIND, None) == 'ValueError'
+            assert log_kv_args.get(logs.ERROR_KIND, None) is ValueError
             assert isinstance(log_kv_args.get(logs.ERROR_OBJECT, None),
                               ValueError)
-            assert 'raise ValueError(error_message)' in \
-                   log_kv_args.get(logs.STACK, None)
+            assert isinstance(log_kv_args.get(logs.STACK, None),
+                              types.TracebackType)
 
 
 def test_inject():

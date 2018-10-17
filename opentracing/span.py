@@ -14,7 +14,6 @@
 # limitations under the License.
 
 from __future__ import absolute_import
-import traceback
 from . import logs
 
 from opentracing.ext import tags
@@ -226,10 +225,10 @@ class Span(object):
         self.set_tag(tags.ERROR, True)
         self.log_kv({
             logs.EVENT: tags.ERROR,
-            logs.ERROR_OBJECT: exc_val,
-            logs.ERROR_KIND: exc_type.__name__,
             logs.MESSAGE: str(exc_val),
-            logs.STACK: traceback.format_exc(),
+            logs.ERROR_OBJECT: exc_val,
+            logs.ERROR_KIND: exc_type,
+            logs.STACK: exc_tb,
         })
 
     def log_event(self, event, payload=None):
