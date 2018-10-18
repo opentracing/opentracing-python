@@ -40,6 +40,16 @@ class APICompatibilityCheckMixin(object):
         """
         return True
 
+    def check_trace_identifiers(self):
+        """If true, the test will validate trace ID and :class:`Span` ID by
+        retrieving them from the trace context (parent and child :class:`Span`s
+        must have the same trace ID and different :class:`Span` ID). If false,
+        it will only attempt to retrieve them to check the API compliance,
+        but not actually validate the values. The latter mode is only useful
+        for no-op tracer.
+        """
+        return True
+
     def check_scope_manager(self):
         """If true, the test suite will validate the `ScopeManager` propagation
         to ensure correct parenting. If false, it will only use the API without
@@ -260,6 +270,19 @@ class APICompatibilityCheckMixin(object):
             if self.check_baggage_values():
                 assert span.context.baggage == {'Kiff-loves': 'Amy'}
             pass
+
+    def test_context_trace_identifiers(self):
+        tracer = self.tracer()
+        parent = tracer.start_span(operation_name='Fry')
+        assert parent.context.to_trace_id() is not None
+        assert parent.context.to_span_id() is not None
+
+        if self.check_trace_identifiers():
+            child = tracer.start_span('Bender', child_of=parent)
+            assert parent.context.to_trace_id() == child.context.to_trace_id()
+            assert parent.context.to_span_id() != child.context.to_span_id()
+            other = tracer.start_span('Amy')
+            assert other.context.to_trace_id() != parent.context.to_trace_id()
 
     def test_text_propagation(self):
         with self.tracer().start_span(operation_name='Bender') as span:

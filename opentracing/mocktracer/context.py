@@ -38,6 +38,12 @@ class SpanContext(opentracing.SpanContext):
         self.span_id = span_id
         self._baggage = baggage or opentracing.SpanContext.EMPTY_BAGGAGE
 
+    def to_trace_id(self):
+        return str(self.trace_id)
+
+    def to_span_id(self):
+        return str(self.span_id)
+
     @property
     def baggage(self):
         return self._baggage

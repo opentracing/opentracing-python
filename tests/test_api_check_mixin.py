@@ -28,6 +28,10 @@ class VerifyAPICompatibilityCheck(unittest.TestCase):
         api_check = APICompatibilityCheckMixin()
         assert api_check.check_baggage_values() is True
 
+    def test_default_trace_identifiers_check_mode(self):
+        api_check = APICompatibilityCheckMixin()
+        assert api_check.check_trace_identifiers() is True
+
     def test_default_scope_manager_check_mode(self):
         api_check = APICompatibilityCheckMixin()
         assert api_check.check_scope_manager() is True
@@ -44,6 +48,16 @@ class VerifyAPICompatibilityCheck(unittest.TestCase):
         # second check that assert on empty baggage will fail too
         with self.assertRaises(AssertionError):
             api_check.test_context_baggage()
+
+    def test_trace_identifiers_check_works(self):
+        api_check = APICompatibilityCheckMixin()
+        setattr(api_check, 'tracer', lambda: Tracer())
+
+        # no-op tracer returns a no-op Span implementation,
+        # which means no *actual* trace identifiers are
+        # used, so the test should fail.
+        with self.assertRaises(AssertionError):
+            api_check.test_context_trace_identifiers()
 
     def test_scope_manager_check_works(self):
         api_check = APICompatibilityCheckMixin()
