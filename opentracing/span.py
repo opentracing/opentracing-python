@@ -16,6 +16,8 @@
 from __future__ import absolute_import
 from . import logs
 
+from opentracing.ext import tags
+
 
 class SpanContext(object):
     """SpanContext represents :class:`Span` state that must propagate to
@@ -209,16 +211,25 @@ class Span(object):
     def __exit__(self, exc_type, exc_val, exc_tb):
         """Ends context manager and calls finish() on the :class:`Span`.
 
-        If exception has occurred during execution, it is automatically added
-        as a tag to the :class:`Span`.
+        If exception has occurred during execution, it is automatically logged
+        and added as a tag. :attr:`~operation.ext.tags.ERROR` will also be set
+        to `True`.
         """
-        if exc_type:
-            self.log_kv({
-                'python.exception.type': exc_type,
-                'python.exception.val': exc_val,
-                'python.exception.tb': exc_tb,
-                })
+        self._on_error(exc_type, exc_val, exc_tb)
         self.finish()
+
+    def _on_error(self, exc_type, exc_val, exc_tb):
+        if not exc_val:
+            return
+
+        self.set_tag(tags.ERROR, True)
+        self.log_kv({
+            logs.EVENT: tags.ERROR,
+            logs.MESSAGE: str(exc_val),
+            logs.ERROR_OBJECT: exc_val,
+            logs.ERROR_KIND: exc_type,
+            logs.STACK: exc_tb,
+        })
 
     def log_event(self, event, payload=None):
         """DEPRECATED"""

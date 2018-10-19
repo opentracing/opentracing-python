@@ -21,11 +21,14 @@
 from __future__ import absolute_import
 
 import mock
+import types
 
 from opentracing.scope_manager import ScopeManager
 from opentracing.tracer import Tracer
 from opentracing.scope import Scope
 from opentracing.span import Span, SpanContext
+from opentracing import tags
+from opentracing import logs
 
 
 def test_scope_wrapper():
@@ -44,3 +47,30 @@ def test_scope_context_manager():
         with scope:
             pass
         assert close.call_count == 1
+
+
+def test_scope_error_report():
+    tracer = Tracer()
+    scope = tracer.start_active_span('foo')
+    error_message = 'unexpected_situation'
+
+    with mock.patch.object(scope.span, 'log_kv') as log_kv:
+        with mock.patch.object(scope.span, 'set_tag') as set_tag:
+            try:
+                with scope:
+                    raise ValueError(error_message)
+            except ValueError:
+                pass
+
+            assert set_tag.call_count == 1
+            assert set_tag.call_args[0] == (tags.ERROR, True)
+
+            assert log_kv.call_count == 1
+            log_kv_args = log_kv.call_args[0][0]
+            assert log_kv_args.get(logs.EVENT, None) is tags.ERROR
+            assert log_kv_args.get(logs.MESSAGE, None) is error_message
+            assert log_kv_args.get(logs.ERROR_KIND, None) is ValueError
+            assert isinstance(log_kv_args.get(logs.ERROR_OBJECT, None),
+                              ValueError)
+            assert isinstance(log_kv_args.get(logs.STACK, None),
+                              types.TracebackType)
