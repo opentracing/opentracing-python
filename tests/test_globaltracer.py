@@ -36,3 +36,13 @@ def test_set_global_tracer(mock_obj):
 def test_register_none():
     with pytest.raises(ValueError):
         opentracing.set_global_tracer(None)
+
+
+def test_is_global_tracer_registered_defaults_to_false():
+    assert opentracing.is_global_tracer_registered() is False
+
+
+def test_is_global_tracer_registered_returns_true_after_registering_a_tracer():
+    tracer = mock.Mock()
+    opentracing.set_global_tracer(tracer)
+    assert opentracing.is_global_tracer_registered() is True
