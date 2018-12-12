@@ -34,7 +34,7 @@ from .propagation import UnsupportedFormatException  # noqa
 # 'from opentracing import tracer', the latter seems to take a copy.
 # DEPRECATED, use global_tracer() and set_global_tracer() instead.
 tracer = Tracer()
-is_registered = False
+is_tracer_registered = False
 
 
 def global_tracer():
@@ -60,7 +60,8 @@ def set_global_tracer(value):
     global tracer
     tracer = value
 
-    is_registered = True
+    global is_tracer_registered
+    is_tracer_registered = True
 
 
 def is_global_tracer_registered():
@@ -69,4 +70,4 @@ def is_global_tracer_registered():
     :rtype: :value:bool
     :return: True if a global tracer has been registered, otherwise False.
     """
-    return is_registered
+    return is_tracer_registered
