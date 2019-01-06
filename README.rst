@@ -201,7 +201,7 @@ This project includes a set of ``ScopeManager`` implementations under the ``open
 
    from opentracing.scope_managers import ThreadLocalScopeManager
 
-There exist implementations for ``thread-local`` (the default), ``gevent``, ``Tornado`` and ``asyncio``:
+There exist implementations for ``thread-local`` (the default instance of the submodule ``opentracing.scope_managers``), ``gevent``, ``Tornado`` and ``asyncio``:
 
 .. code-block:: python
 
