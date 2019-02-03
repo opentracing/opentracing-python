@@ -31,7 +31,7 @@ setup(
             'flake8-quotes',
             'mock<1.1.0',
             'pytest>=2.7,<3',
-            'pytest-cov',
+            'pytest-cov==2.6.0', # pytest-cov 2.6.1 depends on pytest>=3.6
             'pytest-mock',
             'Sphinx',
             'sphinx_rtd_theme',
