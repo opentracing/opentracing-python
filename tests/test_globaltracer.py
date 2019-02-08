@@ -18,19 +18,30 @@ import mock
 import opentracing
 
 
+def teardown_function(function):
+    opentracing._reset_global_tracer()
+
+
 def test_opentracing_tracer():
     assert opentracing.tracer is opentracing.global_tracer()
     assert isinstance(opentracing.global_tracer(), opentracing.Tracer)
 
 
-@mock.patch('opentracing.tracer')
-def test_set_global_tracer(mock_obj):
+def test_is_global_tracer_registered():
+    assert opentracing.is_global_tracer_registered() is False
+
+
+def test_set_global_tracer():
     tracer = mock.Mock()
     opentracing.set_global_tracer(tracer)
     assert opentracing.global_tracer() is tracer
+    assert opentracing.is_global_tracer_registered()
 
-    opentracing.set_global_tracer(mock_obj)
-    assert opentracing.global_tracer() is mock_obj
+    # Register another value.
+    tracer = mock.Mock()
+    opentracing.set_global_tracer(tracer)
+    assert opentracing.global_tracer() is tracer
+    assert opentracing.is_global_tracer_registered()
 
 
 def test_register_none():
