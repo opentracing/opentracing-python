@@ -80,11 +80,10 @@ class APICompatibilityCheckMixin(object):
     def test_start_active_span(self):
         # the first usage returns a `Scope` that wraps a root `Span`
         tracer = self.tracer()
-        scope = tracer.start_active_span('Fry')
-
-        assert scope.span is not None
-        if self.check_scope_manager():
-            assert self.is_parent(None, scope.span)
+        with tracer.start_active_span('Fry') as scope:
+            assert scope.span is not None
+            if self.check_scope_manager():
+                assert self.is_parent(None, scope.span)
 
     def test_start_active_span_parent(self):
         # ensure the `ScopeManager` provides the right parenting

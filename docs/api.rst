@@ -29,6 +29,10 @@ Classes
 
 Utility Functions
 -----------------
+.. autofunction:: opentracing.global_tracer
+
+.. autofunction:: opentracing.set_global_tracer
+
 .. autofunction:: opentracing.start_child_span
 
 .. autofunction:: opentracing.child_of
