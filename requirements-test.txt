@@ -2,4 +2,4 @@
 
 -r requirements.txt
 
--e .[tests]
+-e .[tests,gevent,tornado]
