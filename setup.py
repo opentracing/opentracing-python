@@ -37,7 +37,7 @@ setup(
             'six>=1.10.0,<2.0',
         ],
         'tornado': [
-            'tornado',
+            'tornado<6',
         ],
         'gevent': [
             'gevent==1.2',
