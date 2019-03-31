@@ -18,7 +18,8 @@ class TestAsyncio(OpenTracingTestCase):
 
     def test_main(self):
         # Create a Span and use it as (explicit) parent of a pair of subtasks.
-        parent_span = self.tracer.start_span('parent')
+        parent_scope = self.tracer.start_active_span('parent')
+        parent_span = parent_scope.span
         self.submit_subtasks(parent_span)
 
         stop_loop_when(self.loop,
@@ -26,7 +27,7 @@ class TestAsyncio(OpenTracingTestCase):
         self.loop.run_forever()
 
         # Late-finish the parent Span now.
-        parent_span.finish()
+        parent_scope.close()
 
         spans = self.tracer.finished_spans()
         self.assertEqual(len(spans), 3)
@@ -44,7 +45,19 @@ class TestAsyncio(OpenTracingTestCase):
             logger.info('Running %s' % name)
             with self.tracer.scope_manager.activate(parent_span, False):
                 with self.tracer.start_active_span(name):
-                    asyncio.sleep(0.1)
+                    await asyncio.sleep(0.1)
+
+        self.loop.create_task(task('task1'))
+        self.loop.create_task(task('task2'))
+
+
+class TestAutoContextPropagationAsyncio(TestAsyncio):
+
+    def submit_subtasks(self, parent_span):
+        async def task(name):
+            logger.info('Running %s' % name)
+            with self.tracer.start_active_span(name):
+                await asyncio.sleep(0.1)
 
         self.loop.create_task(task('task1'))
         self.loop.create_task(task('task2'))

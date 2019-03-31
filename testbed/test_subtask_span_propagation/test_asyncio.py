@@ -1,7 +1,5 @@
 from __future__ import absolute_import, print_function
 
-import functools
-
 import asyncio
 
 from opentracing.mocktracer import MockTracer
@@ -33,3 +31,10 @@ class TestAsyncio(OpenTracingTestCase):
         with self.tracer.scope_manager.activate(span, False):
             with self.tracer.start_active_span('child'):
                 return '%s::response' % message
+
+
+class TestAutoContextPropagationAsyncio(TestAsyncio):
+
+    async def child_task(self, message, span):
+        with self.tracer.start_active_span('child'):
+            return '%s::response' % message

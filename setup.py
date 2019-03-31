@@ -26,6 +26,10 @@ setup(
     include_package_data=True,
     zip_safe=False,
     platforms='any',
+    install_requires=[
+        'futures;python_version=="2.7"',
+        'aiocontextvars;python_version>="3.5"',
+    ],
     extras_require={
         'tests': [
             'doubles',
@@ -40,8 +44,7 @@ setup(
 
             'six>=1.10.0,<2.0',
             'gevent',
-            'tornado<6',
+            'tornado',
         ],
-        ':python_version == "2.7"': ['futures'],
     },
 )

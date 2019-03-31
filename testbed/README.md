@@ -18,11 +18,16 @@ Alternatively, due to the organization of the suite, it's possible to run direct
 
 ## Tested frameworks
 
-Currently the examples cover `threading`, `tornado`, `gevent` and `asyncio` (which requires Python 3). Each example uses their respective `ScopeManager` instance from `opentracing.scope_managers`, along with their related requirements and limitations.
+Currently the examples cover from ..utils import get_one_by_operation_name, stop_loop_when
+`threading`, `tornado`, `gevent` and `asyncio` (which requires Python 3). Each example uses their respective `ScopeManager` instance from `opentracing.scope_managers`, along with their related requirements and limitations.
 
-### threading, asyncio and gevent
+### threading and gevent
 
 No automatic `Span` propagation between parent and children tasks is provided, and thus the `Span` need to be manually passed down the chain.
+
+### asyncio
+
+`AsyncioScopeManager` supports automatically propagate the context from parent coroutines to their children. For compatibility reasons with previous version of `AsyncioScopeManager`, asyncio testbed contains test cases showing that manual activation of parent span in child span also works as expected. 
 
 ### tornado
 

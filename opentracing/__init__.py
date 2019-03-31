@@ -14,6 +14,11 @@
 # limitations under the License.
 
 from __future__ import absolute_import
+try:
+    # Contextvars backport with coroutine supporting (python 3.6).
+    import aiocontextvars  # noqa
+except ImportError:
+    pass
 from .span import Span  # noqa
 from .span import SpanContext  # noqa
 from .scope import Scope  # noqa

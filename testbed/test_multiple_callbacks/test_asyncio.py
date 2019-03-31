@@ -57,3 +57,11 @@ class TestAsyncio(OpenTracingTestCase):
             tasks.append(t)
 
         return tasks
+
+
+class TestAutoContextPropagationAsyncio(TestAsyncio):
+
+    async def task(self, interval, parent_span):
+        logger.info('Starting task')
+        with self.tracer.start_active_span('task'):
+            await asyncio.sleep(interval)
