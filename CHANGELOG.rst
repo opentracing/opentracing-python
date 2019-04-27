@@ -3,10 +3,17 @@
 History
 =======
 
-2.0.1 (unreleased)
+2.1.0 (2019-04-27)
 ------------------
 
-- Nothing changed yet.
+- Add support for indicating if a global tracer has been registered (#109) <Mike Goldsmith>
+- Use pytest-cov==2.6.0 as 2.6.1 depends on pytest>=3.6.0 (#113) <Carlos Alberto Cortez>
+- Better error handling in context managers for Span/Scope. (#101) <Carlos Alberto Cortez>
+- Add log fields constants to opentracing.logs. (#99) <Carlos Alberto Cortez>
+- Move opentracing.ext.tags to opentracing.tags. (#103) <Carlos Alberto Cortez>
+- Add SERVICE tag (#100) <Carlos Alberto Cortez>
+- Fix unclosed active scope in tests (#97) <Michał Szymański>
+- Initial implementation of a global Tracer. (#95) <Carlos Alberto Cortez>
 
 
 2.0.0 (2018-07-10)
