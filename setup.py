@@ -16,7 +16,9 @@ setup(
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: Implementation :: PyPy',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
@@ -27,18 +29,18 @@ setup(
     extras_require={
         'tests': [
             'doubles',
-            'flake8<3',  # see https://github.com/zheller/flake8-quotes/issues/29
+            'flake8',
             'flake8-quotes',
-            'mock<1.1.0',
-            'pytest>=2.7,<3',
-            'pytest-cov==2.6.0', # pytest-cov 2.6.1 depends on pytest>=3.6
+            'mock',
+            'pytest',
+            'pytest-cov',
             'pytest-mock',
             'Sphinx',
             'sphinx_rtd_theme',
 
             'six>=1.10.0,<2.0',
-            'gevent==1.2',
-            'tornado',
+            'gevent',
+            'tornado<6',
         ],
         ':python_version == "2.7"': ['futures'],
     },

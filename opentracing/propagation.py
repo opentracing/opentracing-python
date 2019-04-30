@@ -63,8 +63,8 @@ class Format(object):
 
     TEXT_MAP = 'text_map'
     """
-    The TEXT_MAP format represents :class:`SpanContext`\ s in a python ``dict``
-    mapping from strings to strings.
+    The TEXT_MAP format represents :class:`SpanContext`\\ s in a python
+    ``dict`` mapping from strings to strings.
 
     Both the keys and the values have unrestricted character sets (unlike the
     HTTP_HEADERS format).
@@ -77,7 +77,7 @@ class Format(object):
 
     HTTP_HEADERS = 'http_headers'
     """
-    The HTTP_HEADERS format represents :class:`SpanContext`\ s in a python
+    The HTTP_HEADERS format represents :class:`SpanContext`\\ s in a python
     ``dict`` mapping from character-restricted strings to strings.
 
     Keys and values in the HTTP_HEADERS carrier must be suitable for use as
