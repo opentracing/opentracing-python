@@ -206,7 +206,7 @@ There exist implementations for ``thread-local`` (the default instance of the su
 .. code-block:: python
 
    from opentracing.scope_managers.gevent import GeventScopeManager # requires gevent
-   from opentracing.scope_managers.tornado import TornadoScopeManager # requires Tornado
+   from opentracing.scope_managers.tornado import TornadoScopeManager # requires tornado<6
    from opentracing.scope_managers.asyncio import AsyncioScopeManager # requires Python 3.4 or newer.
 
 Development
@@ -221,6 +221,12 @@ Tests
    . ./env/bin/activate
    make bootstrap
    make test
+
+You can use `tox <https://tox.readthedocs.io>`_ to run tests as well.
+
+.. code-block:: sh
+
+    tox
 
 Testbed suite
 ^^^^^^^^^^^^^

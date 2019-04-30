@@ -98,7 +98,7 @@ class Tracer(object):
         :type child_of: Span or SpanContext
 
         :param references: (optional) references that identify one or more
-            parent :class:`SpanContext`\ s. (See the Reference documentation
+            parent :class:`SpanContext`\\ s. (See the Reference documentation
             for detail).
         :type references: :obj:`list` of :class:`Reference`
 
@@ -165,7 +165,7 @@ class Tracer(object):
         :type child_of: Span or SpanContext
 
         :param references: (optional) references that identify one or more
-            parent :class:`SpanContext`\ s. (See the Reference documentation
+            parent :class:`SpanContext`\\ s. (See the Reference documentation
             for detail).
         :type references: :obj:`list` of :class:`Reference`
 
@@ -256,7 +256,7 @@ class Reference(namedtuple('Reference', ['type', 'referenced_context'])):
     """A Reference pairs a reference type with a referenced :class:`SpanContext`.
 
     References are used by :meth:`Tracer.start_span()` to describe the
-    relationships between :class:`Span`\ s.
+    relationships between :class:`Span`\\ s.
 
     :class:`Tracer` implementations must ignore references where
     referenced_context is ``None``.  This behavior allows for simpler code when
@@ -321,7 +321,7 @@ def start_child_span(parent_span, operation_name, tags=None, start_time=None):
             start_time=start_time)
 
     :param parent_span: the :class:`Span` which will act as the parent in the
-        returned :class:`Span`\ s child_of reference.
+        returned :class:`Span`\\ s child_of reference.
     :type parent_span: Span
 
     :param operation_name: the operation name for the child :class:`Span`

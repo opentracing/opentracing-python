@@ -21,7 +21,7 @@ from opentracing.ext import tags
 
 class SpanContext(object):
     """SpanContext represents :class:`Span` state that must propagate to
-    descendant :class:`Span`\ s and across process boundaries.
+    descendant :class:`Span`\\ s and across process boundaries.
 
     SpanContext is logically divided into two pieces: the user-level "Baggage"
     (see :meth:`Span.set_baggage_item` and :meth:`Span.get_baggage_item`) that
