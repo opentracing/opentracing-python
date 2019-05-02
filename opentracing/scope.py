@@ -1,4 +1,4 @@
-# Copyright (c) 2017 The OpenTracing Authors.
+# Copyright (c) 2017-2019 The OpenTracing Authors.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -19,6 +19,8 @@
 # THE SOFTWARE.
 
 from __future__ import absolute_import
+
+from .span import Span
 
 
 class Scope(object):
@@ -78,5 +80,5 @@ class Scope(object):
         and added as a tag to the :class:`Span`.
         :attr:`~operation.ext.tags.ERROR` will also be set to `True`.
         """
-        self.span._on_error(exc_type, exc_val, exc_tb)
+        Span._on_error(self.span, exc_type, exc_val, exc_tb)
         self.close()
