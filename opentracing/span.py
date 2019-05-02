@@ -215,15 +215,16 @@ class Span(object):
         and added as a tag. :attr:`~operation.ext.tags.ERROR` will also be set
         to `True`.
         """
-        self._on_error(exc_type, exc_val, exc_tb)
+        Span._on_error(self, exc_type, exc_val, exc_tb)
         self.finish()
 
-    def _on_error(self, exc_type, exc_val, exc_tb):
-        if not exc_val:
+    @staticmethod
+    def _on_error(span, exc_type, exc_val, exc_tb):
+        if not span or not exc_val:
             return
 
-        self.set_tag(tags.ERROR, True)
-        self.log_kv({
+        span.set_tag(tags.ERROR, True)
+        span.log_kv({
             logs.EVENT: tags.ERROR,
             logs.MESSAGE: str(exc_val),
             logs.ERROR_OBJECT: exc_val,

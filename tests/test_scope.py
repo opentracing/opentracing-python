@@ -74,3 +74,12 @@ def test_scope_error_report():
                               ValueError)
             assert isinstance(log_kv_args.get(logs.STACK, None),
                               types.TracebackType)
+
+
+def test_scope_exit_with_no_span():
+    # ensure `Scope.__exit__` doesn't fail with `AttributeError`
+    try:
+        with Scope(None, None):
+            raise ValueError
+    except ValueError:
+        pass
