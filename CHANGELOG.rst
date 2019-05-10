@@ -3,10 +3,11 @@
 History
 =======
 
-2.1.1 (unreleased)
+2.2.0 (2019-05-10)
 ------------------
 
-- Nothing changed yet.
+- Fix __exit__ method of Scope class (#120) <Aliaksei Urbanski>
+- Add support for Python 3.5/3.7 and fix tests (#121) <Aliaksei Urbanski>
 
 
 2.1.0 (2019-04-27)
