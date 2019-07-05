@@ -1,6 +1,6 @@
 # Subtask Span propagation example.
 
-This example shows an active `Span` being simply propagated to the sutasks -either threads or coroutines-, and finished **by** the parent task. In real-life scenarios instrumentation libraries may help with `Span` propagation **if** not offered by default (see implementation details below), but we show here the case without such help.
+This example shows an active `Span` being simply propagated to the subtasks -either threads or coroutines-, and finished **by** the parent task. In real-life scenarios instrumentation libraries may help with `Span` propagation **if** not offered by default (see implementation details below), but we show here the case without such help.
 
 Implementation details:
 - For `threading`, `gevent` and `asyncio` the `Span` is manually passed down the call chain, being manually reactivated it in each corotuine/task.
