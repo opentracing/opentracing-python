@@ -16,6 +16,8 @@
 from __future__ import absolute_import
 from . import logs
 
+import traceback
+
 from opentracing.ext import tags
 
 
@@ -229,7 +231,7 @@ class Span(object):
             logs.MESSAGE: str(exc_val),
             logs.ERROR_OBJECT: exc_val,
             logs.ERROR_KIND: exc_type,
-            logs.STACK: exc_tb,
+            logs.STACK: ''.join(traceback.format_tb(exc_tb)),
         })
 
     def log_event(self, event, payload=None):

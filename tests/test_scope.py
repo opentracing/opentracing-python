@@ -21,7 +21,6 @@
 from __future__ import absolute_import
 
 import mock
-import types
 
 from opentracing.scope_manager import ScopeManager
 from opentracing.tracer import Tracer
@@ -72,8 +71,8 @@ def test_scope_error_report():
             assert log_kv_args.get(logs.ERROR_KIND, None) is ValueError
             assert isinstance(log_kv_args.get(logs.ERROR_OBJECT, None),
                               ValueError)
-            assert isinstance(log_kv_args.get(logs.STACK, None),
-                              types.TracebackType)
+            assert isinstance(log_kv_args.get(logs.STACK, None), str)
+            assert 'raise ValueError' in log_kv_args.get(logs.STACK)
 
 
 def test_scope_exit_with_no_span():
