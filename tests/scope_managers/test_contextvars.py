@@ -1,4 +1,4 @@
-# Copyright (c) 2016 The OpenTracing Authors.
+# Copyright (c) The OpenTracing Authors.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,21 +18,35 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 from __future__ import absolute_import
-import sys
-import six
 
-PYTHON3_FILES = [
-    'scope_managers/test_asyncio.py',
-]
+from concurrent.futures import ThreadPoolExecutor
+from unittest import TestCase
 
-PYTHON37_FILES = [
-    'scope_managers/test_contextvars.py',
-]
+import asyncio
 
-collect_ignore = []
+from opentracing.scope_managers.contextvars import ContextVarsScopeManager
+from opentracing.harness.scope_check import ScopeCompatibilityCheckMixin
 
-if six.PY2:
-    collect_ignore += PYTHON3_FILES
 
-if sys.version_info < (3, 7):
-    collect_ignore += PYTHON37_FILES
+class AsyncioContextVarsCompabilityCheck(
+    TestCase, ScopeCompatibilityCheckMixin
+):
+
+    def scope_manager(self):
+        return ContextVarsScopeManager()
+
+    def run_test(self, test_fn):
+        @asyncio.coroutine
+        def async_test_fn():
+            test_fn()
+        asyncio.get_event_loop().run_until_complete(async_test_fn())
+
+    def test_no_event_loop(self):
+        # no event loop exists by default in
+        # new threads, so make sure we don't fail there.
+        def test_fn():
+            manager = self.scope_manager()
+            assert manager.active is None
+
+        executor = ThreadPoolExecutor(max_workers=1)
+        executor.submit(test_fn).result()

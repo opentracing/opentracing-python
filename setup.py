@@ -28,7 +28,6 @@ setup(
     platforms='any',
     install_requires=[
         'futures;python_version=="2.7"',
-        'aiocontextvars;python_version>="3.5"',
     ],
     extras_require={
         'tests': [

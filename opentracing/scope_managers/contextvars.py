@@ -20,32 +20,30 @@
 
 from __future__ import absolute_import
 
-import asyncio
+from contextlib import contextmanager
+from contextvars import ContextVar
 
 from opentracing import Scope
 from opentracing.scope_managers import ThreadLocalScopeManager
-from .constants import ACTIVE_ATTR
 
 
-class AsyncioScopeManager(ThreadLocalScopeManager):
+_SCOPE = ContextVar('scope')
+
+
+class ContextVarsScopeManager(ThreadLocalScopeManager):
     """
     :class:`~opentracing.ScopeManager` implementation for **asyncio**
-    that stores the :class:`~opentracing.Scope` in the current
-    :class:`Task` (:meth:`Task.current_task()`), falling back to
-    thread-local storage if none was being executed.
+    that stores the :class:`~opentracing.Scope` using ContextVar.
 
-    Automatic :class:`~opentracing.Span` propagation from
-    parent coroutines to their children is not provided, which needs to be
-    done manually:
+    The scope manager provides automatic :class:`~opentracing.Span` propagation
+    from parent coroutines to their children.
 
     .. code-block:: python
 
         async def child_coroutine(span):
-            # activate the parent Span, but do not finish it upon
-            # deactivation. That will be done by the parent coroutine.
-            with tracer.scope_manager.activate(span, finish_on_close=False):
-                with tracer.start_active_span('child') as scope:
-                    ...
+            # No need manual activation of parent span in child coroutine.
+            with tracer.start_active_span('child') as scope:
+                ...
 
         async def parent_coroutine():
             with tracer.start_active_span('parent') as scope:
@@ -54,6 +52,7 @@ class AsyncioScopeManager(ThreadLocalScopeManager):
                 ...
 
     """
+    # TODO: update description
 
     def activate(self, span, finish_on_close):
         """
@@ -63,24 +62,13 @@ class AsyncioScopeManager(ThreadLocalScopeManager):
         :param finish_on_close: whether *span* should automatically be
             finished when :meth:`Scope.close()` is called.
 
-        If no :class:`Task` is being executed, thread-local
-        storage will be used to store the :class:`~opentracing.Scope`.
-
         :return: a :class:`~opentracing.Scope` instance to control the end
             of the active period for the :class:`~opentracing.Span`.
             It is a programming error to neglect to call :meth:`Scope.close()`
             on the returned instance.
         """
 
-        task = self._get_task()
-        if not task:
-            return super(AsyncioScopeManager, self).activate(span,
-                                                             finish_on_close)
-
-        scope = _AsyncioScope(self, span, finish_on_close)
-        self._set_task_scope(scope, task)
-
-        return scope
+        return self._set_scope(span, finish_on_close)
 
     @property
     def active(self):
@@ -92,47 +80,36 @@ class AsyncioScopeManager(ThreadLocalScopeManager):
         :return: the :class:`~opentracing.Scope` that is active,
             or ``None`` if not available.
         """
+        # TODO: update description
 
-        task = self._get_task()
-        if not task:
-            return super(AsyncioScopeManager, self).active
+        return self._get_scope()
 
-        return self._get_task_scope(task)
+    def _set_scope(self, span, finish_on_close):
+        return _ContextVarsScope(self, span, finish_on_close)
 
-    def _get_task(self):
-        try:
-            # Prevent failure when run from a thread
-            # without an event loop.
-            loop = asyncio.get_event_loop()
-        except RuntimeError:
-            return None
-
-        return asyncio.Task.current_task(loop=loop)
-
-    def _set_task_scope(self, scope, task=None):
-        if task is None:
-            task = self._get_task()
-
-        setattr(task, ACTIVE_ATTR, scope)
-
-    def _get_task_scope(self, task=None):
-        if task is None:
-            task = self._get_task()
-
-        return getattr(task, ACTIVE_ATTR, None)
+    def _get_scope(self):
+        return _SCOPE.get(None)
 
 
-class _AsyncioScope(Scope):
+class _ContextVarsScope(Scope):
     def __init__(self, manager, span, finish_on_close):
-        super(_AsyncioScope, self).__init__(manager, span)
+        super(_ContextVarsScope, self).__init__(manager, span)
         self._finish_on_close = finish_on_close
-        self._to_restore = manager.active
+        self._token = _SCOPE.set(self)
 
     def close(self):
         if self.manager.active is not self:
             return
-
-        self.manager._set_task_scope(self._to_restore)
+        _SCOPE.reset(self._token)
 
         if self._finish_on_close:
             self.span.finish()
+
+
+@contextmanager
+def no_parent_scope():
+    token = _SCOPE.set(None)
+    try:
+        yield
+    finally:
+        _SCOPE.reset(token)

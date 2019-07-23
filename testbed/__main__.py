@@ -18,6 +18,8 @@ if tornado_version < (6, 0, 0, 0):
     enabled_platforms.append('tornado')
 if six.PY3:
     enabled_platforms.append('asyncio')
+if sys.version_info >= (3, 7):
+    enabled_platforms.append('contextvars')
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__package__)

@@ -6,8 +6,9 @@ This example shows a `Span` created for a top-level operation, covering a set of
 
 Implementation details:
 - For `threading`, a thread-safe counter is put in each `Span` to keep track of the pending callbacks, and call `Span.finish()` when the count becomes 0.
-- For `gevent`, `tornado` and `asyncio` the children corotuines representing the subtasks are simply yielded over, so no counter is needed.
+- For `gevent`, `tornado`, `asyncio` and `contextvars` the children coroutines representing the subtasks are simply yielded over, so no counter is needed.
 - For `tornado`, the invoked coroutines do not set any active `Span` as doing so messes the used `StackContext`. So yielding over **multiple** coroutines is not supported.
+- For `contextvars`, parent context propagating to the children coroutines implicitly, manual context activation has been avoided. 
 
 `threading` implementation:
 ```python

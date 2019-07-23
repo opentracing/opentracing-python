@@ -18,20 +18,19 @@ Alternatively, due to the organization of the suite, it's possible to run direct
 
 ## Tested frameworks
 
-Currently the examples cover from ..utils import get_one_by_operation_name, stop_loop_when
-`threading`, `tornado`, `gevent` and `asyncio` (which requires Python 3). Each example uses their respective `ScopeManager` instance from `opentracing.scope_managers`, along with their related requirements and limitations.
+Currently the examples cover `threading`, `tornado`, `gevent`, `asyncio` (which requires Python 3) and `contextvars` (which requires Python 3.7 and higher). Each example uses their respective `ScopeManager` instance from `opentracing.scope_managers`, along with their related requirements and limitations.
 
-### threading and gevent
+### threading, asyncio and gevent
 
 No automatic `Span` propagation between parent and children tasks is provided, and thus the `Span` need to be manually passed down the chain.
-
-### asyncio
-
-`AsyncioScopeManager` supports automatically propagate the context from parent coroutines to their children. For compatibility reasons with previous version of `AsyncioScopeManager`, asyncio testbed contains test cases showing that manual activation of parent span in child span also works as expected. 
 
 ### tornado
 
 `TornadoScopeManager` uses a variation of `tornado.stack_context.StackContext` to both store **and** automatically propagate the context from parent coroutines to their children. 
+
+### contextvars
+
+`ContextVarsScopeManager` uses [contextvars](https://docs.python.org/3/library/contextvars.html) module to both store **and** automatically propagate the context from parent coroutines / tasks / scheduled in event loop callbacks to their children.
 
 Currently, yielding over multiple children is not supported, as the context is effectively shared, and switching from coroutine to coroutine messes up the current active `Span`.
 
@@ -59,7 +58,3 @@ testbed/
 ```
 
 Supporting all the platforms is optional, and a warning will be displayed when doing `make testbed` in such case.
-
-## Flake8 support
-
-Currently `flake8` does not support the Python 3 `await`/`async` syntax, and does not offer a way to ignore such syntax.

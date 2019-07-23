@@ -56,25 +56,3 @@ class TestAsyncio(OpenTracingTestCase):
                 self.loop.create_task(task2())
 
         self.loop.create_task(task1())
-
-
-class TestAutoContextPropagationAsyncio(TestAsyncio):
-
-    def submit(self):
-        span = self.tracer.scope_manager.active.span
-
-        async def task1():
-            span.set_tag('key1', '1')
-
-            async def task2():
-                span.set_tag('key2', '2')
-
-                async def task3():
-                    span.set_tag('key3', '3')
-                    span.finish()
-
-                self.loop.create_task(task3())
-
-            self.loop.create_task(task2())
-
-        self.loop.create_task(task1())
