@@ -71,7 +71,7 @@ Somewhere in your server's request handler code:
        )
        span = tracer.start_span(
            operation_name=request.operation,
-           child_of(span_context))
+           child_of=span_context)
        span.set_tag('http.url', request.full_url)
 
        remote_ip = request.remote_ip
