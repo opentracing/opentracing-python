@@ -309,3 +309,36 @@ class TestAsyncioContextVarsScheduleInLoop(OpenTracingTestCase):
         # Second task "wrapped" by `no_parent_scope`.
         self.assertEmptySpan(task2, 'task_2')
         self.assertHasNoParent(task2)
+
+    def test_await_with_no_parent_scope(self):
+
+        async def coro(name):
+            with self.tracer.start_active_span(name):
+                pass
+
+        async def main_coro():
+            await coro('coro_1')
+            with no_parent_scope():
+                await coro('coro_2')
+            await coro('coro_3')
+
+        with self.tracer.start_active_span('root'):
+            self.loop.create_task(main_coro())
+
+        stop_loop_when(self.loop,
+                       lambda: len(self.tracer.finished_spans()) == 4)
+        self.loop.run_forever()
+
+        root, coro1, coro2, coro3 = self.tracer.finished_spans()
+
+        self.assertEmptySpan(root, 'root')
+
+        self.assertEmptySpan(coro1, 'coro_1')
+        self.assertIsChildOf(coro1, root)
+
+        # second coroutine "wrapped" by `no_parent_scope`.
+        self.assertEmptySpan(coro2, 'coro_2')
+        self.assertHasNoParent(coro2)
+
+        self.assertEmptySpan(coro3, 'coro_3')
+        self.assertIsChildOf(coro3, root)

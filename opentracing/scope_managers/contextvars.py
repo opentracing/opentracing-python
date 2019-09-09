@@ -23,24 +23,24 @@ from __future__ import absolute_import
 from contextlib import contextmanager
 from contextvars import ContextVar
 
-from opentracing import Scope
-from opentracing.scope_managers import ThreadLocalScopeManager
+from opentracing import Scope, ScopeManager
 
 
 _SCOPE = ContextVar('scope')
 
 
-class ContextVarsScopeManager(ThreadLocalScopeManager):
+class ContextVarsScopeManager(ScopeManager):
     """
     :class:`~opentracing.ScopeManager` implementation for **asyncio**
     that stores the :class:`~opentracing.Scope` using ContextVar.
 
     The scope manager provides automatic :class:`~opentracing.Span` propagation
-    from parent coroutines to their children.
+    from parent coroutines, tasks and scheduled in event loop callbacks to
+    their children.
 
     .. code-block:: python
 
-        async def child_coroutine(span):
+        async def child_coroutine():
             # No need manual activation of parent span in child coroutine.
             with tracer.start_active_span('child') as scope:
                 ...
@@ -48,11 +48,10 @@ class ContextVarsScopeManager(ThreadLocalScopeManager):
         async def parent_coroutine():
             with tracer.start_active_span('parent') as scope:
                 ...
-                await child_coroutine(span)
+                await child_coroutine()
                 ...
 
     """
-    # TODO: update description
 
     def activate(self, span, finish_on_close):
         """
@@ -74,13 +73,11 @@ class ContextVarsScopeManager(ThreadLocalScopeManager):
     def active(self):
         """
         Return the currently active :class:`~opentracing.Scope` which
-        can be used to access the currently active
-        :attr:`Scope.span`.
+        can be used to access the currently active :attr:`Scope.span`.
 
         :return: the :class:`~opentracing.Scope` that is active,
             or ``None`` if not available.
         """
-        # TODO: update description
 
         return self._get_scope()
 
@@ -100,6 +97,7 @@ class _ContextVarsScope(Scope):
     def close(self):
         if self.manager.active is not self:
             return
+
         _SCOPE.reset(self._token)
 
         if self._finish_on_close:
@@ -108,6 +106,24 @@ class _ContextVarsScope(Scope):
 
 @contextmanager
 def no_parent_scope():
+    """
+    Context manager that resets current Scope. Intended to break span
+    propagation to children coroutines, tasks or scheduled callbacks.
+
+    .. code-block:: python
+
+        from opentracing.scope_managers.contextvars import no_parent_scope
+
+        def periodic()
+            # `periodic` span will be children of root only at the first time.
+            with self.tracer.start_active_span('periodic'):
+                # Now we break span propagation.
+                with no_parent_scope():
+                    self.loop.call_soon(periodic)
+
+        with self.tracer.start_active_span('root'):
+            self.loop.call_soon(periodic)
+    """
     token = _SCOPE.set(None)
     try:
         yield
