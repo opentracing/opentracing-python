@@ -23,7 +23,7 @@ from __future__ import absolute_import
 import threading
 import tornado.stack_context
 
-from opentracing import Scope
+from opentracing import Scope, global_tracer
 from opentracing.scope_managers import ThreadLocalScopeManager
 
 
@@ -246,7 +246,7 @@ class _TracerRequestContextManager(object):
         return False
 
 
-def tracer_stack_context():
+def tracer_stack_context(parent_span=None):
     """
     Create a custom Tornado's :class:`StackContext` that allows
     :class:`TornadoScopeManager` to store the active
@@ -269,12 +269,47 @@ def tracer_stack_context():
                 with tracer.scope_manager.activate(span, True):
                     return actual_handler(*args, **kwargs)
 
+    You can specify `parent_span` when schedule callback/coroutine/future in
+    loop or run fire & forget coroutine, to achieve parent span propagation.
+    Note that you cannot use one stack context for more than one
+    callback/coroutine/future, because this will lead to interception of
+    context by different tasks:
+
+    .. code-block:: python
+            from opentracing import global_tracer
+            from opentracing.scope_managers.tornado import tracer_stack_context
+
+            @tornado.gen.coroutine
+            def send_notification(message):
+                # should be used as fire & forget coroutine
+                with tracer.start_active_span('send_notification'):
+                    # send.
+
+            # Ok
+            with tracer_stack_context(tracer.active_span):
+                send_notification('hello!')
+            with tracer_stack_context(tracer.active_span):
+                io_loop.add_callback(send_notification, 'foobar!')
+
+            # Incorrect
+            with tracer_stack_context(tracer.active_span):
+                send_notification('hello!')
+                io_loop.add_callback(send_notification, 'foobar!')
+
+    :param parent_span: the :class:`~opentracing.Span` that should be used as
+        parent in the context.
+
     :return:
         Return a custom :class:`StackContext` that allows
         :class:`TornadoScopeManager` to activate and propagate
         :class:`~opentracing.Span` instances.
     """
-    context = _TracerRequestContext()
+    if parent_span is not None:
+        scope = _TornadoScope(
+            global_tracer().scope_manager, parent_span, False)
+    else:
+        scope = None
+    context = _TracerRequestContext(scope)
     return ThreadSafeStackContext(
             lambda: _TracerRequestContextManager(context)
     )
