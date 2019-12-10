@@ -4,7 +4,7 @@ This example shows an active `Span` being simply propagated to the subtasks -eit
 
 Implementation details:
 - For `threading`, `gevent` and `asyncio` the `Span` is manually passed down the call chain, being manually reactivated it in each corotuine/task.
-- For `tornado` and `contextvars`, the active `Span` is not passed nor activated down the chain due to implicitly context propagating.
+- For `tornado` and `contextvars`, the active `Span` is not passed down the chain nor activated because the context is implicitly propagated.
 
 `threading` implementation:
 ```python
