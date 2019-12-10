@@ -4,7 +4,7 @@ This example shows a `Span` for a top-level operation, and how it can be passed 
 
 Implementation details:
 - For `threading`, `gevent` and `asyncio` the `Span` is manually passed down the call chain, activating it in each corotuine/task.
-- For `tornado` and `contextvars`, the active `Span` is not passed nor activated down due to implicitly context propagating.
+- For `tornado` and `contextvars`, the active `Span` is not passed down nor activated because the context is implicitly propagated.
 
 `threading` implementation:
 ```python
