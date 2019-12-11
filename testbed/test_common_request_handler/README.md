@@ -5,7 +5,6 @@ This example shows a `Span` used with `RequestHandler`, which is used as a middl
 Implementation details:
 - For `threading`, no active `Span` is consumed as the tasks may be run concurrently on different threads, and an explicit `SpanContext` has to be saved to be used as parent.
 - For `gevent` and `asyncio`, as no automatic `Span` propagation is done, an explicit `Span` has to be saved to be used as parent (observe an instrumentation library could help to do that implicitly - we stick to the simplest case, though).
-- For `tornado` (as the `StackContext`) and `contextvars` automatically propagates the context (even is the tasks are called through different coroutines), we **do** leverage the active `Span`.
 - For `tornado` and `contextvars`, as parent `Span` propagates automatically (even is the tasks are called through different coroutines), we **do** leverage the active `Span`.
 
 
