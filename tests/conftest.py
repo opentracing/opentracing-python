@@ -18,12 +18,21 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 from __future__ import absolute_import
-
+import sys
 import six
 
 PYTHON3_FILES = [
     'scope_managers/test_asyncio.py',
 ]
 
+PYTHON37_FILES = [
+    'scope_managers/test_contextvars.py',
+]
+
+collect_ignore = []
+
 if six.PY2:
-    collect_ignore = PYTHON3_FILES
+    collect_ignore += PYTHON3_FILES
+
+if sys.version_info < (3, 7):
+    collect_ignore += PYTHON37_FILES

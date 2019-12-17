@@ -3,8 +3,8 @@
 This example shows a `Span` for a top-level operation, and how it can be passed down on a list of nested callbacks (always one at a time), have it as the active one for each of them, and finished **only** when the last one executes. For Python, we have decided to do it in a **fire-and-forget** fashion.
 
 Implementation details:
-- For `threading`, `gevent` and `tornado` the `Span` is manually passed down the call chain, activating it in each corotuine/task.
-- For `tornado`, the active `Span` is not passed nor activated down the chain as the custom `StackContext` automatically propagates it.
+- For `threading`, `gevent` and `asyncio` the `Span` is manually passed down the call chain, activating it in each corotuine/task.
+- For `tornado` and `contextvars`, the active `Span` is not passed down nor activated because the context is implicitly propagated.
 
 `threading` implementation:
 ```python

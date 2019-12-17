@@ -8,12 +8,21 @@ python:
   - "3.7"
   - "3.8-dev"
 
+env:
+  - TORNADO=">=4,<5"
+  - TORNADO=">=5,<6"
+  - TORNADO=">=6"
+
 matrix:
   allow_failures:
     - python: "3.8-dev"
+  exclude:
+  - python: "2.7"
+    env: TORNADO=">=6"
 
 install:
   - make bootstrap
+  - pip install -q "tornado$TORNADO"
 
 script:
   - make test testbed lint

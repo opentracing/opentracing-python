@@ -1,17 +1,25 @@
 from importlib import import_module
 import logging
 import os
+import sys
 import six
 import unittest
+from tornado import version_info as tornado_version
 
 
 enabled_platforms = [
     'threads',
-    'tornado',
     'gevent',
 ]
+if tornado_version < (6, 0, 0, 0):
+    # Including testbed for Tornado coroutines and stack context.
+    # We don't need run testbed in case Tornado>=6, because it became
+    # asyncio-based framework and `stack_context` was deprecated.
+    enabled_platforms.append('tornado')
 if six.PY3:
     enabled_platforms.append('asyncio')
+if sys.version_info >= (3, 7):
+    enabled_platforms.append('contextvars')
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__package__)
@@ -47,4 +55,6 @@ for test_dir in get_test_directories():
         suite = loader.loadTestsFromModule(test_module)
         main_suite.addTests(suite)
 
-unittest.TextTestRunner(verbosity=3).run(main_suite)
+result = unittest.TextTestRunner(verbosity=3).run(main_suite)
+if result.failures or result.errors:
+    sys.exit(1)
