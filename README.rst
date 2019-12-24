@@ -211,7 +211,7 @@ There exist implementations for ``thread-local`` (the default instance of the su
    from opentracing.scope_managers.contextvars import ContextVarsScopeManager # for asyncio applications, requires Python 3.7 or newer.
 
 
-**Note** that for asyncio applications it's preferable to use ``ContextVarsScopeManager`` instead of ``AsyncioScopeManager`` because of automatically parent span propagation to children coroutines, tasks or scheduled callbacks.
+**Note** that for asyncio applications it's preferable to use ``ContextVarsScopeManager`` instead of ``AsyncioScopeManager`` because of automatic parent span propagation to children coroutines, tasks or scheduled callbacks.
 
 
 Development
