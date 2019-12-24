@@ -176,9 +176,9 @@ Note that ``start_active_span('...')`` automatically finishes the span on ``Scop
        try:
            # Do things.
        except Exception as e:
-           scope.set_tag('error', '...')
+           span.set_tag('error', '...')
        finally:
-           scope.finish()
+           scope.close()
 
 **If there is a Scope, it will act as the parent to any newly started Span** unless
 the programmer passes ``ignore_active_span=True`` at ``start_span()``/``start_active_span()``
@@ -201,13 +201,18 @@ This project includes a set of ``ScopeManager`` implementations under the ``open
 
    from opentracing.scope_managers import ThreadLocalScopeManager
 
-There exist implementations for ``thread-local`` (the default instance of the submodule ``opentracing.scope_managers``), ``gevent``, ``Tornado`` and ``asyncio``:
+There exist implementations for ``thread-local`` (the default instance of the submodule ``opentracing.scope_managers``), ``gevent``, ``Tornado``, ``asyncio`` and ``contextvars``:
 
 .. code-block:: python
 
    from opentracing.scope_managers.gevent import GeventScopeManager # requires gevent
    from opentracing.scope_managers.tornado import TornadoScopeManager # requires tornado<6
-   from opentracing.scope_managers.asyncio import AsyncioScopeManager # requires Python 3.4 or newer.
+   from opentracing.scope_managers.asyncio import AsyncioScopeManager # fits for old asyncio applications, requires Python 3.4 or newer.
+   from opentracing.scope_managers.contextvars import ContextVarsScopeManager # for asyncio applications, requires Python 3.7 or newer.
+
+
+**Note** that for asyncio applications it's preferable to use ``ContextVarsScopeManager`` instead of ``AsyncioScopeManager`` because of automatic parent span propagation to children coroutines, tasks or scheduled callbacks.
+
 
 Development
 -----------
