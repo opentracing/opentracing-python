@@ -3,10 +3,11 @@
 History
 =======
 
-2.2.1 (unreleased)
+2.3.0 (2020-01-02)
 ------------------
 
-- Nothing changed yet.
+- Add AsyncioScopeManager based on contextvars and supporting Tornado 6 (#118) <Vasilii Novikov>
+
 
 
 2.2.0 (2019-05-10)
