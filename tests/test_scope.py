@@ -63,7 +63,7 @@ def test_scope_error_report():
                 pass
 
             assert set_tag.call_count == 1
-            assert set_tag.call_args[0] == (tags.ERROR, True)
+            assert set_tag.call_args[0] == (tags.ERROR, 'true')
 
             assert log_kv.call_count == 1
             log_kv_args = log_kv.call_args[0][0]

@@ -223,7 +223,7 @@ class Span(object):
         if not span or not exc_val:
             return
 
-        span.set_tag(tags.ERROR, True)
+        span.set_tag(tags.ERROR, 'true')
         span.log_kv({
             logs.EVENT: tags.ERROR,
             logs.MESSAGE: str(exc_val),
