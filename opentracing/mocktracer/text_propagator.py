@@ -55,7 +55,7 @@ class TextPropagator(Propagator):
             elif k == field_name_trace_id:
                 trace_id = int(v, 16)
                 count += 1
-            elif k.startswith(prefix_baggage):
+            elif k.startswith(prefix_baggage.encode()):
                 baggage[k[len(prefix_baggage):]] = v
 
         if count != field_count:
