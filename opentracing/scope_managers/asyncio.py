@@ -106,8 +106,12 @@ class AsyncioScopeManager(ThreadLocalScopeManager):
             loop = asyncio.get_event_loop()
         except RuntimeError:
             return None
-
-        return asyncio.Task.current_task(loop=loop)
+        if hasattr(asyncio, "current_task"):
+            # Python 3.7+
+            return asyncio.current_task(loop=loop)
+        else:
+            # Python 3.6 and below
+            return asyncio.Task.current_task(loop=loop)
 
     def _set_task_scope(self, scope, task=None):
         if task is None:
