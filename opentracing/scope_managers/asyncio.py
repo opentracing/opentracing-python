@@ -31,7 +31,7 @@ class AsyncioScopeManager(ThreadLocalScopeManager):
     """
     :class:`~opentracing.ScopeManager` implementation for **asyncio**
     that stores the :class:`~opentracing.Scope` in the current
-    :class:`Task` (:meth:`Task.current_task()`), falling back to
+    :class:`Task` (:meth:`asyncio.current_task()`), falling back to
     thread-local storage if none was being executed.
 
     Automatic :class:`~opentracing.Span` propagation from
