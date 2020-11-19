@@ -3,10 +3,11 @@
 History
 =======
 
-2.3.1 (unreleased)
+2.4.0 (2020-11-19)
 ------------------
 
-- Nothing changed yet.
+- Use current_task from asyncio module for Python 3.9 compatibility (#138) <Michael Tannenbaum>
+- Drop build support for Python 3.5 (#138) <Michael Tannenbaum>
 
 
 2.3.0 (2020-01-02)
