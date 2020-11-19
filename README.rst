@@ -280,10 +280,11 @@ Before new release, add a summary of changes since last version to CHANGELOG.rst
 
 .. code-block:: sh
 
-   pip install zest.releaser[recommended]
+   pip install 'zest.releaser[recommended]'
    prerelease
    release
    git push origin master --follow-tags
+   make docs
    python setup.py sdist upload -r pypi upload_docs -r pypi
    postrelease
    git push
