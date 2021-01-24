@@ -148,7 +148,7 @@ another task or thread, but not ``Scope``.
 .. code-block:: python
 
        # Access to the active span is straightforward.
-       scope = tracer.scope_manager.active()
+       scope = tracer.scope_manager.active
        if scope is not None:
            scope.span.set_tag('...', '...')
 
