@@ -14,6 +14,7 @@
 
 from __future__ import absolute_import
 import mock
+import sys
 import time
 import types
 from opentracing import child_of
@@ -21,6 +22,7 @@ from opentracing import Format
 from opentracing import Tracer
 from opentracing import logs
 from opentracing import tags
+from opentracing import span as span_module
 
 
 def test_span():
@@ -67,26 +69,48 @@ def test_span_error_report():
     span = tracer.start_span('foo')
     error_message = 'unexpected_situation'
 
-    with mock.patch.object(span, 'log_kv') as log_kv:
-        with mock.patch.object(span, 'set_tag') as set_tag:
-            try:
-                with span:
-                    raise ValueError(error_message)
-            except ValueError:
-                pass
+    callback1 = mock.Mock()
+    callback2 = mock.Mock()
 
-            assert set_tag.call_count == 1
-            assert set_tag.call_args[0] == (tags.ERROR, True)
+    with mock.patch.object(span_module, 'on_error_callbacks', []):
+        with mock.patch.object(span, 'log_kv') as log_kv:
+            with mock.patch.object(span, 'set_tag') as set_tag:
+                span_module.add_on_error_callback(callback1)
+                span_module.add_on_error_callback(callback2)
 
-            assert log_kv.call_count == 1
-            log_kv_args = log_kv.call_args[0][0]
-            assert log_kv_args.get(logs.EVENT, None) is tags.ERROR
-            assert log_kv_args.get(logs.MESSAGE, None) is error_message
-            assert log_kv_args.get(logs.ERROR_KIND, None) is ValueError
-            assert isinstance(log_kv_args.get(logs.ERROR_OBJECT, None),
-                              ValueError)
-            assert isinstance(log_kv_args.get(logs.STACK, None),
-                              types.TracebackType)
+                exc_type = None
+                exc_value = None
+                exc_tb = None
+
+                try:
+                    with span:
+                        raise ValueError(error_message)
+                except ValueError:
+                    exc_type, exc_value, exc_tb = sys.exc_info()
+                    pass
+
+                def test_callback_called(callback):
+                    assert callback.call_count == 1
+                    assert callback.call_args[0] == (span,
+                                                     exc_type,
+                                                     exc_value,
+                                                     exc_tb)
+
+                test_callback_called(callback1)
+                test_callback_called(callback2)
+
+                assert set_tag.call_count == 1
+                assert set_tag.call_args[0] == (tags.ERROR, True)
+
+                assert log_kv.call_count == 1
+                log_kv_args = log_kv.call_args[0][0]
+                assert log_kv_args.get(logs.EVENT, None) is tags.ERROR
+                assert log_kv_args.get(logs.MESSAGE, None) is error_message
+                assert log_kv_args.get(logs.ERROR_KIND, None) is ValueError
+                assert isinstance(log_kv_args.get(logs.ERROR_OBJECT, None),
+                                  ValueError)
+                assert isinstance(log_kv_args.get(logs.STACK, None),
+                                  types.TracebackType)
 
 
 def test_inject():

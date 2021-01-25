@@ -18,6 +18,14 @@ from . import logs
 
 from opentracing.ext import tags
 
+on_error_callbacks = []
+
+
+def add_on_error_callback(fn):
+    global on_error_callbacks
+
+    on_error_callbacks.append(fn)
+
 
 class SpanContext(object):
     """SpanContext represents :class:`Span` state that must propagate to
@@ -222,6 +230,9 @@ class Span(object):
     def _on_error(span, exc_type, exc_val, exc_tb):
         if not span or not exc_val:
             return
+
+        for callback in on_error_callbacks:
+            callback(span, exc_type, exc_val, exc_tb)
 
         span.set_tag(tags.ERROR, True)
         span.log_kv({
