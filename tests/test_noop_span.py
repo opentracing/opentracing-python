@@ -13,9 +13,12 @@
 # limitations under the License.
 
 from __future__ import absolute_import
-import mock
 import time
 import types
+try:
+    from unittest import mock
+except ImportError:
+    import mock
 from opentracing import child_of
 from opentracing import Format
 from opentracing import Tracer

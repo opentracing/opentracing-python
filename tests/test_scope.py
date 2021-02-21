@@ -20,8 +20,11 @@
 
 from __future__ import absolute_import
 
-import mock
 import types
+try:
+    from unittest import mock
+except ImportError:
+    import mock
 
 from opentracing.scope_manager import ScopeManager
 from opentracing.tracer import Tracer
