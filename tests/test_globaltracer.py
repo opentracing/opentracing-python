@@ -14,8 +14,11 @@
 
 from __future__ import absolute_import
 import pytest
-import mock
 import opentracing
+try:
+    from unittest import mock
+except ImportError:
+    import mock
 
 
 def teardown_function(function):

@@ -33,7 +33,7 @@ setup(
         'tests': [
             'flake8',
             'flake8-quotes',
-            'mock',
+            'mock;python_version<"3.3"',
             'pytest',
             'pytest-cov',
             'pytest-mock',
