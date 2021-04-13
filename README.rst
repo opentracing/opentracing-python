@@ -128,7 +128,7 @@ Somewhere in your service that's about to make an outgoing call:
 
        http_header_carrier = {}
        opentracing.global_tracer().inject(
-           span_context=outbound_span,
+           span_context=outbound_span.context,
            format=Format.HTTP_HEADERS,
            carrier=http_header_carrier)
 
