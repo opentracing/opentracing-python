@@ -17,11 +17,11 @@ class TestTornado(OpenTracingTestCase):
         self.tracer = MockTracer(TornadoScopeManager())
         self.loop = ioloop.IOLoop.current()
 
-    def test_main(self):
+    def test_active_parent_span_explicitly(self):
         # Create a Span and use it as (explicit) parent of a pair of subtasks.
         with tracer_stack_context():
             parent_span = self.tracer.start_span('parent')
-            self.submit_subtasks(parent_span)
+            self.submit_subtasks_with_span(parent_span)
 
         stop_loop_when(self.loop,
                        lambda: len(self.tracer.finished_spans()) >= 2)
@@ -41,13 +41,48 @@ class TestTornado(OpenTracingTestCase):
 
     # Fire away a few subtasks, passing a parent Span whose lifetime
     # is not tied at all to the children.
-    def submit_subtasks(self, parent_span):
+    def submit_subtasks_with_span(self, parent_span):
         @gen.coroutine
         def task(name):
             logger.info('Running %s' % name)
             with self.tracer.scope_manager.activate(parent_span, False):
                 with self.tracer.start_active_span(name):
                     gen.sleep(0.1)
+
+        self.loop.add_callback(task, 'task1')
+        self.loop.add_callback(task, 'task2')
+
+    def test_use_active_span_implicitly(self):
+        parent_span = self.tracer.start_span('parent')
+        # Make new stack context which scope has `parent_span` as active span.
+        with tracer_stack_context(parent_span):
+            self.submit_subtasks()
+
+        stop_loop_when(self.loop,
+                       lambda: len(self.tracer.finished_spans()) >= 2)
+        self.loop.start()
+
+        # Late-finish the parent Span now.
+        parent_span.finish()
+
+        spans = self.tracer.finished_spans()
+        self.assertEqual(len(spans), 3)
+        self.assertNamesEqual(spans, ['task1', 'task2', 'parent'])
+
+        for i in range(2):
+            self.assertSameTrace(spans[i], spans[-1])
+            self.assertIsChildOf(spans[i], spans[-1])
+            self.assertTrue(spans[i].finish_time <= spans[-1].finish_time)
+
+    # Fire away a few subtasks, whose lifetime is not tied at all to the
+    # children. Parent (active) span will be taken from tornado's stack
+    # context implicitly.
+    def submit_subtasks(self):
+        @gen.coroutine
+        def task(name):
+            logger.info('Running %s' % name)
+            with self.tracer.start_active_span(name):
+                gen.sleep(0.1)
 
         self.loop.add_callback(task, 'task1')
         self.loop.add_callback(task, 'task2')
