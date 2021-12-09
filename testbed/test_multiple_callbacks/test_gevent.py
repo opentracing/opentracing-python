@@ -28,7 +28,7 @@ class TestGevent(OpenTracingTestCase):
         gevent.wait(timeout=5.0)
 
         spans = self.tracer.finished_spans()
-        self.assertEquals(len(spans), 4)
+        self.assertEqual(len(spans), 4)
         self.assertNamesEqual(spans, ['task', 'task', 'task', 'parent'])
 
         for i in range(3):

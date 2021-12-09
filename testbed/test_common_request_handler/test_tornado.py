@@ -66,15 +66,15 @@ class TestTornado(OpenTracingTestCase):
                        lambda: len(self.tracer.finished_spans()) >= 2)
         self.loop.start()
 
-        self.assertEquals('message1::response', res_future1.result())
-        self.assertEquals('message2::response', res_future2.result())
+        self.assertEqual('message1::response', res_future1.result())
+        self.assertEqual('message2::response', res_future2.result())
 
         spans = self.tracer.finished_spans()
-        self.assertEquals(len(spans), 2)
+        self.assertEqual(len(spans), 2)
 
         for span in spans:
-            self.assertEquals(span.tags.get(tags.SPAN_KIND, None),
-                              tags.SPAN_KIND_RPC_CLIENT)
+            self.assertEqual(span.tags.get(tags.SPAN_KIND, None),
+                             tags.SPAN_KIND_RPC_CLIENT)
 
         self.assertNotSameTrace(spans[0], spans[1])
         self.assertIsNone(spans[0].parent_id)
@@ -87,10 +87,10 @@ class TestTornado(OpenTracingTestCase):
         with tracer_stack_context():
             with self.tracer.start_active_span('parent'):
                 response = self.client.send_sync('no_parent')
-                self.assertEquals('no_parent::response', response)
+                self.assertEqual('no_parent::response', response)
 
         spans = self.tracer.finished_spans()
-        self.assertEquals(len(spans), 2)
+        self.assertEqual(len(spans), 2)
 
         child_span = get_one_by_operation_name(spans, 'send')
         self.assertIsNotNone(child_span)
@@ -112,14 +112,14 @@ class TestTornado(OpenTracingTestCase):
                 client = Client(req_handler, self.loop)
                 response = client.send_sync('correct_parent')
 
-                self.assertEquals('correct_parent::response', response)
+                self.assertEqual('correct_parent::response', response)
 
         # Should NOT be a child of the previously activated Span
         response = client.send_sync('wrong_parent')
-        self.assertEquals('wrong_parent::response', response)
+        self.assertEqual('wrong_parent::response', response)
 
         spans = self.tracer.finished_spans()
-        self.assertEquals(len(spans), 3)
+        self.assertEqual(len(spans), 3)
 
         spans = sorted(spans, key=lambda x: x.start_time)
         parent_span = get_one_by_operation_name(spans, 'parent')
