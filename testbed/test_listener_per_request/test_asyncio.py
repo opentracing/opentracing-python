@@ -37,7 +37,7 @@ class TestAsyncio(OpenTracingTestCase):
     def test_main(self):
         client = Client(self.tracer, self.loop)
         res = client.send_sync('message')
-        self.assertEquals(res, 'message::response')
+        self.assertEqual(res, 'message::response')
 
         spans = self.tracer.finished_spans()
         self.assertEqual(len(spans), 1)
