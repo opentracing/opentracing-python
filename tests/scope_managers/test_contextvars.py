@@ -36,8 +36,7 @@ class AsyncioContextVarsCompabilityCheck(
         return ContextVarsScopeManager()
 
     def run_test(self, test_fn):
-        @asyncio.coroutine
-        def async_test_fn():
+        async def async_test_fn():
             test_fn()
         asyncio.get_event_loop().run_until_complete(async_test_fn())
 
