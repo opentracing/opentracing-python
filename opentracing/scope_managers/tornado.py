@@ -95,7 +95,7 @@ class TornadoScopeManager(ThreadLocalScopeManager):
         If no :func:`tracer_stack_context()` is detected, thread-local
         storage will be used to store the :class:`~opentracing.Scope`.
         Observe that in this case the active :class:`~opentracing.Span`
-        will not be automatically propagated to the child corotuines.
+        will not be automatically propagated to the child coroutines.
 
         :return: a :class:`~opentracing.Scope` instance to control the end
             of the active period for the :class:`~opentracing.Span`.
